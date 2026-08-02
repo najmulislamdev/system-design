@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>সিস্টেম ডিজাইন রোডম্যাপ — বিগিনার থেকে FAANG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBF1;
+  --card:#FFFFFF;
+  --ink:#141C2B;
+  --ink-2:#3E4A5E;
+  --muted:#77839A;
+  --rule:#CBD3DF;
+
+  --l1:#E24E1B;
+  --l2:#1F63D6;
+  --l3:#0E8474;
+  --l4:#7B4FE0;
+  --l5:#C08A00;
+
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --disp:"Anek Bangla","Hind Siliguri",system-ui,sans-serif;
+  --body:"Hind Siliguri","Anek Bangla",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px, rgba(20,28,43,.07) 1px, transparent 0);
+  background-size:26px 26px;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+/* ---------- sticky progress bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:60;backdrop-filter:blur(10px);
+  background:rgba(231,235,241,.88);border-bottom:1px solid var(--rule);
+}
+.topbar .wrap{display:flex;align-items:center;gap:16px;height:56px}
+.tb-label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);white-space:nowrap}
+.tb-track{flex:1;height:7px;background:#D2D9E3;border-radius:99px;overflow:hidden}
+.tb-fill{height:100%;width:0%;border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.2,1);
+  background:linear-gradient(90deg,var(--l1),var(--l2) 34%,var(--l3) 62%,var(--l4) 82%,var(--l5))}
+.tb-pct{font-family:var(--mono);font-size:14px;font-weight:700;min-width:52px;text-align:right}
+.tb-reset{font-family:var(--mono);font-size:11px;background:none;border:1px solid var(--rule);
+  color:var(--muted);border-radius:99px;padding:4px 11px;cursor:pointer}
+.tb-reset:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ---------- hero ---------- */
+header.hero{padding:70px 0 34px}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.24em;color:var(--l2);
+  display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--rule)}
+h1{
+  font-family:var(--disp);font-weight:800;font-stretch:88%;
+  font-size:clamp(38px,7.2vw,76px);line-height:1.06;letter-spacing:-.02em;margin:0 0 20px;
+}
+h1 .thin{font-weight:400;color:var(--ink-2);display:block}
+.lede{font-size:18px;color:var(--ink-2);max-width:620px;margin:0 0 30px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:var(--card);border:1px solid var(--rule);border-radius:99px;padding:7px 16px;
+  font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.chip b{font-family:var(--mono);font-size:12px;color:var(--l2)}
+
+/* ---------- map ---------- */
+.mapsec{padding:26px 0 10px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.sec-num{font-family:var(--mono);font-size:12px;color:var(--muted)}
+h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(24px,3.4vw,34px);
+  margin:0;letter-spacing:-.01em}
+.sec-note{color:var(--muted);font-size:14.5px;margin:4px 0 26px}
+
+.map{position:relative;width:100%;aspect-ratio:1000/280;min-height:250px}
+.map svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.map .seg{fill:none;stroke-width:9;stroke-linecap:round}
+.branchline{stroke-dasharray:14 9;animation:flow 2.4s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-46}}
+
+.station{position:absolute;transform:translate(-50%,-50%);background:none;border:0;padding:0;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0}
+.dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--c) calc(var(--p)*1%), #D2D9E3 0);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1);position:relative}
+.dot::after{content:"";width:20px;height:20px;border-radius:50%;background:var(--card);
+  box-shadow:0 1px 3px rgba(20,28,43,.2)}
+.dot span{position:absolute;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--c);z-index:2}
+.station:hover .dot{transform:scale(1.16)}
+.station[aria-selected="true"] .dot{transform:scale(1.3)}
+.station[aria-selected="true"] .dot::after{background:var(--c)}
+.station[aria-selected="true"] .dot span{color:#fff}
+.st-label{position:absolute;top:40px;width:150px;text-align:center;font-size:13.5px;
+  font-weight:700;line-height:1.35;color:var(--ink-2)}
+.st-label em{display:block;font-family:var(--mono);font-style:normal;font-size:10.5px;
+  color:var(--muted);font-weight:400;letter-spacing:.06em;margin-top:2px}
+.station[aria-selected="true"] .st-label{color:var(--ink)}
+.branch-tag{position:absolute;transform:translate(-50%,-50%);font-family:var(--mono);
+  font-size:10.5px;letter-spacing:.1em;color:var(--l4);background:var(--paper);padding:0 8px}
+
+/* mobile map */
+.map-m{display:none;flex-direction:column;gap:0;margin:8px 0 4px}
+.mst{display:flex;align-items:center;gap:14px;background:none;border:0;padding:0;cursor:pointer;text-align:right}
+.mst-rail{width:34px;display:flex;flex-direction:column;align-items:center;flex:none}
+.mst-line{width:5px;flex:1;min-height:26px;background:var(--c);border-radius:99px}
+.mst-line.dashed{background:repeating-linear-gradient(var(--c) 0 8px,transparent 8px 15px)}
+.mst-line.hide{background:none}
+.mst-body{flex:1;padding:8px 0;text-align:left}
+.mst-body h4{margin:0;font-size:15px;font-weight:700}
+.mst-body em{font-family:var(--mono);font-style:normal;font-size:10.5px;color:var(--muted);letter-spacing:.06em}
+.mst[aria-selected="true"] .mst-body h4{color:var(--c)}
+
+/* ---------- panel ---------- */
+.panel{background:var(--card);border:1px solid var(--rule);border-radius:20px;overflow:hidden;
+  margin:34px 0 60px;box-shadow:0 18px 44px -30px rgba(20,28,43,.5)}
+.p-head{padding:26px 30px;border-bottom:1px solid var(--rule);border-top:5px solid var(--c);
+  display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;justify-content:space-between}
+.p-head h3{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:27px;margin:0 0 5px;letter-spacing:-.01em}
+.p-head p{margin:0;color:var(--ink-2);font-size:15px;max-width:560px}
+.p-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:4px 11px;border-radius:99px;
+  background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c);font-weight:500}
+.p-ring{text-align:center;flex:none}
+.p-ring .n{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--c);line-height:1}
+.p-ring .t{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+
+.p-body{display:grid;grid-template-columns:1.45fr 1fr;gap:0}
+.p-col{padding:26px 30px}
+.p-col+.p-col{border-left:1px solid var(--rule);background:#FAFBFD}
+.col-title{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--muted);
+  margin:0 0 16px;text-transform:uppercase}
+
+ul.check{list-style:none;margin:0;padding:0}
+ul.check li{margin-bottom:2px}
+ul.check label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:7px 9px;
+  border-radius:10px;transition:background .18s;font-size:15px;line-height:1.6}
+ul.check label:hover{background:color-mix(in srgb,var(--c) 7%,transparent)}
+ul.check input{appearance:none;width:19px;height:19px;flex:none;margin-top:4px;border-radius:6px;
+  border:2px solid var(--rule);background:#fff;cursor:pointer;transition:.16s;position:relative}
+ul.check input:checked{background:var(--c);border-color:var(--c)}
+ul.check input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:5px;height:10px;
+  border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.check input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+ul.check input:checked+span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--rule)}
+.tierhead{font-family:var(--mono);font-size:11px;color:var(--c);letter-spacing:.1em;
+  margin:18px 0 6px;padding-left:9px;font-weight:700}
+.tierhead:first-child{margin-top:0}
+
+.res{display:block;text-decoration:none;color:inherit;border:1px solid var(--rule);background:#fff;
+  border-radius:12px;padding:13px 15px;margin-bottom:10px;transition:.18s}
+.res:hover{border-color:var(--c);transform:translateY(-2px)}
+.res b{display:block;font-size:14.5px;font-weight:700;margin-bottom:2px}
+.res em{font-style:normal;font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+.milestone{margin-top:24px;border-left:3px solid var(--c);padding:2px 0 2px 15px}
+.milestone .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--c);display:block;margin-bottom:4px}
+.milestone p{margin:0;font-size:14.5px;color:var(--ink-2);line-height:1.65}
+
+/* ---------- generic blocks ---------- */
+section.block{padding:0 0 62px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.box{background:var(--card);border:1px solid var(--rule);border-radius:18px;padding:26px 28px}
+.box h3{font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:21px;margin:0 0 6px}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14.5px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);
+  font-weight:500;padding:0 0 9px;border-bottom:1px solid var(--rule)}
+td{padding:11px 0;border-bottom:1px solid #EDF0F5;vertical-align:top}
+td:first-child{font-family:var(--mono);font-size:12.5px;color:var(--l2);white-space:nowrap;padding-right:16px;font-weight:500}
+tr:last-child td{border-bottom:0}
+
+/* interview timeline */
+.tl{display:flex;gap:4px;margin:20px 0 18px;height:52px}
+.tl button{flex-grow:var(--g);flex-basis:0;border:0;border-radius:8px;cursor:pointer;
+  background:#DDE3EC;color:var(--ink-2);font-family:var(--mono);font-size:11.5px;font-weight:500;
+  transition:.22s cubic-bezier(.2,.8,.2,1);padding:0}
+.tl button:hover{background:#CFD7E3}
+.tl button[aria-selected="true"]{background:var(--l2);color:#fff}
+.tl-out{border-left:3px solid var(--l2);padding-left:16px;min-height:92px}
+.tl-out h4{margin:0 0 6px;font-size:17px;font-family:var(--disp);font-weight:700}
+.tl-out p{margin:0;color:var(--ink-2);font-size:14.5px}
+.tl-out .say{display:block;margin-top:10px;font-size:13.5px;color:var(--muted);
+  border-top:1px dashed var(--rule);padding-top:9px}
+
+ol.mistakes{counter-reset:m;list-style:none;padding:0;margin:14px 0 0}
+ol.mistakes li{counter-increment:m;position:relative;padding-left:40px;margin-bottom:15px;font-size:15px;line-height:1.65}
+ol.mistakes li::before{content:"✕";position:absolute;left:0;top:1px;width:25px;height:25px;
+  border-radius:7px;background:color-mix(in srgb,var(--l1) 13%,transparent);color:var(--l1);
+  display:grid;place-items:center;font-size:12px;font-weight:700}
+ol.mistakes b{font-weight:700}
+
+.reality{background:#141C2B;color:#DDE4EE;border-radius:18px;padding:30px 32px}
+.reality h3{font-family:var(--disp);font-weight:700;font-size:22px;margin:0 0 12px;color:#fff}
+.reality p{margin:0 0 12px;font-size:15px;line-height:1.75;color:#B4C0D2}
+.reality p:last-child{margin-bottom:0}
+.reality strong{color:#FFD166;font-weight:600}
+
+footer{border-top:1px solid var(--rule);padding:26px 0 46px;font-size:13px;color:var(--muted);
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+footer span{font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+
+@media(max-width:860px){
+  .p-body{grid-template-columns:1fr}
+  .p-col+.p-col{border-left:0;border-top:1px solid var(--rule)}
+  .grid2{grid-template-columns:1fr}
+  .map{display:none}
+  .map-m{display:flex}
+  .tl{height:auto;flex-direction:column}
+  .tl button{padding:11px;text-align:left}
+  header.hero{padding:44px 0 26px}
+  .p-col{padding:22px}
+  .p-head{padding:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="tb-label">সামগ্রিক অগ্রগতি</span>
+    <div class="tb-track"><div class="tb-fill" id="tbFill"></div></div>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-reset" id="reset">রিসেট</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">সিস্টেম ডিজাইন · রোডম্যাপ · ৬–৯ মাস</div>
+  <h1>বিগিনার থেকে<span class="thin">FAANG লেভেল পর্যন্ত</span></h1>
+  <p class="lede">পাঁচটা ধাপ, একটা লাইন। নিচের ম্যাপের স্টেশনে ক্লিক করে প্রতিটা ধাপের ভেতরে ঢুকুন, আর যা শেষ করেছেন সেগুলো টিক দিন — স্টেশনের রিং নিজে থেকেই ভরে উঠবে।</p>
+  <div class="chips">
+    <span class="chip"><b>৬–৯</b> মাস সময়</span>
+    <span class="chip"><b>১–১.৫</b> ঘণ্টা/দিন</span>
+    <span class="chip"><b>৫</b> ধাপ</span>
+    <span class="chip"><b>১৭</b> কেস স্টাডি</span>
+  </div>
+</header>
+
+<section class="mapsec">
+  <div class="sec-head"><span class="sec-num">০১</span><h2>পুরো রাস্তাটা এক নজরে</h2></div>
+  <p class="sec-note">Low Level Design আলাদা কোনো গন্তব্য নয় — এটা পাশাপাশি চলা একটা লাইন, ধাপ ২ থেকে শুরু করে ইন্টারভিউর আগে মূল লাইনে মিশে যায়।</p>
+
+  <div class="map" id="map">
+    <svg viewBox="0 0 1000 280" preserveAspectRatio="none" aria-hidden="true">
+      <path class="seg" d="M70 90 H320"  stroke="#E24E1B"/>
+      <path class="seg" d="M320 90 H570" stroke="#1F63D6"/>
+      <path class="seg" d="M570 90 H880" stroke="#0E8474"/>
+      <path class="seg branchline" d="M420 90 Q460 90 460 130 V180 Q460 210 490 210 H700 Q730 210 730 180 V130 Q730 90 770 90" stroke="#7B4FE0" stroke-width="7"/>
+    </svg>
+    <span class="branch-tag" style="left:59.5%;top:75%">সমান্তরাল</span>
+  </div>
+
+  <div class="map-m" id="mapM"></div>
+</section>
+
+<div class="panel" id="panel"></div>
+
+<section class="block">
+  <div class="sec-head"><span class="sec-num">০২</span><h2>৪৫ মিনিটের ইন্টারভিউ ভেঙে দেখুন</h2></div>
+  <p class="sec-note">প্রতিটা সেগমেন্টে ক্লিক করুন। সময়ের ভাগটাই আসল স্কিল — বেশিরভাগ ক্যান্ডিডেট প্রথম ১০ মিনিট নষ্ট করে ফেলে।</p>
+  <div class="box">
+    <div class="tl" id="tl"></div>
+    <div class="tl-out" id="tlOut"></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="grid2">
+    <div class="box">
+      <h3>সাপ্তাহিক রুটিন</h3>
+      <p style="margin:0;color:var(--ink-2);font-size:14.5px">চাকরি করতে করতে যেভাবে চালানো যায়।</p>
+      <table>
+        <tr><th>দিন</th><th>কাজ</th></tr>
+        <tr><td>সোম–শুক্র</td><td>১ ঘণ্টা — থিওরি ও পড়া (ধাপ ১–২)</td></tr>
+        <tr><td>শনি</td><td>২ ঘণ্টা — টাইমার ধরে একটা পূর্ণ ডিজাইন প্রবলেম</td></tr>
+        <tr><td>রবি</td><td>১ ঘণ্টা — আগের প্রবলেম রিভিশন, নোট ও ডায়াগ্রাম</td></tr>
+        <tr><td>মাসে ১×</td><td>একটা mock interview, রেকর্ড করে নিজে শোনা</td></tr>
+      </table>
+    </div>
+    <div class="box">
+      <h3>যে সংখ্যাগুলো মুখস্থ থাকতে হবে</h3>
+      <p style="margin:0;color:var(--ink-2);font-size:14.5px">Back-of-envelope estimation এগুলো ছাড়া হয় না।</p>
+      <table>
+        <tr><th>অপারেশন</th><th>সময়</th></tr>
+        <tr><td>RAM read</td><td>~১০০ ন্যানোসেকেন্ড</td></tr>
+        <tr><td>SSD random read</td><td>~১০০ মাইক্রোসেকেন্ড</td></tr>
+        <tr><td>একই ডেটাসেন্টারে round trip</td><td>~৫০০ মাইক্রোসেকেন্ড</td></tr>
+        <tr><td>ডিস্ক seek (HDD)</td><td>~১০ মিলিসেকেন্ড</td></tr>
+        <tr><td>মহাদেশ পেরিয়ে round trip</td><td>~১৫০ মিলিসেকেন্ড</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-head"><span class="sec-num">০৩</span><h2>যে ভুলগুলো প্রায় সবাই করে</h2></div>
+  <div class="box">
+    <ol class="mistakes">
+      <li><b>সলিউশন মুখস্থ করা।</b> ইন্টারভিউয়ার একটা টুইস্ট দিলেই পুরো উত্তর ভেঙে পড়ে। প্যাটার্ন শিখুন, স্ক্রিপ্ট না।</li>
+      <li><b>রিকোয়ারমেন্ট ক্লারিফাই না করে ডিজাইন শুরু করা।</b> এটা তাৎক্ষণিক red flag — সিনিয়র ইঞ্জিনিয়াররা কখনো এভাবে শুরু করে না।</li>
+      <li><b>Buzzword বলা, কিন্তু কারণ বলতে না পারা।</b> "Kafka ব্যবহার করব" বললে পরের প্রশ্ন সবসময় — "RabbitMQ কেন নয়?"</li>
+      <li><b>শুরুতেই over-engineer করা।</b> ১০ জন ইউজার ধরে শুরু করে ধাপে ধাপে স্কেল করাই সবচেয়ে শক্তিশালী ন্যারেটিভ।</li>
+      <li><b>DDIA স্কিপ করে শুধু ভিডিও দেখা।</b> ভিডিও দিয়ে পরিচিতি হয়, গভীরতা আসে না — ডিপ ডাইভেই ধরা পড়ে যায়।</li>
+      <li><b>চুপচাপ ভাবা।</b> ইন্টারভিউয়ার আপনার মাথার ভেতর দেখতে পান না। ভাবনাটা জোরে বলতে হয়।</li>
+    </ol>
+  </div>
+</section>
+
+<section class="block">
+  <div class="reality">
+    <h3>শুরু করার আগে দুটো সৎ কথা</h3>
+    <p><strong>এক।</strong> সিস্টেম ডিজাইন রাউন্ড মূলত mid/senior লেভেলে (L4+) হয়। ০–১ বছর অভিজ্ঞতা থাকলে ইন্টারভিউর ৮০% থাকে DSA আর কোডিং — তাই সিস্টেম ডিজাইন শিখুন, কিন্তু DSA-কে প্রায়োরিটি দিন। নাহলে সিস্টেম ডিজাইন রাউন্ড পর্যন্ত পৌঁছানোই হবে না। ২+ বছর হলে এই রোডম্যাপে ফুল ফোকাস দেওয়া যায়।</p>
+    <p><strong>দুই।</strong> বাংলাদেশ থেকে সরাসরি FAANG-এর US অফিসে ঢোকা কঠিন। বাস্তবসম্মত পথ — Dublin, London, Singapore বা Dubai অফিস, অথবা আগে একটা শক্ত প্রোডাক্ট কোম্পানিতে ২–৩ বছর কাটিয়ে জাম্প করা। রেফারেল থাকলে callback rate কয়েক গুণ বাড়ে, তাই LinkedIn-এ নেটওয়ার্ক বানানোটাও এই রোডম্যাপেরই অংশ ধরুন।</p>
+  </div>
+</section>
+
+<footer>
+  <span>SYSTEM DESIGN ROADMAP · BN</span>
+  <span id="footNote">অগ্রগতি শুধু এই ট্যাবে থাকে — পেজ রিফ্রেশ করলে মুছে যাবে</span>
+</footer>
+
+</div>
+
+<script>
+const PHASES = [
+  {
+    id:1, code:"P1", color:"var(--l1)", hex:"#E24E1B",
+    name:"ভিত্তি", weeks:"৬–৮ সপ্তাহ", en:"FOUNDATION",
+    x:7, y:32,
+    goal:"নেটওয়ার্ক, ডেটাবেজ আর ক্যাশের ভেতরটা না বুঝলে পরের সবকিছু মুখস্থ হয়ে যাবে — বোঝা হবে না। এই ধাপটাই সবচেয়ে বেশি স্কিপ করা হয়, আর সবচেয়ে বেশি ভোগায়।",
+    tags:["নেটওয়ার্কিং","ডেটাবেজ","ক্যাশিং"],
+    items:[
+      "DNS resolution ধাপে ধাপে কীভাবে হয়",
+      "TCP vs UDP — কখন কোনটা, কেন",
+      "HTTP/1.1 vs HTTP/2 vs HTTP/3 এর পার্থক্য",
+      "WebSocket, long polling আর SSE — তিনটার tradeoff",
+      "L4 vs L7 load balancer",
+      "B-tree index ভেতরে কীভাবে কাজ করে",
+      "ACID ও isolation levels (dirty read, phantom read)",
+      "Normalization ও connection pooling",
+      "Cache-aside vs write-through vs write-back",
+      "Eviction policy (LRU/LFU), TTL, cache stampede",
+      "Latency numbers মুখস্থ করা",
+      "QPS ও storage estimation প্র্যাকটিস"
+    ],
+    res:[
+      {t:"Computer Networking: A Top-Down Approach",s:"প্রথম ৩ অধ্যায় যথেষ্ট"},
+      {t:"Hussein Nasser — YouTube",s:"নেটওয়ার্কিং ও ডেটাবেজ প্লেলিস্ট"},
+      {t:"Use The Index, Luke",s:"ইনডেক্সিং, ফ্রি ওয়েবসাইট"}
+    ],
+    ms:"একটা সাধারণ ওয়েব অ্যাপে ব্রাউজারে URL টাইপ করার পর থেকে রেসপন্স ফিরে আসা পর্যন্ত পুরো পথটা কোনো নোট ছাড়া ব্যাখ্যা করতে পারা।"
+  },
+  {
+    id:2, code:"P2", color:"var(--l2)", hex:"#1F63D6",
+    name:"ডিস্ট্রিবিউটেড সিস্টেম", weeks:"৮–১০ সপ্তাহ", en:"DISTRIBUTED",
+    x:32, y:32,
+    goal:"এই ধাপটাই আসল পার্থক্য তৈরি করে। বেশিরভাগ ক্যান্ডিডেট ঠিক এখানেই দুর্বল, আর deep dive রাউন্ডে ঠিক এখান থেকেই প্রশ্ন আসে।",
+    tags:["সবচেয়ে গুরুত্বপূর্ণ","DDIA","কনসেনসাস"],
+    items:[
+      "Replication: leader-follower, multi-leader, leaderless",
+      "Partitioning ও consistent hashing (virtual nodes সহ)",
+      "CAP theorem — এবং PACELC (এটা বেশি কাজে লাগে)",
+      "Consistency models: strong, eventual, causal, read-your-writes",
+      "Raft: leader election ও log replication",
+      "ZooKeeper / etcd কেন লাগে",
+      "Kafka architecture: partition, offset, consumer group",
+      "At-least-once vs exactly-once delivery",
+      "Idempotency key ডিজাইন",
+      "Exponential backoff + jitter",
+      "Circuit breaker ও bulkhead প্যাটার্ন",
+      "CDC ও event sourcing এর বেসিক"
+    ],
+    res:[
+      {t:"DDIA — Martin Kleppmann",s:"অধ্যায় ৫–৯ সোনার খনি, সপ্তাহে ১টা"},
+      {t:"MIT 6.824 Lectures",s:"YouTube-এ ফ্রি, Raft ক্লিয়ার হয়ে যাবে"},
+      {t:"Kafka: The Definitive Guide",s:"প্রথম ৪ অধ্যায়"}
+    ],
+    ms:'"কেন Kafka, কেন RabbitMQ নয়" — এই প্রশ্নের উত্তর tradeoff সহ ৩ মিনিটে দিতে পারা।'
+  },
+  {
+    id:3, code:"P3", color:"var(--l3)", hex:"#0E8474",
+    name:"কেস স্টাডি", weeks:"৮–১০ সপ্তাহ", en:"CASE STUDIES",
+    x:57, y:32,
+    goal:"সপ্তাহে ২–৩টা প্রবলেম। একটা নিয়ম কঠোরভাবে মানুন — প্রতিটা প্রবলেম আগে নিজে হাতে সমাধান করুন, তারপর সলিউশন দেখুন। আগে সলিউশন দেখলে কিছুই শেখা হবে না।",
+    tags:["সহজ → কঠিন","১৭টা প্রবলেম"],
+    tiers:[
+      {t:"টিয়ার ১ — ওয়ার্ম আপ",i:["URL shortener","Rate limiter","Pastebin"]},
+      {t:"টিয়ার ২ — কোর",i:["News feed (Twitter/Facebook)","Chat app (WhatsApp)","Notification system"]},
+      {t:"টিয়ার ৩ — স্টোরেজ ও স্কেল",i:["YouTube / Netflix (video streaming)","Google Drive","Web crawler"]},
+      {t:"টিয়ার ৪ — বিশেষ সমস্যা",i:["Uber / Google Maps (geospatial)","Ticketmaster (concurrency ও locking)"]},
+      {t:"টিয়ার ৫ — অ্যাডভান্সড",i:["Payment system","Ad click aggregation","Distributed cache","S3 / object store","Search autocomplete"]}
+    ],
+    res:[
+      {t:"HelloInterview",s:"ইন্টারভিউ-রিয়ালিস্টিক, ফ্রি কনটেন্ট"},
+      {t:"Alex Xu — System Design Interview Vol 1 ও 2",s:"স্ট্রাকচার শেখার জন্য"},
+      {t:"ByteByteGo",s:"ভিজ্যুয়াল রিভিশনের জন্য"}
+    ],
+    ms:"অচেনা একটা প্রবলেম দিলে ৪৫ মিনিটে কাঠামোবদ্ধভাবে ডিজাইন করতে পারা — মুখস্থ ছাড়া।"
+  },
+  {
+    id:4, code:"P4", color:"var(--l4)", hex:"#7B4FE0",
+    name:"Low Level Design", weeks:"৩–৪ সপ্তাহ · সমান্তরাল", en:"LLD · PARALLEL",
+    x:58, y:75,
+    goal:"Amazon, Google, Microsoft-এ আলাদা LLD/OOD রাউন্ড থাকে। এটা মূল লাইনের পাশাপাশি চালান — ধাপ ২ বা ৩ চলাকালীন সপ্তাহে ২–৩ ঘণ্টা।",
+    tags:["Amazon","OOD রাউন্ড"],
+    items:[
+      "SOLID principles — উদাহরণসহ",
+      "Strategy, Observer, Factory, Singleton, Decorator",
+      "Parking lot ডিজাইন",
+      "Elevator system",
+      "Splitwise",
+      "Vending machine",
+      "Rate limiter class design",
+      "Thread safety ও locking basics"
+    ],
+    res:[
+      {t:"Head First Design Patterns",s:"প্যাটার্ন শেখার সবচেয়ে সহজ বই"},
+      {t:"Refactoring Guru",s:"ফ্রি, প্যাটার্ন রেফারেন্স"},
+      {t:"GitHub — awesome-low-level-design",s:"কোড সহ প্রবলেম সেট"}
+    ],
+    ms:"একটা ক্লাস ডায়াগ্রাম আঁকতে পারা যেখানে নতুন ফিচার যোগ করলে পুরোনো ক্লাস বদলাতে হয় না।"
+  },
+  {
+    id:5, code:"P5", color:"var(--l5)", hex:"#C08A00",
+    name:"ইন্টারভিউ এক্সিকিউশন", weeks:"৪–৬ সপ্তাহ", en:"EXECUTION",
+    x:88, y:32,
+    goal:"এখন জ্ঞানকে পারফরম্যান্সে রূপ দেওয়ার ধাপ। এখানে যা শিখেছেন তা নয় — যেভাবে বলছেন সেটাই মূল্যায়ন হয়।",
+    tags:["মক ইন্টারভিউ","কমিউনিকেশন"],
+    items:[
+      "৪৫ মিনিটের স্ট্রাকচার মুখস্থ ও প্র্যাকটিস",
+      "জোরে বলে প্র্যাকটিস — মনে মনে নয়",
+      "নিজের সলিউশন রেকর্ড করে শোনা",
+      "ইংরেজিতে tradeoff ব্যাখ্যা করার ফ্লুয়েন্সি",
+      "হোয়াইটবোর্ড/Excalidraw-এ দ্রুত ডায়াগ্রাম আঁকা",
+      "কমপক্ষে ৮–১০টা mock interview",
+      "প্রতিটা mock-এর পর লিখিত ফিডব্যাক নোট",
+      "নিজের প্রজেক্টের deep dive স্টোরি তৈরি"
+    ],
+    res:[
+      {t:"interviewing.io",s:"বেনামে রিয়েল ইন্টারভিউয়ারের সাথে mock"},
+      {t:"Pramp / Exponent",s:"পিয়ার mock, ফ্রি অপশন আছে"},
+      {t:"Excalidraw",s:"ডায়াগ্রাম প্র্যাকটিসের টুল"}
+    ],
+    ms:"টানা ৩টা mock-এ ইন্টারভিউয়ারের থামানো ছাড়াই ৪৫ মিনিট সময় ঠিকঠাক ম্যানেজ করতে পারা।"
+  }
+];
+
+const TIMELINE = [
+  {g:5,lab:"০–৫",t:"রিকোয়ারমেন্ট ক্লারিফাই",
+   d:"Functional আর non-functional requirement আলাদা করে লিখে নিন। কারা ব্যবহার করবে, কতজন, read-heavy না write-heavy, latency নাকি consistency — এগুলো নিজে ঠিক করে ফেলবেন না, জিজ্ঞেস করবেন।",
+   s:"বলার মতো: “দুটো জিনিস ধরে নিচ্ছি — এটা read-heavy, আর eventual consistency গ্রহণযোগ্য। ঠিক আছে?”"},
+  {g:5,lab:"৫–১০",t:"স্কেল এস্টিমেশন ও API",
+   d:"DAU থেকে QPS, তারপর storage আর bandwidth বের করুন। এরপর ৩–৪টা API endpoint লিখে ফেলুন — এটাই পরের পুরো ডিজাইনের কনট্র্যাক্ট।",
+   s:"গোল সংখ্যা ব্যবহার করুন। ১০০M DAU, প্রতিজন ১০টা রিকোয়েস্ট — হিসাব সহজ রাখলে ভুল কম হয়।"},
+  {g:10,lab:"১০–২০",t:"হাই-লেভেল আর্কিটেকচার",
+   d:"Client → LB → service → database, এই সরল ছবিটা আগে আঁকুন। তারপর ধাপে ধাপে cache, queue, CDN যোগ করুন — প্রতিটার কারণ বলতে বলতে।",
+   s:"শুরুতেই microservice আঁকবেন না। সহজ থেকে জটিলে যাওয়াটাই শক্তিশালী দেখায়।"},
+  {g:20,lab:"২০–৪০",t:"ডিপ ডাইভ",
+   d:"সবচেয়ে বড় অংশ। ইন্টারভিউয়ার যে কম্পোনেন্টে আগ্রহ দেখাবেন সেখানে ঢুকুন — ডেটা মডেল, partitioning key, index, hot key সমস্যা, রেপ্লিকেশন স্ট্র্যাটেজি।",
+   s:"এখানেই ধাপ ২-এর ডিস্ট্রিবিউটেড সিস্টেমের জ্ঞান কাজে লাগে। এটাই পাস-ফেলের জায়গা।"},
+  {g:5,lab:"৪০–৪৫",t:"বটলনেক ও tradeoff",
+   d:"নিজেই নিজের ডিজাইনের দুর্বলতা ধরিয়ে দিন — single point of failure কোথায়, স্কেল ১০ গুণ বাড়লে কী ভাঙবে, কোন সিদ্ধান্তে কী ছেড়ে দিয়েছেন।",
+   s:"নিজের ডিজাইনের সমালোচনা করতে পারা সিনিয়রিটির সবচেয়ে বড় সিগন্যাল।"}
+];
+
+const state = {sel:1, done:{}};
+PHASES.forEach(p=>{
+  const n = p.items ? p.items.length : p.tiers.reduce((a,t)=>a+t.i.length,0);
+  state.done[p.id] = new Array(n).fill(false);
+});
+const flat = p => p.items ? p.items.map(x=>({type:"i",v:x}))
+  : p.tiers.flatMap(t=>[{type:"h",v:t.t},...t.i.map(x=>({type:"i",v:x}))]);
+const pct = id => {
+  const a = state.done[id]; if(!a.length) return 0;
+  return Math.round(a.filter(Boolean).length/a.length*100);
+};
+
+/* ---- map ---- */
+function buildMap(){
+  const map = document.getElementById("map");
+  map.querySelectorAll(".station").forEach(e=>e.remove());
+  PHASES.forEach(p=>{
+    const b = document.createElement("button");
+    b.className="station"; b.style.left=p.x+"%"; b.style.top=p.y+"%";
+    b.style.setProperty("--c",p.hex); b.style.setProperty("--p",pct(p.id));
+    b.setAttribute("aria-selected", state.sel===p.id);
+    b.innerHTML = `<span class="dot"><span>${p.id}</span></span>
+      <span class="st-label">${p.name}<em>${p.weeks}</em></span>`;
+    b.onclick = ()=>{ state.sel=p.id; render(); };
+    map.appendChild(b);
+  });
+}
+function buildMapM(){
+  const m = document.getElementById("mapM"); m.innerHTML="";
+  PHASES.forEach((p,idx)=>{
+    const b = document.createElement("button");
+    b.className="mst"; b.style.setProperty("--c",p.hex); b.style.setProperty("--p",pct(p.id));
+    b.setAttribute("aria-selected", state.sel===p.id);
+    const dash = p.id===4 ? " dashed" : "";
+    const last = idx===PHASES.length-1 ? " hide" : "";
+    b.innerHTML = `<span class="mst-rail">
+        <span class="dot"><span>${p.id}</span></span>
+        <span class="mst-line${dash}${last}"></span>
+      </span>
+      <span class="mst-body"><h4>${p.name}</h4><em>${p.weeks} · ${pct(p.id)}%</em></span>`;
+    b.onclick = ()=>{ state.sel=p.id; render(); };
+    m.appendChild(b);
+  });
+}
+
+/* ---- panel ---- */
+function buildPanel(){
+  const p = PHASES.find(x=>x.id===state.sel);
+  const list = flat(p);
+  let li="", ii=-1;
+  list.forEach(row=>{
+    if(row.type==="h"){ li += `<div class="tierhead">${row.v}</div>`; return; }
+    ii++; const i=ii;
+    li += `<li><label><input type="checkbox" data-i="${i}" ${state.done[p.id][i]?"checked":""}><span>${row.v}</span></label></li>`;
+  });
+  document.getElementById("panel").innerHTML = `
+    <div class="p-head" style="--c:${p.hex}">
+      <div>
+        <h3>ধাপ ${p.id} — ${p.name}</h3>
+        <p>${p.goal}</p>
+        <div class="p-meta">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+      </div>
+      <div class="p-ring"><div class="n">${pct(p.id)}%</div><div class="t">${p.weeks}</div></div>
+    </div>
+    <div class="p-body">
+      <div class="p-col" style="--c:${p.hex}">
+        <p class="col-title">কী শিখবেন</p>
+        <ul class="check">${li}</ul>
+      </div>
+      <div class="p-col" style="--c:${p.hex}">
+        <p class="col-title">রিসোর্স</p>
+        ${p.res.map(r=>`<div class="res"><b>${r.t}</b><em>${r.s}</em></div>`).join("")}
+        <div class="milestone">
+          <span class="k">মাইলস্টোন</span>
+          <p>${p.ms}</p>
+        </div>
+      </div>
+    </div>`;
+  document.querySelectorAll('#panel input[type=checkbox]').forEach(cb=>{
+    cb.onchange = e=>{ state.done[p.id][+e.target.dataset.i]=e.target.checked; refresh(); };
+  });
+}
+
+/* ---- timeline ---- */
+let tlSel = 0;
+function buildTL(){
+  const tl = document.getElementById("tl"); tl.innerHTML="";
+  TIMELINE.forEach((s,i)=>{
+    const b=document.createElement("button");
+    b.style.setProperty("--g",s.g); b.textContent=s.lab+" মিনিট";
+    b.setAttribute("aria-selected", i===tlSel);
+    b.onclick=()=>{tlSel=i;buildTL();};
+    tl.appendChild(b);
+  });
+  const s=TIMELINE[tlSel];
+  document.getElementById("tlOut").innerHTML =
+    `<h4>${s.t}</h4><p>${s.d}</p><span class="say">${s.s}</span>`;
+}
+
+function refresh(){
+  const all = Object.values(state.done).flat();
+  const p = Math.round(all.filter(Boolean).length/all.length*100);
+  document.getElementById("tbFill").style.width = p+"%";
+  document.getElementById("tbPct").textContent = p+"%";
+  document.querySelectorAll("#map .station").forEach((el,i)=>
+    el.style.setProperty("--p", pct(PHASES[i].id)));
+  const cur = PHASES.find(x=>x.id===state.sel);
+  const ring = document.querySelector(".p-ring .n"); if(ring) ring.textContent = pct(cur.id)+"%";
+  buildMapM();
+}
+function render(){ buildMap(); buildMapM(); buildPanel(); refresh(); }
+
+document.getElementById("reset").onclick = ()=>{
+  PHASES.forEach(p=>state.done[p.id].fill(false)); render();
+};
+render(); buildTL();
+</script>
+</body>
+</html>
