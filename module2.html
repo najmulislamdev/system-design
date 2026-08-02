@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ভলিউম ২ — ডিস্ট্রিবিউটেড সিস্টেম | সিস্টেম ডিজাইন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBF1; --card:#FFF; --ink:#141C2B; --ink-2:#3E4A5E; --muted:#77839A; --rule:#CBD3DF;
+  --acc:#1F63D6; --l1:#E24E1B; --l3:#0E8474; --l4:#7B4FE0; --l5:#C08A00; --red:#C42B1C;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --disp:"Anek Bangla","Hind Siliguri",system-ui,sans-serif;
+  --body:"Hind Siliguri","Anek Bangla",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;
+  line-height:1.8;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px,rgba(20,28,43,.07) 1px,transparent 0);background-size:26px 26px}
+.shell{max-width:1240px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:44px}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:34px 0;align-self:start}
+.toc-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
+.toc a{display:block;text-decoration:none;color:var(--ink-2);font-size:13.5px;padding:6px 0 6px 14px;
+  border-left:2px solid var(--rule);line-height:1.4;transition:.16s}
+.toc a:hover{color:var(--ink);border-color:var(--muted)}
+.toc a.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+.toc a i{font-family:var(--mono);font-style:normal;font-size:10.5px;color:var(--muted);margin-right:7px}
+main{padding:34px 0 80px;min-width:0}
+.hero{padding:26px 0 44px;border-bottom:1px solid var(--rule);margin-bottom:44px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--acc);margin-bottom:18px}
+h1{font-family:var(--disp);font-weight:800;font-stretch:88%;font-size:clamp(32px,5.2vw,56px);
+  line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+h1 span{display:block;font-weight:400;color:var(--ink-2)}
+.lede{font-size:17.5px;color:var(--ink-2);max-width:640px;margin:0}
+.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:20px}
+.ch:last-of-type{border-bottom:0}
+.ch-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc);margin-bottom:10px}
+h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(25px,3.6vw,36px);
+  margin:0 0 8px;letter-spacing:-.015em;line-height:1.2}
+.sub{color:var(--muted);font-size:15px;margin:0 0 26px}
+h3{font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:20px;margin:32px 0 10px}
+p{margin:0 0 15px;color:var(--ink-2)}
+p.lead{color:var(--ink)}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.86em;background:#DDE3EC;padding:2px 6px;border-radius:5px;color:var(--ink)}
+ul.plain{margin:0 0 16px;padding-left:20px;color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+.w{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;margin:22px 0 24px;
+  box-shadow:0 14px 34px -28px rgba(20,28,43,.55)}
+.w-h{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.w-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.ctrls{display:flex;gap:7px;flex-wrap:wrap}
+button.b{font-family:var(--body);font-size:13.5px;font-weight:600;border:1px solid var(--rule);background:#fff;
+  color:var(--ink-2);border-radius:9px;padding:7px 14px;cursor:pointer;transition:.16s}
+button.b:hover{border-color:var(--ink);color:var(--ink)}
+button.b[aria-selected="true"],button.b.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+button.b.warn{border-color:var(--red);color:var(--red)}
+button.b.warn:hover{background:var(--red);color:#fff}
+button.b:disabled{opacity:.4;cursor:default}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);
+  font-weight:500;padding:0 10px 9px 0;border-bottom:1px solid var(--rule)}
+td{padding:10px 10px 10px 0;border-bottom:1px solid #EDF0F5;vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td.y{color:var(--l3);font-weight:600}td.n{color:var(--red);font-weight:600}
+.note{border-left:3px solid var(--acc);padding:4px 0 4px 16px;margin:20px 0;font-size:14.5px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--acc);display:block;margin-bottom:3px}
+.note p{margin:0;font-size:14.5px}
+.iq{background:#141C2B;color:#C3CEDD;border-radius:14px;padding:20px 24px;margin:24px 0;font-size:14.5px}
+.iq .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#FFD166;display:block;margin-bottom:8px}
+.iq p{color:#C3CEDD;margin:0 0 10px}.iq p:last-child{margin:0}
+.iq strong{color:#fff}
+.log{font-family:var(--mono);font-size:11.5px;line-height:1.85;background:#141C2B;color:#9FB0C6;
+  border-radius:10px;padding:14px 16px;height:158px;overflow-y:auto;margin-top:12px}
+.log b{color:#7FD4C1;font-weight:400}.log u{color:#FF8B7A;text-decoration:none}
+.log em{color:#FFD166;font-style:normal}
+.out-box{border-left:3px solid var(--acc);padding-left:15px;margin-top:14px}
+.out-box h4{margin:0 0 5px;font-size:16.5px;font-family:var(--disp);font-weight:700}
+.out-box p{margin:0;font-size:14.5px}
+.stat{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px}
+.stat div em{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.stat div b{font-family:var(--mono);font-size:23px;font-weight:700}
+
+/* nodes */
+.nodes{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.nd{border:1.5px solid var(--rule);border-radius:12px;padding:12px 16px;background:#FAFBFD;text-align:center;
+  min-width:112px;transition:.3s}
+.nd.lead{border-color:var(--l5);background:color-mix(in srgb,var(--l5) 11%,#fff)}
+.nd.act{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,#fff);transform:translateY(-3px)}
+.nd.dead{border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,#fff);opacity:.55}
+.nd.cand{border-color:var(--l4);background:color-mix(in srgb,var(--l4) 11%,#fff)}
+.nd b{display:block;font-family:var(--mono);font-size:12px;color:var(--ink)}
+.nd em{font-style:normal;font-size:11.5px;color:var(--muted);display:block}
+.nd .val{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:5px}
+
+/* ring */
+.ring-wrap{display:grid;grid-template-columns:1fr 260px;gap:22px;align-items:start}
+.ring svg{width:100%;height:auto;display:block}
+.bars .br{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-family:var(--mono);font-size:11px}
+.bars .br span{width:46px;color:var(--muted)}
+.bars .br .f{height:13px;border-radius:4px;transition:width .5s cubic-bezier(.2,.8,.2,1);min-width:2px}
+.bars .br u{text-decoration:none;color:var(--ink-2);width:26px;text-align:right}
+.moved{background:#141C2B;border-radius:11px;padding:14px 16px;margin-top:14px}
+.moved em{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#98A6BC}
+.moved b{font-family:var(--mono);font-size:26px;color:#FFD166;font-weight:700}
+.moved p{margin:4px 0 0;font-size:12.5px;color:#98A6BC;line-height:1.6}
+
+/* timeline consistency */
+.tlrow{display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:center;margin-bottom:9px;font-size:13px}
+.tlrow em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.tlline{position:relative;height:30px;background:#F2F5F9;border-radius:6px;border:1px solid var(--rule)}
+.ev{position:absolute;top:4px;transform:translateX(-50%);font-family:var(--mono);font-size:10px;
+  padding:2px 7px;border-radius:5px;white-space:nowrap;color:#fff}
+
+/* kafka */
+.part{border:1.5px solid var(--rule);border-radius:10px;margin-bottom:8px;padding:9px 12px;background:#FAFBFD;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;transition:.3s}
+.part b{font-family:var(--mono);font-size:11.5px;width:88px;flex:none;color:var(--ink)}
+.msgs{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+.msg{width:22px;height:22px;border-radius:5px;background:#DCE3EC;font-family:var(--mono);font-size:9px;
+  display:grid;place-items:center;color:var(--muted)}
+.msg.done{background:var(--l3);color:#fff}
+.owner{font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:99px;color:#fff}
+.idle{background:#B4BECC}
+
+/* circuit breaker */
+.cb-states{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.cbs{border:2px solid var(--rule);border-radius:12px;padding:12px 20px;text-align:center;background:#FAFBFD;transition:.3s}
+.cbs.on{transform:scale(1.06)}
+.cbs.on.closed{border-color:var(--l3);background:color-mix(in srgb,var(--l3) 12%,#fff)}
+.cbs.on.open{border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,#fff)}
+.cbs.on.half{border-color:var(--l5);background:color-mix(in srgb,var(--l5) 14%,#fff)}
+.cbs b{display:block;font-family:var(--mono);font-size:12px}
+.cbs em{font-style:normal;font-size:11.5px;color:var(--muted)}
+.dots{display:flex;gap:5px;margin-top:10px;justify-content:center;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:4px;background:#DCE3EC}
+.dot.ok{background:var(--l3)}.dot.err{background:var(--red)}
+.dot.blocked{background:#DCE3EC;border:2px dashed var(--red)}
+
+/* backoff chart */
+.bo{display:flex;align-items:flex-end;gap:6px;height:110px;margin-top:10px}
+.bo div{flex:1;background:var(--acc);border-radius:4px 4px 0 0;position:relative;transition:height .5s}
+.bo div i{position:absolute;bottom:-19px;left:0;right:0;text-align:center;font-family:var(--mono);
+  font-size:9px;color:var(--muted);font-style:normal}
+
+/* saga */
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}
+.fbox{border:1.5px solid var(--rule);border-radius:9px;padding:8px 13px;font-size:13px;background:#FAFBFD;transition:.3s}
+.fbox.ok{border-color:var(--l3);background:color-mix(in srgb,var(--l3) 10%,#fff)}
+.fbox.fail{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,#fff);color:var(--red)}
+.fbox.comp{border-color:var(--l5);background:color-mix(in srgb,var(--l5) 12%,#fff)}
+.fa{color:var(--rule);font-family:var(--mono)}
+
+.q{border:1px solid var(--rule);border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.q>button{width:100%;text-align:left;background:none;border:0;padding:15px 18px;font-family:var(--body);
+  font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.q>button i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--acc);margin-top:4px}
+.q .a{display:none;padding:0 18px 16px 47px;font-size:14.5px;color:var(--ink-2);border-top:1px solid #EDF0F5;padding-top:14px}
+.q.open .a{display:block}
+footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.08em;color:var(--muted)}
+@media(max-width:960px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;height:auto;padding:26px 0 0;display:flex;gap:8px;overflow-x:auto}
+  .toc-k{display:none}
+  .toc a{border-left:0;border-bottom:2px solid var(--rule);white-space:nowrap;padding:6px 4px}
+  .ring-wrap{grid-template-columns:1fr}
+  .w{padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="toc">
+  <p class="toc-k">ভলিউম ২ · অধ্যায়</p>
+  <a href="#c1"><i>০১</i>রেপ্লিকেশন</a>
+  <a href="#c2"><i>০২</i>পার্টিশনিং ও রিং</a>
+  <a href="#c3"><i>০৩</i>CAP ও PACELC</a>
+  <a href="#c4"><i>০৪</i>কনসিস্টেন্সি মডেল</a>
+  <a href="#c5"><i>০৫</i>Raft কনসেনসাস</a>
+  <a href="#c6"><i>০৬</i>Kafka ও মেসেজিং</a>
+  <a href="#c7"><i>০৭</i>ডেলিভারি ও Idempotency</a>
+  <a href="#c8"><i>০৮</i>রেজিলিয়েন্স প্যাটার্ন</a>
+  <a href="#c9"><i>০৯</i>2PC বনাম Saga</a>
+  <a href="#c10"><i>১০</i>নিজেকে যাচাই</a>
+</nav>
+
+<main>
+<div class="hero">
+  <div class="eyebrow">ভলিউম ২ / ৫ · ডিস্ট্রিবিউটেড সিস্টেম · ৮–১০ সপ্তাহ</div>
+  <h1>ডিস্ট্রিবিউটেড<span>একাধিক মেশিন, একটাই সত্য</span></h1>
+  <p class="lede">এক মেশিনে সব সহজ। দুই মেশিন হলেই নতুন প্রশ্ন আসে — কে ঠিক? কার কথা শুনব? একজন মরে গেলে কী হবে? এই ভলিউমের প্রতিটা অধ্যায় সেই প্রশ্নগুলোর একটা করে উত্তর, আর প্রতিটা উত্তরের সাথে একটা করে দাম।</p>
+</div>
+
+<!-- 1 REPLICATION -->
+<section class="ch" id="c1">
+  <div class="ch-n">অধ্যায় ০১</div>
+  <h2>রেপ্লিকেশন</h2>
+  <p class="sub">একই ডেটার একাধিক কপি — কে লিখবে, কে পড়বে, কে মরলে কী হবে</p>
+
+  <p class="lead">রেপ্লিকেশন করা হয় তিনটা কারণে: <strong>ফল্ট টলারেন্স</strong> (একটা মেশিন মরলেও ডেটা থাকবে), <strong>রিড স্কেলিং</strong> (অনেক কপি থেকে পড়া যায়), আর <strong>লেটেন্সি</strong> (ইউজারের কাছের কপি থেকে পড়া)। কিন্তু কপি মানেই প্রশ্ন — কপিগুলো কখন এক হবে?</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">রেপ্লিকেশন মোড</span>
+      <div class="ctrls">
+        <button class="b" data-rp="sync" aria-selected="true">সিঙ্ক্রোনাস</button>
+        <button class="b" data-rp="async">অ্যাসিঙ্ক্রোনাস</button>
+        <button class="b" data-rp="multi">মাল্টি-লিডার</button>
+        <button class="b" data-rp="quorum">Leaderless (কোরাম)</button>
+      </div>
+    </div>
+    <div class="nodes" id="rpNodes"></div>
+    <div class="ctrls" style="justify-content:center;margin-top:16px">
+      <button class="b pri" id="rpWrite">write(x = ৪২)</button>
+      <button class="b warn" id="rpKill">লিডার মেরে ফেলুন</button>
+      <button class="b" id="rpReset">রিসেট</button>
+    </div>
+    <div class="log" id="rpLog"><b>▸ একটা মোড বেছে write চাপুন</b></div>
+  </div>
+
+  <table>
+    <tr><th>মোড</th><th>লেখার গতি</th><th>ডেটা হারানোর ঝুঁকি</th><th>লেখার কনফ্লিক্ট</th></tr>
+    <tr><td>সিঙ্ক্রোনাস</td><td class="n">ধীর — সবার জন্য অপেক্ষা</td><td class="y">নেই</td><td class="y">নেই</td></tr>
+    <tr><td>অ্যাসিঙ্ক্রোনাস</td><td class="y">দ্রুত</td><td class="n">লিডার মরলে হারায়</td><td class="y">নেই</td></tr>
+    <tr><td>মাল্টি-লিডার</td><td class="y">দ্রুত, স্থানীয়</td><td>মাঝারি</td><td class="n">হয় — মেটাতে হবে</td></tr>
+    <tr><td>Leaderless</td><td>মাঝারি</td><td class="y">কম (কোরাম)</td><td class="n">হয় — ভার্সনিং লাগে</td></tr>
+  </table>
+
+  <h3>কোরামের নিয়ম</h3>
+  <p>Leaderless সিস্টেমে (Cassandra, DynamoDB) নিয়মটা সহজ: <code>W + R > N</code>। N মানে মোট রেপ্লিকা, W মানে কতজন লিখলে "লেখা হয়েছে" বলব, R মানে কতজনকে জিজ্ঞেস করে পড়ব। যোগফল N-এর বেশি হলে অন্তত একজন থাকবেই যে নতুন ডেটা জানে।</p>
+  <ul class="plain">
+    <li><code>N=3, W=2, R=2</code> — সবচেয়ে প্রচলিত। একটা নোড মরলেও লেখা-পড়া দুটোই চলে।</li>
+    <li><code>W=1, R=3</code> — লেখা খুব দ্রুত, পড়া ধীর। লগ ইনজেশনের জন্য ভালো।</li>
+    <li><code>W=3, R=1</code> — পড়া খুব দ্রুত, কিন্তু একটা নোড মরলেই লেখা বন্ধ।</li>
+  </ul>
+  <p>পিছিয়ে পড়া রেপ্লিকা ধরার দুটো উপায়: <strong>read repair</strong> (পড়ার সময় পুরোনো কপি দেখলে সাথে সাথে ঠিক করে দেওয়া) আর <strong>anti-entropy</strong> (ব্যাকগ্রাউন্ডে Merkle tree মিলিয়ে পার্থক্য খুঁজে বের করা)।</p>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"রিড রেপ্লিকা যোগ করলাম, কিন্তু ইউজার নিজের পোস্ট করা কমেন্ট দেখতে পাচ্ছে না। কেন?"</strong></p>
+    <p>লেখা গেছে লিডারে, পড়া হয়েছে পিছিয়ে থাকা রেপ্লিকা থেকে — এটাই <strong>replication lag</strong>। সমাধান: নিজের লেখা ডেটা পড়ার সময় লিডার থেকে পড়ুন (read-your-writes), বা লেখার পর কিছুক্ষণ ঐ ইউজারকে লিডারে পিন করে রাখুন, বা ক্লায়েন্টের কাছে থাকা টাইমস্ট্যাম্পের চেয়ে নতুন রেপ্লিকা খুঁজে নিন।</p>
+  </div>
+</section>
+
+<!-- 2 PARTITIONING -->
+<section class="ch" id="c2">
+  <div class="ch-n">অধ্যায় ০২</div>
+  <h2>পার্টিশনিং ও কনসিস্টেন্ট হ্যাশিং</h2>
+  <p class="sub">রিং-এ নোড যোগ করুন, দেখুন কতগুলো কী নড়ে</p>
+
+  <p class="lead">ডেটা এক মেশিনে না আঁটলে ভাগ করতে হয়। সহজ উপায় — <code>hash(key) % N</code>। কাজ করে, যতক্ষণ N না বদলায়। কিন্তু একটা সার্ভার যোগ করলেই N বদলে যায়, আর <strong>প্রায় সব কী নতুন জায়গায় চলে যায়</strong>। নিচে নিজে চালিয়ে দেখুন পার্থক্যটা কত ভয়ংকর।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">৪৮টা কী · <span id="ringMode">কনসিস্টেন্ট হ্যাশিং</span></span>
+      <div class="ctrls">
+        <button class="b" data-hm="ch" aria-selected="true">কনসিস্টেন্ট হ্যাশিং</button>
+        <button class="b" data-hm="mod">মডুলো হ্যাশিং</button>
+      </div>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring"><svg viewBox="0 0 420 420" id="ringSvg"></svg></div>
+      <div>
+        <div class="ctrls" style="margin-bottom:14px">
+          <button class="b pri" id="addN">নোড যোগ</button>
+          <button class="b warn" id="delN">নোড সরান</button>
+          <button class="b" id="vnToggle">ভার্চুয়াল নোড: বন্ধ</button>
+        </div>
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);margin:0 0 9px">প্রতি নোডে কী সংখ্যা</p>
+        <div class="bars" id="ringBars"></div>
+        <div class="moved">
+          <em>শেষ পরিবর্তনে যত কী সরেছে</em>
+          <b id="movedPct">—</b>
+          <p id="movedTxt">নোড যোগ বা সরান।</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>কীভাবে কাজ করে</h3>
+  <p>হ্যাশ স্পেসটাকে একটা <strong>বৃত্ত</strong> ভাবুন — ০ থেকে ২<sup>৩২</sup>, তারপর আবার ০। নোডগুলোকেও হ্যাশ করে এই বৃত্তে বসানো হয়। একটা কী কোথায় যাবে? কী-টাকে হ্যাশ করে বৃত্তে বসান, তারপর <strong>ঘড়ির কাঁটার দিকে হাঁটতে থাকুন — প্রথম যে নোড পাবেন, সেটাই মালিক</strong>।</p>
+  <p>নোড যোগ করলে শুধু <em>তার আর তার আগের নোডের মাঝখানের</em> কী-গুলো নড়ে। বাকি সবাই যেখানে ছিল সেখানেই থাকে। তাই গড়ে <code>1/N</code> ভাগ কী সরে — মডুলোতে যেখানে <code>(N-1)/N</code> ভাগ সরত।</p>
+
+  <div class="note">
+    <span class="k">ভার্চুয়াল নোড কেন লাগে</span>
+    <p>মাত্র ৩–৪টা নোড বৃত্তে এলোমেলোভাবে বসালে কেউ বড় অংশ পায়, কেউ ছোট — লোড অসমান হয়ে যায়। সমাধান: প্রতিটা ফিজিক্যাল সার্ভারকে <strong>১০০–২০০টা ভার্চুয়াল পয়েন্ট</strong> হিসেবে বৃত্তে ছড়িয়ে দেওয়া। উপরের টগলটা চেপে বারগুলো কতটা সমান হয় দেখুন। বাড়তি সুবিধা: একটা নোড মরলে তার ভাগ কোনো একজনের ঘাড়ে না পড়ে সবার মধ্যে ভাগ হয়ে যায়।</p>
+  </div>
+
+  <h3>পার্টিশন কী বাছাই — আসল ফাঁদ</h3>
+  <p>কনসিস্টেন্ট হ্যাশিং কেবল সমস্যার অর্ধেক। বাকি অর্ধেক হলো <strong>কোন কলামে ভাগ করবেন</strong>।</p>
+  <ul class="plain">
+    <li><strong>Hot key / hot partition:</strong> ব্যবহারকারীর ID দিয়ে ভাগ করলে সেলিব্রিটির পার্টিশনে সব ট্রাফিক জমে। সমাধান — কী-র সাথে র‍্যান্ডম সাফিক্স জোড়া, বা সেলিব্রিটিদের আলাদা করে সামলানো।</li>
+    <li><strong>Range partition</strong> (যেমন তারিখ) রেঞ্জ কোয়েরিতে দারুণ, কিন্তু আজকের তারিখের পার্টিশনেই সব লেখা পড়ে — হটস্পট তৈরি হয়।</li>
+    <li><strong>Hash partition</strong> লোড সমান রাখে, কিন্তু রেঞ্জ কোয়েরি করতে সব পার্টিশনে যেতে হয়।</li>
+    <li>ভুল কী বাছলে পরে বদলানো প্রায় অসম্ভব — পুরো ডেটা মাইগ্রেট করতে হয়। তাই ইন্টারভিউতে পার্টিশন কী নিয়ে <strong>জোরে ভাবা</strong>টাই সিনিয়রিটির সংকেত।</li>
+  </ul>
+</section>
+
+<!-- 3 CAP -->
+<section class="ch" id="c3">
+  <div class="ch-n">অধ্যায় ০৩</div>
+  <h2>CAP ও PACELC</h2>
+  <p class="sub">নেটওয়ার্ক ভাগ হলে আপনি কোনটা ছাড়বেন?</p>
+
+  <p class="lead">CAP নিয়ে সবচেয়ে বড় ভুল বোঝাবুঝি হলো "তিনটার মধ্যে দুটো বেছে নিন"। আসলে <strong>P বেছে নেওয়ার সুযোগ নেই</strong> — নেটওয়ার্ক পার্টিশন ঘটবেই, কেবল লিঙ্ক ছিঁড়লে বা সুইচ মরলে। আসল প্রশ্ন হলো: <strong>পার্টিশন যখন ঘটবে, তখন আপনি ভুল উত্তর দেবেন, নাকি কোনো উত্তরই দেবেন না?</strong></p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">দুটো ডেটাসেন্টার · মাঝখানের লিঙ্ক</span>
+      <div class="ctrls">
+        <button class="b" data-cp="CP" aria-selected="true">CP বেছেছি</button>
+        <button class="b" data-cp="AP">AP বেছেছি</button>
+        <button class="b warn" id="cutLink">লিঙ্ক কাটুন</button>
+      </div>
+    </div>
+    <div class="nodes">
+      <div class="nd" id="dc1"><b>DC-1 (ঢাকা)</b><em>x = ১০</em><div class="val" id="v1">১০</div></div>
+      <div class="nd" style="border:0;background:none;min-width:70px" id="linkBox">
+        <b style="color:var(--l3)">═══</b><em id="linkTxt">লিঙ্ক ঠিক আছে</em></div>
+      <div class="nd" id="dc2"><b>DC-2 (সিঙ্গাপুর)</b><em>x = ১০</em><div class="val" id="v2">১০</div></div>
+    </div>
+    <div class="ctrls" style="justify-content:center;margin-top:16px">
+      <button class="b pri" id="cpWrite">DC-1 এ লিখুন (x = ৯৯)</button>
+      <button class="b" id="cpRead">DC-2 থেকে পড়ুন</button>
+      <button class="b" id="cpReset">রিসেট</button>
+    </div>
+    <div class="out-box" id="cpOut"><h4>শুরু করুন</h4><p>প্রথমে লিঙ্ক কেটে দিন, তারপর লিখে-পড়ে দেখুন CP আর AP-তে ফল কেমন বদলায়।</p></div>
+  </div>
+
+  <h3>PACELC — CAP-এর যে অংশটা বাদ পড়ে যায়</h3>
+  <p>CAP শুধু পার্টিশনের কথা বলে। কিন্তু পার্টিশন তো বছরে কয়েকবার হয় — <strong>বাকি ৯৯.৯% সময়ে কী?</strong> PACELC সেটা যোগ করে:</p>
+  <p style="font-family:var(--mono);font-size:14px;background:#141C2B;color:#C3CEDD;padding:14px 18px;border-radius:10px">
+  if (<em style="color:#FF8B7A;font-style:normal">P</em>artition) then <em style="color:#FFD166;font-style:normal">A</em> or <em style="color:#FFD166;font-style:normal">C</em><br>
+  <em style="color:#7FD4C1;font-style:normal">E</em>lse &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <em style="color:#FFD166;font-style:normal">L</em>atency or <em style="color:#FFD166;font-style:normal">C</em>onsistency</p>
+  <p>অর্থাৎ পার্টিশন না থাকলেও একটা ট্রেডঅফ থেকেই যায় — সব রেপ্লিকার নিশ্চিত করা উত্তরের জন্য অপেক্ষা করবেন (C), নাকি কাছের রেপ্লিকা থেকে দ্রুত উত্তর দেবেন (L)?</p>
+
+  <table>
+    <tr><th>সিস্টেম</th><th>শ্রেণি</th><th>মানে</th></tr>
+    <tr><td>Cassandra, DynamoDB</td><td>PA / EL</td><td>সবসময় গতি ও প্রাপ্যতাকে এগিয়ে রাখে</td></tr>
+    <tr><td>MongoDB, HBase</td><td>PC / EC</td><td>সবসময় সঠিকতাকে এগিয়ে রাখে</td></tr>
+    <tr><td>Spanner</td><td>PC / EC</td><td>পারমাণবিক ঘড়ি দিয়ে C ধরে রেখে L কমায়</td></tr>
+    <tr><td>MySQL (একক নোড)</td><td>—/EC</td><td>পার্টিশনই নেই, তাই C সহজ</td></tr>
+  </table>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউতে কীভাবে বলবেন</span>
+    <p>"এটা AP সিস্টেম" — এভাবে বলবেন না, খুব মোটা দাগের কথা। বরং <strong>ফিচার ধরে ধরে বলুন</strong>: "শপিং কার্টে আইটেম যোগ করা AP — কার্ট হারানোর চেয়ে ডুপ্লিকেট আইটেম ভালো। কিন্তু পেমেন্ট প্রসেসিং CP — এখানে ভুল উত্তরের চেয়ে ব্যর্থতা ভালো।" একই সিস্টেমে দুই রকম সিদ্ধান্ত থাকতে পারে, এটা বোঝাতে পারলেই আপনি বাকিদের থেকে আলাদা।</p>
+  </div>
+</section>
+
+<!-- 4 CONSISTENCY -->
+<section class="ch" id="c4">
+  <div class="ch-n">অধ্যায় ০৪</div>
+  <h2>কনসিস্টেন্সি মডেল</h2>
+  <p class="sub">"ডেটা সঠিক" কথাটার অন্তত পাঁচটা মানে আছে</p>
+
+  <p class="lead">Consistency শব্দটা দুই জায়গায় দুই মানে বহন করে — ACID-এর C মানে ডেটাবেজের নিয়ম ভাঙছে না, আর CAP-এর C মানে সব রেপ্লিকা একই উত্তর দিচ্ছে। এখানে দ্বিতীয়টার কথা বলছি।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">টাইমলাইন · A লিখছে, B ও C পড়ছে</span>
+      <div class="ctrls">
+        <button class="b" data-cm="strong" aria-selected="true">Strong</button>
+        <button class="b" data-cm="eventual">Eventual</button>
+        <button class="b" data-cm="ryw">Read-your-writes</button>
+        <button class="b" data-cm="mono">Monotonic read</button>
+        <button class="b" data-cm="causal">Causal</button>
+      </div>
+    </div>
+    <div id="cmBox"></div>
+  </div>
+
+  <p><strong>এখানে মূল কথাটা:</strong> শক্তিশালী কনসিস্টেন্সি মানেই ভালো নয়। Strong consistency-র জন্য প্রতিটা পড়াকে কোরামের জন্য অপেক্ষা করতে হয় বা লিডারে যেতে হয় — লেটেন্সি বাড়ে, প্রাপ্যতা কমে। বেশিরভাগ ফিচারে eventual যথেষ্ট, শুধু কয়েকটাতে শক্ত গ্যারান্টি লাগে। <strong>কোন ফিচারে কোনটা লাগবে সেটা বেছে নিতে পারাই ডিজাইন দক্ষতা।</strong></p>
+
+  <div class="note">
+    <span class="k">ব্যবহারিক উদাহরণ</span>
+    <p>ইনস্টাগ্রামে লাইক কাউন্ট eventual — দুই সেকেন্ড পুরোনো দেখালে কিছু যায় আসে না। কিন্তু আপনি নিজে লাইক দিলে সেটা সাথে সাথে দেখতে হবে (read-your-writes)। আর ব্যাংক ব্যালান্স? সেখানে strong ছাড়া উপায় নেই। <strong>একই অ্যাপে তিন রকম গ্যারান্টি — এটাই স্বাভাবিক।</strong></p>
+  </div>
+</section>
+
+<!-- 5 RAFT -->
+<section class="ch" id="c5">
+  <div class="ch-n">অধ্যায় ০৫</div>
+  <h2>Raft কনসেনসাস</h2>
+  <p class="sub">পাঁচটা মেশিন কীভাবে একজন নেতা বেছে নেয়</p>
+
+  <p class="lead">কনসেনসাস মানে — একদল নোড, যাদের কেউ মরে যেতে পারে আর যাদের বার্তা হারিয়ে যেতে পারে, তারা একটা বিষয়ে <strong>একমত</strong> হবে। Paxos প্রথম সমাধান দিয়েছিল, কিন্তু বোঝা কঠিন। Raft একই কাজ করে, বোঝার মতো করে। নিচে ধাপে ধাপে চালান।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">৫ নোডের ক্লাস্টার · টার্ম <span id="rfTerm">১</span></span>
+      <div class="ctrls">
+        <button class="b pri" id="rfNext">পরের ধাপ</button>
+        <button class="b" id="rfReset">আবার</button>
+      </div>
+    </div>
+    <div class="nodes" id="rfNodes"></div>
+    <div class="out-box" id="rfOut"></div>
+  </div>
+
+  <h3>তিনটা ভূমিকা</h3>
+  <ul class="plain">
+    <li><strong>Follower</strong> — চুপচাপ থাকে, লিডারের হার্টবিট শোনে। শুরুতে সবাই follower।</li>
+    <li><strong>Candidate</strong> — নির্দিষ্ট সময় হার্টবিট না পেলে follower নিজেই প্রার্থী হয়ে ভোট চায়।</li>
+    <li><strong>Leader</strong> — সংখ্যাগরিষ্ঠ ভোট পেলে নেতা। সব লেখা তার মাধ্যমে যায়, সে বাকিদের লগে কপি করে।</li>
+  </ul>
+
+  <h3>কেন সংখ্যাগরিষ্ঠতা, আর কেন বিজোড় সংখ্যা</h3>
+  <p>নেতা হতে <code>(N/2)+1</code> ভোট লাগে। কারণ দুটো দল একসাথে সংখ্যাগরিষ্ঠতা পেতে পারে না — তাই <strong>দুজন নেতা কখনো একসাথে থাকতে পারবে না</strong> (split brain অসম্ভব)।</p>
+  <ul class="plain">
+    <li>৩ নোড → ২ লাগে → ১টা মরলেও চলে</li>
+    <li>৪ নোড → ৩ লাগে → ১টা মরলেও চলে (একটা বেশি খরচ, লাভ শূন্য)</li>
+    <li>৫ নোড → ৩ লাগে → ২টা মরলেও চলে</li>
+  </ul>
+  <p>এই কারণেই ZooKeeper, etcd, Consul ক্লাস্টার সবসময় ৩ বা ৫ নোডের হয়।</p>
+
+  <div class="note">
+    <span class="k">র‍্যান্ডম টাইমআউট</span>
+    <p>সব নোড একই সময়ে টাইমআউট করলে সবাই একসাথে প্রার্থী হবে, ভোট ভাগ হয়ে যাবে, কেউ জিতবে না — <strong>split vote</strong>। Raft প্রতিটা নোডকে <strong>এলোমেলো</strong> টাইমআউট দেয় (যেমন ১৫০–৩০০ ms), তাই সাধারণত একজন আগে জেগে ওঠে ও জিতে যায়। সমাধানটা এত সরল বলেই Raft এত জনপ্রিয়।</p>
+  </div>
+
+  <h3>বাস্তবে কোথায় লাগে</h3>
+  <p>আপনি নিজে Raft লিখবেন না, কিন্তু এর উপরে দাঁড়ানো জিনিস রোজ ব্যবহার করবেন: <strong>লিডার ইলেকশন</strong> (কোন সার্ভার ক্রন জব চালাবে), <strong>ডিস্ট্রিবিউটেড লক</strong>, <strong>সার্ভিস ডিসকভারি</strong>, <strong>কনফিগারেশন স্টোর</strong>। ইন্টারভিউতে যখন আঁকবেন "ZooKeeper দিয়ে লিডার ইলেকশন", তখন ভেতরে এই জিনিসটাই চলছে।</p>
+</section>
+
+<!-- 6 KAFKA -->
+<section class="ch" id="c6">
+  <div class="ch-n">অধ্যায় ০৬</div>
+  <h2>Kafka ও মেসেজিং</h2>
+  <p class="sub">কনজিউমার যোগ করুন, দেখুন পার্টিশন কীভাবে ভাগ হয়</p>
+
+  <p class="lead">Kafka আসলে মেসেজ কিউ নয় — এটা একটা <strong>বিতরণ করা, শুধু-যোগ-হওয়া লগ</strong>। মেসেজ পড়ার পর মুছে যায় না, নির্দিষ্ট সময় পর্যন্ত থেকে যায়। এই একটা পার্থক্যই সব বদলে দেয়: একই ডেটা একাধিক ভোক্তা আলাদা গতিতে পড়তে পারে, আর দরকার হলে পেছনে গিয়ে আবার পড়া যায়।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">টপিক <code>orders</code> · ৪ পার্টিশন</span>
+      <div class="ctrls">
+        <button class="b" id="kSub">কনজিউমার সরান</button>
+        <button class="b pri" id="kAdd">কনজিউমার যোগ</button>
+      </div>
+    </div>
+    <div id="kParts"></div>
+    <p style="margin:12px 0 0;font-size:14px" id="kMsg"></p>
+  </div>
+
+  <h3>যে গ্যারান্টিটা সবচেয়ে বেশি ভুল বোঝা হয়</h3>
+  <p>Kafka <strong>শুধু পার্টিশনের ভেতরে</strong> ক্রম নিশ্চিত করে — পুরো টপিকে নয়। তাই যদি একটা অর্ডারের সব ইভেন্ট ক্রমে দরকার হয়, তাহলে <code>order_id</code>-কে পার্টিশন কী বানাতে হবে, যাতে একই অর্ডারের সব ইভেন্ট একই পার্টিশনে পড়ে।</p>
+  <ul class="plain">
+    <li><strong>একটা পার্টিশন একটা কনজিউমারের</strong> — একই গ্রুপে। তাই কনজিউমার সংখ্যা পার্টিশনের বেশি হলে বাড়তিরা বসে থাকে (উপরে চালিয়ে দেখুন)।</li>
+    <li><strong>পার্টিশন সংখ্যাই আপনার সর্বোচ্চ সমান্তরালতা।</strong> পরে বাড়ানো যায়, কিন্তু তখন কী → পার্টিশন ম্যাপিং বদলে যায়, ক্রমের গ্যারান্টি ভাঙে।</li>
+    <li><strong>Consumer lag</strong> সবচেয়ে গুরুত্বপূর্ণ মেট্রিক — প্রোডিউসার কত এগিয়ে আছে কনজিউমারের চেয়ে। এটা বাড়তে থাকলে সিস্টেম পিছিয়ে পড়ছে।</li>
+    <li>আলাদা <strong>consumer group</strong> মানে আলাদা offset — একই ডেটা অ্যানালিটিক্স আর নোটিফিকেশন সার্ভিস স্বাধীনভাবে পড়তে পারে।</li>
+  </ul>
+
+  <table>
+    <tr><th></th><th>Kafka</th><th>RabbitMQ / SQS</th></tr>
+    <tr><td>মডেল</td><td>লগ — পড়লেও থাকে</td><td>কিউ — পড়লে মুছে যায়</td></tr>
+    <tr><td>রি-প্রসেস</td><td class="y">offset পিছিয়ে দিলেই হয়</td><td class="n">সম্ভব নয়</td></tr>
+    <tr><td>থ্রুপুট</td><td class="y">খুব বেশি (লাখো/সেকেন্ড)</td><td>মাঝারি</td></tr>
+    <tr><td>প্রতি-মেসেজ রাউটিং</td><td class="n">সীমিত</td><td class="y">সমৃদ্ধ (exchange, routing key)</td></tr>
+    <tr><td>যেখানে ভালো</td><td>ইভেন্ট স্ট্রিম, লগ, অ্যানালিটিক্স, CDC</td><td>টাস্ক কিউ, জব ডিসপ্যাচ, RPC</td></tr>
+  </table>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"Kafka কেন, RabbitMQ কেন নয়?"</strong></p>
+    <p>উত্তরটা যেন ব্যবহারের ধরন থেকে আসে, ব্র্যান্ড থেকে নয়। "একটা ইভেন্ট একাধিক ভোক্তা আলাদাভাবে পড়বে, ভবিষ্যতে নতুন সার্ভিস এসে পুরোনো ডেটা রি-প্রসেস করতে পারবে, আর থ্রুপুট লাখের ঘরে — তাই Kafka।" বনাম "প্রতিটা জব একবার কেউ একজন করবে, প্রায়োরিটি ও রাউটিং লাগবে, ভলিউম মাঝারি — তাই RabbitMQ।"</p>
+  </div>
+</section>
+
+<!-- 7 DELIVERY -->
+<section class="ch" id="c7">
+  <div class="ch-n">অধ্যায় ০৭</div>
+  <h2>ডেলিভারি সেমান্টিক্স ও Idempotency</h2>
+  <p class="sub">রিট্রাই করলেন — ইউজারের কার্ড দুবার চার্জ হলো?</p>
+
+  <p class="lead">নেটওয়ার্কে একটা নিষ্ঠুর সত্য আছে: <strong>রিকোয়েস্ট পাঠিয়ে উত্তর না পেলে আপনি জানেন না কী হয়েছে</strong>। রিকোয়েস্টটা পৌঁছায়নি? নাকি পৌঁছেছে, কাজও হয়েছে, শুধু উত্তরটা হারিয়েছে? দুটো ক্ষেত্রে দেখতে একই রকম — কিন্তু রিট্রাই করলে ফল সম্পূর্ণ আলাদা।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">পেমেন্ট রিকোয়েস্ট · উত্তর হারিয়ে যাবে, ক্লায়েন্ট রিট্রাই করবে</span>
+      <div class="ctrls">
+        <button class="b" id="payNo">Idempotency key ছাড়া</button>
+        <button class="b pri" id="payYes">Idempotency key সহ</button>
+      </div>
+    </div>
+    <div class="log" id="payLog" style="height:180px"><b>▸ যেকোনো একটা চালান</b></div>
+    <div class="stat">
+      <div><em>মোট চার্জ</em><b id="payTotal" style="color:var(--red)">৳০</b></div>
+      <div><em>ডেটাবেজে সারি</em><b id="payRows">০</b></div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>সেমান্টিক</th><th>মানে</th><th>খরচ</th><th>কোথায়</th></tr>
+    <tr><td>At-most-once</td><td>রিট্রাই নেই</td><td class="n">মেসেজ হারাতে পারে</td><td>মেট্রিক, লগ</td></tr>
+    <tr><td>At-least-once</td><td>উত্তর না পেলে আবার</td><td class="n">ডুপ্লিকেট হতে পারে</td><td>ডিফল্ট, সবচেয়ে প্রচলিত</td></tr>
+    <tr><td>Exactly-once</td><td>ঠিক একবার</td><td class="n">জটিল ও ধীর</td><td>Kafka ট্রানজেকশন, পেমেন্ট</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="k">বাস্তব সত্য</span>
+    <p>বিতরণ করা সিস্টেমে সত্যিকারের exactly-once <em>ডেলিভারি</em> অসম্ভব। যেটা সম্ভব সেটা হলো exactly-once <strong>প্রসেসিং</strong> — অর্থাৎ at-least-once ডেলিভারি + রিসিভারের দিকে ডিডুপ্লিকেশন। তাই ব্যবহারিক নিয়মটা হলো: <strong>রিট্রাই ধরে নিন, আর প্রতিটা অপারেশন idempotent বানান।</strong> এই বাক্যটা ইন্টারভিউতে সোনার দাম রাখে।</p>
+  </div>
+
+  <h3>Idempotency কীভাবে বাস্তবায়ন করবেন</h3>
+  <ul class="plain">
+    <li>ক্লায়েন্ট প্রতিটা অপারেশনের জন্য একটা <strong>ইউনিক কী</strong> তৈরি করে (UUID) এবং রিট্রাইতেও <em>একই</em> কী পাঠায়।</li>
+    <li>সার্ভার সেই কী-কে <strong>unique constraint</strong> সহ সংরক্ষণ করে। একই কী দ্বিতীয়বার এলে নতুন কাজ না করে আগের ফলাফলটাই ফেরত দেয়।</li>
+    <li>কী-র একটা মেয়াদ রাখুন (যেমন ২৪ ঘণ্টা), নাহলে টেবিল অসীম বাড়বে।</li>
+    <li>মনে রাখবেন কিছু অপারেশন এমনিতেই idempotent — <code>SET x = 5</code> যতবার চালান একই ফল। কিন্তু <code>x = x + 5</code> নয়। ডিজাইনের সময় প্রথমটার দিকে ঝোঁকা ভালো।</li>
+  </ul>
+</section>
+
+<!-- 8 RESILIENCE -->
+<section class="ch" id="c8">
+  <div class="ch-n">অধ্যায় ০৮</div>
+  <h2>রেজিলিয়েন্স প্যাটার্ন</h2>
+  <p class="sub">একটা সার্ভিস মরলে যেন পুরো সিস্টেম না মরে</p>
+
+  <p class="lead">বিতরণ করা সিস্টেমে সবচেয়ে ভয়ংকর জিনিস <strong>ক্যাসকেডিং ফেইলিউর</strong> — একটা ধীর সার্ভিস তার কলারদের থ্রেড আটকে রাখে, তারা ধীর হয়, তাদের কলাররাও আটকে যায়, আর কয়েক সেকেন্ডে পুরো সিস্টেম বসে পড়ে। নিচের প্যাটার্নগুলো ঠিক এই শৃঙ্খলটা ভাঙার জন্য।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">সার্কিট ব্রেকার · ৩ বার ব্যর্থ হলে খুলে যাবে</span>
+      <div class="ctrls">
+        <button class="b" id="cbOk">সফল রিকোয়েস্ট</button>
+        <button class="b warn" id="cbFail">ব্যর্থ রিকোয়েস্ট</button>
+        <button class="b" id="cbWait">অপেক্ষার সময় শেষ</button>
+        <button class="b" id="cbReset">রিসেট</button>
+      </div>
+    </div>
+    <div class="cb-states">
+      <div class="cbs closed on" id="sClosed"><b>CLOSED</b><em>সব যাচ্ছে</em></div>
+      <span class="fa">→</span>
+      <div class="cbs open" id="sOpen"><b>OPEN</b><em>সব আটকানো</em></div>
+      <span class="fa">→</span>
+      <div class="cbs half" id="sHalf"><b>HALF-OPEN</b><em>পরীক্ষামূলক</em></div>
+    </div>
+    <div class="dots" id="cbDots"></div>
+    <div class="out-box" id="cbOut" style="margin-top:16px"></div>
+  </div>
+
+  <p>তিনটা অবস্থা: <strong>CLOSED</strong>-এ সব রিকোয়েস্ট যায় (স্বাভাবিক)। পরপর কয়েকটা ব্যর্থ হলে <strong>OPEN</strong> — এখন আর কল করাই হয় না, সাথে সাথে ব্যর্থ বলা হয়। এতে ভাঙা সার্ভিস শ্বাস নেওয়ার সুযোগ পায়, আর কলারের থ্রেড আটকায় না। কিছুক্ষণ পর <strong>HALF-OPEN</strong> — একটা রিকোয়েস্ট ছেড়ে দেখা হয় সেরেছে কি না। সফল হলে CLOSED, ব্যর্থ হলে আবার OPEN।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">রিট্রাই ব্যাকঅফ · ৮টা প্রচেষ্টার অপেক্ষা</span>
+      <div class="ctrls">
+        <button class="b" data-bo="fixed">নির্দিষ্ট</button>
+        <button class="b" data-bo="exp" aria-selected="true">এক্সপোনেনশিয়াল</button>
+        <button class="b" data-bo="jit">এক্সপোনেনশিয়াল + jitter</button>
+      </div>
+    </div>
+    <div class="bo" id="boChart"></div>
+    <p style="margin:26px 0 0;font-size:14px" id="boTxt"></p>
+  </div>
+
+  <h3>বাকি প্যাটার্নগুলো</h3>
+  <ul class="plain">
+    <li><strong>Bulkhead</strong> — জাহাজের জলনিরোধক কামরার মতো। প্রতিটা ডাউনস্ট্রিম সার্ভিসের জন্য আলাদা থ্রেড পুল রাখুন, যাতে একটা সার্ভিস ধীর হলে সে শুধু নিজের পুল শেষ করে, পুরো অ্যাপের থ্রেড নয়।</li>
+    <li><strong>Timeout</strong> — সবচেয়ে অবহেলিত অথচ সবচেয়ে জরুরি। টাইমআউট ছাড়া কল মানে অসীম অপেক্ষা। নিয়ম: প্রতিটা নেটওয়ার্ক কলে টাইমআউট থাকবে, আর ভেতরের টাইমআউট বাইরের চেয়ে ছোট হবে।</li>
+    <li><strong>Rate limiting</strong> ও <strong>load shedding</strong> — ক্ষমতার বেশি এলে ভদ্রভাবে না বলুন। ৫০% রিকোয়েস্ট দ্রুত প্রত্যাখ্যান করা ১০০% রিকোয়েস্টের টাইমআউট হওয়ার চেয়ে ভালো।</li>
+    <li><strong>Graceful degradation</strong> — রেকমেন্ডেশন সার্ভিস মরলে পুরো হোমপেজ ভাঙবে না; জনপ্রিয় আইটেমের একটা স্ট্যাটিক তালিকা দেখান।</li>
+  </ul>
+
+  <div class="iq">
+    <span class="k">যে ভুলটা সিস্টেম নামায়</span>
+    <p>Jitter ছাড়া এক্সপোনেনশিয়াল ব্যাকঅফ। ১০ হাজার ক্লায়েন্ট একই সেকেন্ডে ব্যর্থ হলে তারা সবাই ঠিক ১ সেকেন্ড পর একসাথে রিট্রাই করবে, তারপর ঠিক ২ সেকেন্ড পর একসাথে — <strong>thundering herd</strong>। সদ্য সেরে ওঠা সার্ভিস আবার মরে যাবে। উপরের তৃতীয় বোতামটা চেপে পার্থক্যটা দেখুন।</p>
+  </div>
+</section>
+
+<!-- 9 SAGA -->
+<section class="ch" id="c9">
+  <div class="ch-n">অধ্যায় ০৯</div>
+  <h2>ডিস্ট্রিবিউটেড ট্রানজেকশন — 2PC বনাম Saga</h2>
+  <p class="sub">তিনটা সার্ভিস, তিনটা ডেটাবেজ, একটাই ব্যবসায়িক কাজ</p>
+
+  <p class="lead">এক ডেটাবেজে <code>BEGIN … COMMIT</code> দিয়েই কাজ শেষ। কিন্তু অর্ডার সার্ভিস, পেমেন্ট সার্ভিস আর ইনভেন্টরি সার্ভিসের আলাদা ডেটাবেজ হলে? তখন "সব হবে অথবা কিছুই হবে না" নিশ্চিত করা কঠিন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">অর্ডার প্রক্রিয়া · ইনভেন্টরি ধাপে ব্যর্থ হবে</span>
+      <div class="ctrls">
+        <button class="b" data-dt="2pc" aria-selected="true">Two-Phase Commit</button>
+        <button class="b" data-dt="saga">Saga</button>
+        <button class="b pri" id="dtRun">চালান</button>
+      </div>
+    </div>
+    <div class="flow" id="dtFlow"></div>
+    <div class="log" id="dtLog" style="height:150px"><b>▸ চালান চাপুন</b></div>
+  </div>
+
+  <table>
+    <tr><th></th><th>2PC</th><th>Saga</th></tr>
+    <tr><td>অ্যাটমিসিটি</td><td class="y">সত্যিকারের</td><td>শুধু চূড়ান্ত ফলাফলে</td></tr>
+    <tr><td>লকিং</td><td class="n">কমিট পর্যন্ত লক ধরে থাকে</td><td class="y">লক নেই</td></tr>
+    <tr><td>কোঅর্ডিনেটর মরলে</td><td class="n">সবাই আটকে থাকে</td><td class="y">সমস্যা নেই</td></tr>
+    <tr><td>মাঝপথের অবস্থা</td><td class="y">কেউ দেখে না</td><td class="n">অন্যরা দেখে ফেলে</td></tr>
+    <tr><td>স্কেল</td><td class="n">খারাপ</td><td class="y">ভালো</td></tr>
+  </table>
+
+  <p>Saga-তে প্রতিটা ধাপের একটা <strong>ক্ষতিপূরণমূলক ধাপ</strong> (compensating transaction) থাকে — পেমেন্ট নেওয়ার উল্টো হলো রিফান্ড, স্টক কমানোর উল্টো হলো স্টক ফেরত। কোনো ধাপ ব্যর্থ হলে আগের ধাপগুলো উল্টো ক্রমে বাতিল করা হয়। এটা rollback নয়, <strong>নতুন করে উল্টো কাজ করা</strong> — আর এখানেই ধরা পড়ে যে মাঝখানে কেউ পুরোনো অবস্থাটা দেখে ফেলতে পারে।</p>
+
+  <div class="note">
+    <span class="k">দুই ধরনের Saga</span>
+    <p><strong>Choreography</strong> — কোনো কেন্দ্রীয় নিয়ন্ত্রক নেই, প্রতিটা সার্ভিস ইভেন্ট শোনে ও নিজের ইভেন্ট ছাড়ে। কম সার্ভিসে সরল, কিন্তু বাড়লে কে কার পর চলছে তা বোঝা দুঃসাধ্য। <strong>Orchestration</strong> — একটা কেন্দ্রীয় অর্কেস্ট্রেটর ধাপগুলো ডাকে। কোডে ফ্লো স্পষ্ট থাকে, ডিবাগ সহজ, কিন্তু অর্কেস্ট্রেটর নিজেই একটা নির্ভরতা। ৩-৪টার বেশি ধাপ হলে orchestration বেছে নিন।</p>
+  </div>
+</section>
+
+<!-- 10 QUIZ -->
+<section class="ch" id="c10">
+  <div class="ch-n">অধ্যায় ১০</div>
+  <h2>নিজেকে যাচাই করুন</h2>
+  <p class="sub">উত্তর দেখার আগে জোরে বলুন — এটাই আসল প্র্যাকটিস</p>
+  <div id="quiz"></div>
+  <div class="note" style="border-color:var(--l3)">
+    <span class="k" style="color:var(--l3)">ভলিউম ২ শেষ</span>
+    <p>এগুলোর উত্তর নোট ছাড়া দিতে পারলে আপনি সিস্টেম ডিজাইন ইন্টারভিউর সবচেয়ে কঠিন অংশটা পার করেছেন। পরের ভলিউম — <strong>কেস স্টাডি</strong>: URL shortener থেকে শুরু করে news feed, চ্যাট, ভিডিও স্ট্রিমিং, geospatial ও পেমেন্ট সিস্টেম পর্যন্ত ধাপে ধাপে ডিজাইন।</p>
+  </div>
+</section>
+
+<footer>
+  <span>ভলিউম ২ / ৫ · ডিস্ট্রিবিউটেড সিস্টেম</span>
+  <span>পরবর্তী → কেস স্টাডি</span>
+</footer>
+</main>
+</div>
+
+<script>
+const bn=n=>String(n).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const links=[...document.querySelectorAll(".toc a")];
+new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)
+  links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))})},
+  {rootMargin:"-20% 0px -70% 0px"}).observe&&
+document.querySelectorAll(".ch").forEach(s=>new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))})},
+  {rootMargin:"-20% 0px -70% 0px"}).observe(s));
+
+/* ---------- 1 REPLICATION ---------- */
+let rpMode="sync",rpDead=false;
+const rpNodes=document.getElementById("rpNodes"),rpLog=document.getElementById("rpLog");
+function rpDraw(){
+  const isMulti=rpMode==="multi",isQ=rpMode==="quorum";
+  const roles=isQ?["রেপ্লিকা","রেপ্লিকা","রেপ্লিকা"]
+    :isMulti?["লিডার (ঢাকা)","লিডার (লন্ডন)","ফলোয়ার"]:["লিডার","ফলোয়ার","ফলোয়ার"];
+  rpNodes.innerHTML=roles.map((r,i)=>
+   `<div class="nd ${(!isQ&&(i===0||(isMulti&&i===1)))?"lead":""} ${rpDead&&i===0?"dead":""}" id="rn${i}">
+      <b>node-${bn(i+1)}</b><em>${rpDead&&i===0?"মৃত":r}</em><div class="val" id="rv${i}">x = ০</div></div>`).join("");
+}
+function rlog(t,c){rpLog.innerHTML+=`<div>${c?`<${c}>${t}</${c}>`:t}</div>`;rpLog.scrollTop=rpLog.scrollHeight;}
+function setV(i,v,cls){const n=document.getElementById("rn"+i);
+  document.getElementById("rv"+i).textContent="x = "+v;
+  if(cls){n.classList.add("act");setTimeout(()=>n.classList.remove("act"),700);}}
+const RPD={sync:"সিঙ্ক্রোনাস: লিডার সব ফলোয়ারের নিশ্চয়তা পাওয়ার পর ক্লায়েন্টকে সফল বলে।",
+ async:"অ্যাসিঙ্ক্রোনাস: লিডার নিজে লিখেই সফল বলে দেয়, কপি পরে যায়।",
+ multi:"মাল্টি-লিডার: একাধিক জায়গায় লেখা যায়, পরে মিলিয়ে নিতে হয়।",
+ quorum:"Leaderless: ক্লায়েন্ট সরাসরি সব রেপ্লিকায় লেখে, W=2 হলেই সফল।"};
+document.querySelectorAll("[data-rp]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-rp]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  rpMode=b.dataset.rp;rpDead=false;rpDraw();rpLog.innerHTML="";rlog("▸ "+RPD[rpMode],"b");});
+document.getElementById("rpWrite").onclick=async()=>{
+  if(rpDead&&rpMode!=="quorum"){rlog("লিডার মৃত — লেখা সম্ভব নয়, নতুন নির্বাচন দরকার","u");return;}
+  if(rpMode==="sync"){
+    rlog("ক্লায়েন্ট → লিডার: write(x=৪২)");setV(0,"৪২",1);
+    await wait(400);rlog("লিডার → ফলোয়ার ১, ২ (অপেক্ষা করছে…)");
+    await wait(600);setV(1,"৪২",1);setV(2,"৪২",1);rlog("দুই ফলোয়ারই নিশ্চিত করেছে ✓");
+    await wait(200);rlog("▸ ক্লায়েন্টকে সফল বলা হলো · সময় ~১.২ ms · সব কপি এক","b");
+  } else if(rpMode==="async"){
+    rlog("ক্লায়েন্ট → লিডার: write(x=৪২)");setV(0,"৪২",1);
+    await wait(150);rlog("▸ ক্লায়েন্টকে সাথে সাথে সফল বলা হলো · সময় ~০.৩ ms","b");
+    rlog("ফলোয়াররা এখনো পুরোনো মান দেখাচ্ছে — replication lag","em");
+    await wait(900);setV(1,"৪২",1);await wait(300);setV(2,"৪২",1);
+    rlog("এখন কপি পৌঁছেছে। এই ফাঁকে কেউ পড়লে পুরোনো ডেটা পেত।","em");
+  } else if(rpMode==="multi"){
+    rlog("ঢাকার ক্লায়েন্ট → node-1: write(x=৪২)");setV(0,"৪২",1);
+    rlog("একই সময়ে লন্ডনের ক্লায়েন্ট → node-2: write(x=৭)");setV(1,"৭",1);
+    await wait(800);rlog("দুই লিডার সিঙ্ক করছে…");
+    await wait(500);rlog("⚠ কনফ্লিক্ট: একই কী-তে দুটো আলাদা মান","u");
+    rlog("মেটানোর উপায়: last-write-wins (ডেটা হারায়), ভার্সন ভেক্টর, বা CRDT","em");
+    setV(0,"৪২ / ৭",1);setV(1,"৪২ / ৭",1);
+  } else {
+    rlog("ক্লায়েন্ট → তিন রেপ্লিকাতেই সমান্তরালে লেখা (N=৩, W=২)");
+    await wait(350);setV(0,"৪২",1);rlog("node-1 নিশ্চিত ✓");
+    await wait(250);setV(2,"৪২",1);rlog("node-3 নিশ্চিত ✓ · W=২ পূর্ণ");
+    rlog("▸ ক্লায়েন্টকে সফল বলা হলো — node-2 এর জন্য অপেক্ষা নেই","b");
+    await wait(700);setV(1,"৪২",1);rlog("node-2 পরে ধরে ফেলল (read repair / anti-entropy)","em");
+    rlog("R=২ দিয়ে পড়লে অন্তত একজন নতুন মান জানবেই — কারণ W+R > N","em");
+  }
+};
+document.getElementById("rpKill").onclick=()=>{
+  rpDead=true;rpDraw();
+  if(rpMode==="sync")rlog("লিডার মৃত। সিঙ্ক্রোনাস ছিল বলে ফলোয়ারদের কাছে পূর্ণ ডেটা আছে — নিরাপদ failover সম্ভব।","em");
+  else if(rpMode==="async")rlog("লিডার মৃত। যে লেখাগুলো এখনো কপি হয়নি সেগুলো চিরতরে হারিয়ে গেল।","u");
+  else if(rpMode==="multi")rlog("একটা লিডার মৃত, অন্য লিডার লেখা নিতে থাকবে — প্রাপ্যতা টিকে রইল।","b");
+  else rlog("একটা রেপ্লিকা মৃত — কোরাম (W=২) এখনো পূরণ হয়, সিস্টেম চলতেই থাকবে।","b");};
+document.getElementById("rpReset").onclick=()=>{rpDead=false;rpDraw();rpLog.innerHTML="<div><b>▸ রিসেট হয়েছে</b></div>";};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+rpDraw();rlog("▸ "+RPD.sync,"b");
+
+/* ---------- 2 CONSISTENT HASHING ---------- */
+const ringSvg=document.getElementById("ringSvg");
+const NCOL=["#1F63D6","#0E8474","#E24E1B","#7B4FE0","#C08A00","#C42B1C","#0891B2","#BE185D"];
+let nodes=[35,140,250],vnodes=false,hmode="ch",prevMap=null;
+const KEYS=Array.from({length:48},(_,i)=>((i*137.508)%360));
+function ownersCH(){
+  let pts=[];
+  nodes.forEach((a,i)=>{ if(vnodes){for(let v=0;v<24;v++)pts.push({a:(a+v*15.1+i*4.7)%360,i});}
+    else pts.push({a,i}); });
+  pts.sort((x,y)=>x.a-y.a);
+  return KEYS.map(k=>{const p=pts.find(p=>p.a>=k)||pts[0];return p.i;});
+}
+function ownersMod(){return KEYS.map((k,i)=>i%nodes.length);}
+function ringDraw(changed){
+  const own=hmode==="ch"?ownersCH():ownersMod();
+  const cx=210,cy=210,R=150;
+  let h=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#CBD3DF" stroke-width="18"/>`;
+  if(hmode==="ch"){
+    let pts=[];nodes.forEach((a,i)=>{if(vnodes){for(let v=0;v<24;v++)pts.push({a:(a+v*15.1+i*4.7)%360,i});}else pts.push({a,i})});
+    pts.forEach(p=>{const r=(p.a-90)*Math.PI/180;
+      h+=`<circle cx="${cx+Math.cos(r)*R}" cy="${cy+Math.sin(r)*R}" r="${vnodes?4:9}"
+           fill="${NCOL[p.i]}" stroke="#fff" stroke-width="${vnodes?1:2.5}"/>`;});
+    nodes.forEach((a,i)=>{const r=(a-90)*Math.PI/180;
+      h+=`<text x="${cx+Math.cos(r)*(R+30)}" y="${cy+Math.sin(r)*(R+30)+4}" text-anchor="middle"
+          font-family="JetBrains Mono" font-size="11" fill="${NCOL[i]}">N${i+1}</text>`;});
+  }
+  KEYS.forEach((k,i)=>{const r=(k-90)*Math.PI/180,rr=R-32;
+    const moved=changed&&changed[i];
+    h+=`<circle cx="${cx+Math.cos(r)*rr}" cy="${cy+Math.sin(r)*rr}" r="${moved?6:4.5}"
+         fill="${NCOL[own[i]]}" opacity="${moved?1:.82}"
+         ${moved?'stroke="#141C2B" stroke-width="2"':''}/>`;});
+  h+=`<text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#141C2B">${bn(nodes.length)} নোড</text>`;
+  h+=`<text x="${cx}" y="${cy+15}" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#77839A">${bn(48)} কী</text>`;
+  ringSvg.innerHTML=h;
+  const counts=nodes.map((_,i)=>own.filter(o=>o===i).length);
+  document.getElementById("ringBars").innerHTML=counts.map((c,i)=>
+   `<div class="br"><span>N${i+1}</span><div class="f" style="width:${c/48*100*2.4}%;background:${NCOL[i]}"></div><u>${bn(c)}</u></div>`).join("");
+  return own;
+}
+function ringUpdate(action){
+  const before=prevMap;
+  const own=ringDraw(null);
+  if(before){
+    const changed=own.map((o,i)=>o!==before[i]);
+    const n=changed.filter(Boolean).length;
+    ringDraw(changed);
+    document.getElementById("movedPct").textContent=bn(Math.round(n/48*100))+"%";
+    document.getElementById("movedTxt").innerHTML= hmode==="ch"
+      ? `${bn(n)}/${bn(48)} কী নতুন নোডে গেছে। বাকি সব যেখানে ছিল সেখানেই — কালো বর্ডারওয়ালা বিন্দুগুলোই সরেছে।`
+      : `${bn(n)}/${bn(48)} কী সরেছে। মডুলো বদলালে প্রায় সবাইকে নড়তে হয় — মানে পুরো ক্যাশ ঠান্ডা, ডেটাবেজে ঝড়।`;
+  }
+  prevMap=own;
+}
+document.getElementById("addN").onclick=()=>{
+  if(nodes.length>=8)return;nodes.push(Math.floor(Math.random()*360));ringUpdate();};
+document.getElementById("delN").onclick=()=>{
+  if(nodes.length<=2)return;nodes.pop();ringUpdate();};
+document.getElementById("vnToggle").onclick=e=>{
+  vnodes=!vnodes;e.target.textContent="ভার্চুয়াল নোড: "+(vnodes?"চালু":"বন্ধ");
+  e.target.setAttribute("aria-selected",vnodes);prevMap=ringDraw(null);
+  document.getElementById("movedTxt").textContent=vnodes
+    ?"প্রতিটা সার্ভার এখন ২৪টা পয়েন্ট হয়ে বৃত্তে ছড়িয়ে আছে — বারগুলো কত সমান হলো দেখুন।"
+    :"ভার্চুয়াল নোড বন্ধ। মাত্র কয়েকটা পয়েন্ট, তাই লোড অসমান।";};
+document.querySelectorAll("[data-hm]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-hm]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  hmode=b.dataset.hm;
+  document.getElementById("ringMode").textContent=hmode==="ch"?"কনসিস্টেন্ট হ্যাশিং":"মডুলো হ্যাশিং";
+  document.getElementById("vnToggle").disabled=hmode==="mod";
+  prevMap=ringDraw(null);
+  document.getElementById("movedPct").textContent="—";
+  document.getElementById("movedTxt").textContent=hmode==="ch"
+    ?"এখন নোড যোগ বা সরিয়ে দেখুন কত কম কী নড়ে।"
+    :"hash(key) % N — এখন নোড যোগ করে দেখুন কী হয়।";});
+prevMap=ringDraw(null);
+
+/* ---------- 3 CAP ---------- */
+let cpMode="CP",cut=false,vDC1=10,vDC2=10;
+function cpDraw(){
+  document.getElementById("v1").textContent=bn(vDC1);
+  document.getElementById("v2").textContent=bn(vDC2);
+  document.getElementById("linkTxt").textContent=cut?"লিঙ্ক ছিঁড়েছে":"লিঙ্ক ঠিক আছে";
+  document.getElementById("linkBox").querySelector("b").style.color=cut?"var(--red)":"var(--l3)";
+  document.getElementById("linkBox").querySelector("b").textContent=cut?"╍╍✕╍╍":"═══";
+  document.getElementById("dc1").classList.toggle("dead",false);
+}
+function cpOut(t,d){document.getElementById("cpOut").innerHTML=`<h4>${t}</h4><p>${d}</p>`;}
+document.querySelectorAll("[data-cp]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-cp]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  cpMode=b.dataset.cp;
+  cpOut(cpMode==="CP"?"CP — সঠিকতা আগে":"AP — প্রাপ্যতা আগে",
+    cpMode==="CP"?"পার্টিশন হলে সিস্টেম বরং <b>না বলবে</b>, কিন্তু ভুল ডেটা দেবে না। ব্যাংক, ইনভেন্টরি, টিকিট বুকিং।"
+    :"পার্টিশন হলেও সিস্টেম <b>উত্তর দেবে</b>, যদিও সেটা পুরোনো হতে পারে। শপিং কার্ট, সোশ্যাল ফিড, DNS।");});
+document.getElementById("cutLink").onclick=()=>{cut=!cut;cpDraw();
+  cpOut(cut?"নেটওয়ার্ক পার্টিশন ঘটল":"লিঙ্ক ফিরে এলো",
+   cut?"দুটো ডেটাসেন্টার এখন একে অপরকে দেখতে পাচ্ছে না। কেউই জানে না অন্যপক্ষ মরে গেছে নাকি শুধু লিঙ্ক ছিঁড়েছে — <b>এই অনিশ্চয়তাই CAP-এর মূল সমস্যা</b>। এখন লিখে-পড়ে দেখুন।"
+   :"সিঙ্ক আবার শুরু। AP মোডে থাকলে এখন কনফ্লিক্ট মেটাতে হবে।");
+  if(!cut&&cpMode==="AP"&&vDC1!==vDC2){vDC2=vDC1;cpDraw();}};
+document.getElementById("cpWrite").onclick=()=>{
+  if(!cut){vDC1=99;vDC2=99;cpDraw();cpOut("লেখা সফল","লিঙ্ক ঠিক, তাই দুই ডেটাসেন্টারই ৯৯ পেয়েছে। কোনো ট্রেডঅফ লাগেনি — <b>এই কারণেই পার্টিশন না হলে CAP অপ্রাসঙ্গিক</b>।");return;}
+  if(cpMode==="CP"){cpOut("লেখা প্রত্যাখ্যাত ✕",
+    "CP মোডে DC-1 নিশ্চিত হতে পারছে না যে সে এখনো সংখ্যাগরিষ্ঠতার অংশ। তাই সে লিখতে <b>অস্বীকার</b> করল — <code>503 Service Unavailable</code>। ডেটা কখনো ভুল হবে না, কিন্তু সিস্টেম এই মুহূর্তে অচল।");}
+  else{vDC1=99;cpDraw();cpOut("লেখা গৃহীত ✓ (কিন্তু বিভাজন তৈরি হলো)",
+    "AP মোডে DC-1 নিজে লিখে ফেলল। এখন DC-1 বলছে ৯৯, DC-2 বলছে ১০ — <b>দুটো ভিন্ন সত্য</b>। লিঙ্ক ফিরলে এই কনফ্লিক্ট মেটাতে হবে।");}};
+document.getElementById("cpRead").onclick=()=>{
+  if(!cut){cpOut("পড়া সফল","DC-2 থেকে পাওয়া গেল x = "+bn(vDC2)+"। সব স্বাভাবিক।");return;}
+  if(cpMode==="CP")cpOut("পড়া প্রত্যাখ্যাত ✕",
+    "CP মোডে DC-2 জানে না তার ডেটা পুরোনো কি না, তাই সে <b>উত্তর দিতেই অস্বীকার</b> করল। বাসি ডেটা দেওয়ার চেয়ে চুপ থাকা ভালো — এটাই CP-র দর্শন।");
+  else cpOut("পড়া সফল, কিন্তু ডেটা বাসি ⚠",
+    "DC-2 ফেরত দিল x = "+bn(vDC2)+"। কিন্তু আসল মান এখন "+bn(vDC1)+"। ইউজার উত্তর পেল — <b>ভুল উত্তর</b>। AP-র দাম এটাই।");};
+document.getElementById("cpReset").onclick=()=>{cut=false;vDC1=vDC2=10;cpDraw();
+  cpOut("রিসেট","আবার শুরু করুন।");};
+cpDraw();
+
+/* ---------- 4 CONSISTENCY MODELS ---------- */
+const CM={
+ strong:{t:"Strong (Linearizable)",
+  d:"লেখা শেষ হওয়ার পর <b>যে কেউ</b> পড়লেই নতুন মান পাবে — যেন একটাই কপি আছে। দাম: প্রতিটা পড়াকে কোরাম বা লিডারের জন্য অপেক্ষা করতে হয়, তাই ধীর ও পার্টিশনে অচল।",
+  ev:[["A",[[18,"W(x=১)","var(--l1)"]]],["B",[[42,"R → ১ ✓","var(--l3)"],[72,"R → ১ ✓","var(--l3)"]]],["C",[[55,"R → ১ ✓","var(--l3)"],[88,"R → ১ ✓","var(--l3)"]]]]},
+ eventual:{t:"Eventual",
+  d:"লেখা থেমে গেলে সব কপি <b>একসময়</b> মিলে যাবে — কিন্তু কখন, তার কোনো গ্যারান্টি নেই। মাঝখানে যে কেউ পুরোনো মান পেতে পারে। সবচেয়ে দ্রুত ও সবচেয়ে সহজলভ্য।",
+  ev:[["A",[[18,"W(x=১)","var(--l1)"]]],["B",[[42,"R → ০ ✕","var(--red)"],[80,"R → ১ ✓","var(--l3)"]]],["C",[[55,"R → ০ ✕","var(--red)"],[92,"R → ১ ✓","var(--l3)"]]]]},
+ ryw:{t:"Read-your-writes",
+  d:"যে লিখেছে সে অন্তত নিজের লেখা দেখবে — অন্যরা পরে দেখলেও চলবে। কমেন্ট পোস্ট করার পর নিজের কমেন্ট দেখতে পাওয়া, এটাই সেই গ্যারান্টি।",
+  ev:[["A",[[18,"W(x=১)","var(--l1)"],[40,"R → ১ ✓","var(--l3)"]]],["B",[[52,"R → ০ ✕","var(--red)"],[86,"R → ১","var(--l3)"]]],["C",[[62,"R → ০ ✕","var(--red)"]]]]},
+ mono:{t:"Monotonic read",
+  d:"একবার নতুন মান দেখে ফেললে আর <b>পিছিয়ে যাবে না</b>। এটা না থাকলে ইউজার রিফ্রেশ করে দেখে কমেন্ট উধাও — কারণ দ্বিতীয় পড়াটা পিছিয়ে থাকা রেপ্লিকায় গেছে। সাধারণত ইউজারকে একই রেপ্লিকায় পিন করে সমাধান করা হয়।",
+  ev:[["A",[[18,"W(x=১)","var(--l1)"]]],["B",[[45,"R → ১ ✓","var(--l3)"],[75,"R → ১ ✓","var(--l3)"]]],["C",[[45,"R → ০","var(--muted)"],[75,"R → ০ বা ১","var(--muted)"]]]]},
+ causal:{t:"Causal",
+  d:"কারণ ও ফলাফলের ক্রম রক্ষা হবে। প্রশ্নের আগে উত্তর কখনো দেখা যাবে না। কিন্তু <b>সম্পর্কহীন</b> লেখাগুলো যে কোনো ক্রমে দেখা যেতে পারে — তাই strong-এর চেয়ে সস্তা, eventual-এর চেয়ে অনেক নিরাপদ।",
+  ev:[["A",[[18,"W(প্রশ্ন)","var(--l1)"],[42,"W(উত্তর)","var(--l1)"]]],["B",[[62,"R → প্রশ্ন ✓","var(--l3)"],[85,"R → উত্তর ✓","var(--l3)"]]],["C",[[70,"প্রশ্ন ছাড়া উত্তর কখনো নয়","var(--l3)"]]]]}
+};
+function cmRender(k){
+  const m=CM[k];
+  document.getElementById("cmBox").innerHTML=
+   `<p style="margin:0 0 16px;font-size:14.5px">${m.d}</p>`+
+   m.ev.map(([n,evs])=>`<div class="tlrow"><em>নোড ${n}</em><div class="tlline">
+     ${evs.map(([x,t,c])=>`<span class="ev" style="left:${x}%;background:${c}">${t}</span>`).join("")}
+     </div></div>`).join("")+
+   `<p style="font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;margin:6px 0 0">সময় →</p>`;
+}
+document.querySelectorAll("[data-cm]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-cm]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  cmRender(b.dataset.cm);});
+cmRender("strong");
+
+/* ---------- 5 RAFT ---------- */
+const RF=[
+ {t:"শুরু — সবাই Follower",d:"পাঁচটা নোড, কোনো লিডার নেই। প্রত্যেকে একটা <b>এলোমেলো নির্বাচনী টাইমআউট</b> নিয়ে অপেক্ষা করছে (১৫০–৩০০ ms)। যার টাইমার আগে শেষ হবে সে-ই প্রথম প্রার্থী হবে।",
+  st:["f","f","f","f","f"],term:1},
+ {t:"node-2 প্রার্থী হলো",d:"node-2 এর টাইমার আগে শেষ হয়েছে। সে <b>টার্ম বাড়িয়ে ২</b> করল, নিজেকে ভোট দিল, আর বাকি সবার কাছে RequestVote পাঠাল।",
+  st:["f","c","f","f","f"],term:2},
+ {t:"ভোট পড়ছে",d:"যে নোডগুলো এই টার্মে এখনো ভোট দেয়নি এবং যাদের লগ প্রার্থীর চেয়ে এগিয়ে নেই, তারা হ্যাঁ বলে। node-2 পেল ৩টা ভোট — <b>৫ এর সংখ্যাগরিষ্ঠতা ৩</b>।",
+  st:["v","c","v","f","f"],term:2},
+ {t:"node-2 এখন Leader",d:"সংখ্যাগরিষ্ঠতা পেয়ে node-2 নেতা হলো। এখন সে নিয়মিত <b>হার্টবিট</b> পাঠাবে, যাতে কেউ নতুন নির্বাচন শুরু না করে।",
+  st:["f","l","f","f","f"],term:2},
+ {t:"লগ রেপ্লিকেশন",d:"ক্লায়েন্ট লিডারকে <code>set x=৫</code> পাঠাল। লিডার এটা নিজের লগে যোগ করে সবাইকে পাঠায়। <b>সংখ্যাগরিষ্ঠ নোড লগে লিখলেই</b> এন্ট্রিটা committed — তখনই ক্লায়েন্টকে সফল বলা হয়।",
+  st:["r","l","r","r","f"],term:2},
+ {t:"লিডার মরে গেল",d:"node-2 ক্র্যাশ করেছে। হার্টবিট বন্ধ। বাকিরা টাইমআউটের অপেক্ষায় — কয়েকশ মিলিসেকেন্ড ক্লাস্টার লেখা নিতে পারবে না।",
+  st:["f","d","f","f","f"],term:2},
+ {t:"নতুন নির্বাচন",d:"node-4 প্রার্থী হলো, টার্ম ৩। যার লগ সবচেয়ে <b>আপ-টু-ডেট</b> শুধু সে-ই জিততে পারে — এই নিয়মটাই নিশ্চিত করে কমিট হওয়া ডেটা কখনো হারাবে না।",
+  st:["v","d","v","c","f"],term:3},
+ {t:"node-4 নতুন Leader",d:"ক্লাস্টার সেরে উঠল। ৫ নোডে ২টা মরলেও চলবে — সংখ্যাগরিষ্ঠতা ৩ এখনো সম্ভব। <b>এভাবেই ফল্ট টলারেন্স সংখ্যায় প্রকাশ পায়।</b>",
+  st:["f","d","f","l","f"],term:3}
+];
+let rfI=0;
+const RFLBL={f:["Follower",""],c:["Candidate","cand"],l:["Leader","lead"],
+ v:["ভোট দিল","act"],r:["লগ কপি ✓","act"],d:["মৃত","dead"]};
+function rfDraw(){
+  const s=RF[rfI];
+  document.getElementById("rfTerm").textContent=bn(s.term);
+  document.getElementById("rfNodes").innerHTML=s.st.map((c,i)=>
+   `<div class="nd ${RFLBL[c][1]}"><b>node-${bn(i+1)}</b><em>${RFLBL[c][0]}</em>
+    <div class="val" style="font-size:11px;color:var(--muted)">term ${bn(s.term)}</div></div>`).join("");
+  document.getElementById("rfOut").innerHTML=
+    `<h4>${bn(rfI+1)}. ${s.t}</h4><p>${s.d}</p>`;
+}
+document.getElementById("rfNext").onclick=()=>{if(rfI<RF.length-1){rfI++;rfDraw();}};
+document.getElementById("rfReset").onclick=()=>{rfI=0;rfDraw();};
+rfDraw();
+
+/* ---------- 6 KAFKA ---------- */
+let consumers=2;
+const KC=["#1F63D6","#0E8474","#E24E1B","#7B4FE0","#C08A00"];
+function kDraw(){
+  const P=4;
+  let h="";
+  for(let p=0;p<P;p++){
+    const owner=p%consumers;
+    h+=`<div class="part"><b>partition-${bn(p)}</b>
+      <div class="msgs">${Array.from({length:9},(_,m)=>
+        `<div class="msg ${m<5+p%3?"done":""}">${bn(m)}</div>`).join("")}</div>
+      <span class="owner" style="background:${KC[owner]}">consumer-${bn(owner+1)}</span></div>`;
+  }
+  for(let c=P;c<consumers;c++){
+    h+=`<div class="part" style="opacity:.6"><b>—</b>
+      <div class="msgs" style="font-size:12.5px;color:var(--muted);font-family:var(--body)">কোনো পার্টিশন বরাদ্দ পায়নি</div>
+      <span class="owner idle">consumer-${bn(c+1)} · অলস</span></div>`;
+  }
+  document.getElementById("kParts").innerHTML=h;
+  const m=document.getElementById("kMsg");
+  if(consumers<P) m.innerHTML=`<b>${bn(consumers)}</b> কনজিউমার, <b>${bn(P)}</b> পার্টিশন — কেউ কেউ একাধিক পার্টিশন সামলাচ্ছে। কনজিউমার যোগ করলে সমান্তরালতা বাড়বে।`;
+  else if(consumers===P) m.innerHTML=`নিখুঁত ভারসাম্য — প্রতি কনজিউমারে ঠিক একটা পার্টিশন। <b>এটাই সর্বোচ্চ কার্যকর সমান্তরালতা।</b>`;
+  else m.innerHTML=`⚠ কনজিউমার (${bn(consumers)}) পার্টিশনের (${bn(P)}) চেয়ে বেশি — বাড়তিরা <b>বসে আছে, কোনো কাজ নেই</b>। আরও গতি চাইলে পার্টিশন বাড়াতে হবে, কনজিউমার নয়।`;
+}
+document.getElementById("kAdd").onclick=()=>{if(consumers<5){consumers++;kDraw();}};
+document.getElementById("kSub").onclick=()=>{if(consumers>1){consumers--;kDraw();}};
+kDraw();
+
+/* ---------- 7 IDEMPOTENCY ---------- */
+const payLog=document.getElementById("payLog");
+function plog(t,c){payLog.innerHTML+=`<div>${c?`<${c}>${t}</${c}>`:t}</div>`;payLog.scrollTop=payLog.scrollHeight;}
+async function runPay(withKey){
+  payLog.innerHTML="";let total=0,rows=0;
+  const upd=()=>{document.getElementById("payTotal").textContent="৳"+bn(total);
+    document.getElementById("payTotal").style.color=total>1000?"var(--red)":"var(--l3)";
+    document.getElementById("payRows").textContent=bn(rows);};
+  upd();
+  plog(withKey?"▸ Idempotency key সহ (key = a7f3-…)":"▸ Idempotency key ছাড়া","b");
+  await wait(400);
+  plog("ক্লায়েন্ট → সার্ভার: charge(৳১০০০)"+(withKey?" · key=a7f3":""));
+  await wait(500);
+  if(withKey)plog("সার্ভার: key দেখা হলো — নতুন। প্রক্রিয়া শুরু।");
+  plog("সার্ভার: কার্ড চার্জ করা হলো ✓");total+=1000;rows++;upd();
+  await wait(400);
+  plog("সার্ভার → ক্লায়েন্ট: 200 OK …");
+  await wait(500);
+  plog("⚡ উত্তরটা নেটওয়ার্কে হারিয়ে গেল","u");
+  await wait(500);
+  plog("ক্লায়েন্ট: টাইমআউট। কী হয়েছে জানি না — রিট্রাই করছি","em");
+  await wait(600);
+  plog("ক্লায়েন্ট → সার্ভার: charge(৳১০০০)"+(withKey?" · key=a7f3 (একই কী)":""));
+  await wait(500);
+  if(withKey){
+    plog("সার্ভার: এই key আগে দেখা হয়েছে — নতুন চার্জ নয়","b");
+    plog("সার্ভার: সংরক্ষিত ফলাফল ফেরত দেওয়া হলো ✓");
+    await wait(300);
+    plog("▸ ফল: ৳১০০০ একবার চার্জ, ডেটাবেজে ১টা সারি। সঠিক।","b");
+  } else {
+    plog("সার্ভার: নতুন রিকোয়েস্ট মনে করে আবার চার্জ করল","u");
+    total+=1000;rows++;upd();
+    await wait(300);
+    plog("▸ ফল: ৳২০০০ চার্জ, ২টা সারি। ইউজার দুবার টাকা দিল।","u");
+  }
+}
+document.getElementById("payNo").onclick=()=>runPay(false);
+document.getElementById("payYes").onclick=()=>runPay(true);
+
+/* ---------- 8 CIRCUIT BREAKER + BACKOFF ---------- */
+let cbState="closed",fails=0,hist=[];
+function cbDraw(msg){
+  ["sClosed","sOpen","sHalf"].forEach(id=>document.getElementById(id).classList.remove("on"));
+  document.getElementById(cbState==="closed"?"sClosed":cbState==="open"?"sOpen":"sHalf").classList.add("on");
+  document.getElementById("cbDots").innerHTML=hist.slice(-16).map(h=>`<span class="dot ${h}"></span>`).join("");
+  document.getElementById("cbOut").innerHTML=`<h4>${cbState.toUpperCase()}</h4><p>${msg}</p>`;
+}
+document.getElementById("cbOk").onclick=()=>{
+  if(cbState==="open"){hist.push("blocked");cbDraw("সার্কিট খোলা — রিকোয়েস্টটা ডাউনস্ট্রিমে <b>যায়ইনি</b>, সাথে সাথে ব্যর্থ বলা হয়েছে। এই fail-fast আচরণই কলারের থ্রেড বাঁচায়।");return;}
+  hist.push("ok");
+  if(cbState==="half"){cbState="closed";fails=0;cbDraw("পরীক্ষামূলক রিকোয়েস্ট সফল — সার্ভিস সেরে উঠেছে। সার্কিট আবার <b>CLOSED</b>, স্বাভাবিক ট্রাফিক চালু।");}
+  else{fails=0;cbDraw("সব স্বাভাবিক। ব্যর্থতার গণনা শূন্যে ফিরল।");}};
+document.getElementById("cbFail").onclick=()=>{
+  if(cbState==="open"){hist.push("blocked");cbDraw("সার্কিট খোলা — কল যায়নি।");return;}
+  hist.push("err");fails++;
+  if(cbState==="half"){cbState="open";cbDraw("পরীক্ষামূলক রিকোয়েস্টও ব্যর্থ — সার্ভিস এখনো ভাঙা। আবার <b>OPEN</b>, আরও অপেক্ষা।");return;}
+  if(fails>=3){cbState="open";cbDraw(`পরপর ${bn(3)}টা ব্যর্থতা — সার্কিট <b>OPEN</b> হয়ে গেল। এখন থেকে কল করাই হবে না, সাথে সাথে ব্যর্থ বলা হবে। ভাঙা সার্ভিস চাপমুক্ত হয়ে সারার সুযোগ পাবে।`);}
+  else cbDraw(`ব্যর্থতা ${bn(fails)}/${bn(3)}। এখনো CLOSED, ট্রাফিক যাচ্ছে।`);};
+document.getElementById("cbWait").onclick=()=>{
+  if(cbState!=="open"){cbDraw("সার্কিট খোলা নেই, অপেক্ষার দরকার নেই।");return;}
+  cbState="half";cbDraw("অপেক্ষার সময় শেষ — <b>HALF-OPEN</b>। এখন <b>একটা মাত্র</b> রিকোয়েস্ট ছেড়ে দেখা হবে সার্ভিস সেরেছে কি না। সফল হলে CLOSED, ব্যর্থ হলে আবার OPEN।");};
+document.getElementById("cbReset").onclick=()=>{cbState="closed";fails=0;hist=[];cbDraw("রিসেট। আবার শুরু করুন।");};
+cbDraw("স্বাভাবিক অবস্থা। ব্যর্থ রিকোয়েস্ট বোতামটা তিনবার চাপুন।");
+
+const BO={fixed:{v:[1,1,1,1,1,1,1,1],
+  t:"প্রতিবার একই বিরতি। সমস্যা: ভাঙা সার্ভিসের উপর চাপ কমে না, আর সব ক্লায়েন্ট একসাথে ফিরে আসে।"},
+ exp:{v:[1,2,4,8,16,32,64,100],
+  t:"প্রতিবার দ্বিগুণ অপেক্ষা — সার্ভিস দ্রুত চাপমুক্ত হয়। কিন্তু সব ক্লায়েন্ট <b>একই মুহূর্তে</b> ফিরে আসে, তাই সেরে ওঠার ঠিক সময়ে আবার ঝড় ওঠে।"},
+ jit:{v:[0.7,1.4,3.1,5,11,24,40,71],
+  t:"একই বৃদ্ধি, কিন্তু প্রতিটা ক্লায়েন্টের অপেক্ষা এলোমেলো (০ থেকে সর্বোচ্চের মধ্যে যেকোনো)। ফলে রিট্রাইগুলো সময়ের উপর ছড়িয়ে যায় — <b>thundering herd ভেঙে যায়</b>। উৎপাদনে সবসময় এটাই ব্যবহার করুন।"}};
+function boDraw(k){
+  const b=BO[k];
+  document.getElementById("boChart").innerHTML=b.v.map((v,i)=>
+   `<div style="height:${Math.max(6,v)}%;opacity:${k==="jit"?.65+Math.random()*.35:1}"><i>${bn(i+1)}</i></div>`).join("");
+  document.getElementById("boTxt").innerHTML=b.t;
+}
+document.querySelectorAll("[data-bo]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-bo]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  boDraw(b.dataset.bo);});
+boDraw("exp");
+
+/* ---------- 9 2PC vs SAGA ---------- */
+let dtMode="2pc";
+const DT={
+ "2pc":{steps:["কোঅর্ডিনেটর","অর্ডার DB","পেমেন্ট DB","ইনভেন্টরি DB"],
+  run:async(set,log)=>{
+    log("▸ ফেজ ১ — PREPARE","b");
+    log("কোঅর্ডিনেটর → সবাই: prepare?");set(0,"ok");
+    await wait(500);log("অর্ডার DB: হ্যাঁ, প্রস্তুত ✓ (লক ধরে রাখল)");set(1,"ok");
+    await wait(400);log("পেমেন্ট DB: হ্যাঁ, প্রস্তুত ✓ (লক ধরে রাখল)");set(2,"ok");
+    await wait(400);log("ইনভেন্টরি DB: না — স্টক নেই ✕","u");set(3,"fail");
+    await wait(500);log("▸ ফেজ ২ — ABORT","b");
+    log("কোঅর্ডিনেটর → সবাই: বাতিল করো");
+    await wait(400);set(1,"");set(2,"");log("সবাই রোলব্যাক করল, লক ছাড়ল");
+    log("▸ ফল: কেউ কিছু দেখেনি, সত্যিকারের অ্যাটমিসিটি","b");
+    log("কিন্তু: ফেজ ১ ও ২ এর মাঝে কোঅর্ডিনেটর মরলে সবাই লক ধরে অনির্দিষ্টকাল আটকে থাকত","em");}},
+ saga:{steps:["অর্ডার তৈরি","পেমেন্ট","ইনভেন্টরি","শিপিং"],
+  run:async(set,log)=>{
+    log("▸ Saga — প্রতিটা ধাপ সাথে সাথে কমিট হয়","b");
+    log("ধাপ ১: অর্ডার তৈরি ✓ (কমিট হয়ে গেল)");set(0,"ok");
+    await wait(500);log("ধাপ ২: ৳১০০০ চার্জ ✓ (কমিট হয়ে গেল — টাকা কেটে নেওয়া হয়েছে)");set(1,"ok");
+    await wait(500);log("ধাপ ৩: স্টক কমানো ✕ — স্টক নেই","u");set(2,"fail");
+    await wait(500);log("▸ ক্ষতিপূরণ শুরু — উল্টো ক্রমে","b");
+    log("ক্ষতিপূরণ: ৳১০০০ রিফান্ড করা হলো");set(1,"comp");
+    await wait(450);log("ক্ষতিপূরণ: অর্ডার বাতিল করা হলো");set(0,"comp");
+    log("▸ ফল: চূড়ান্ত অবস্থা সঠিক, কোনো লক লাগেনি","b");
+    log("কিন্তু: কিছুক্ষণের জন্য টাকা সত্যিই কাটা ছিল — ইউজার সেটা দেখে ফেলতে পারত","em");}}
+};
+function dtDraw(){
+  document.getElementById("dtFlow").innerHTML=DT[dtMode].steps
+    .map((s,i)=>`<div class="fbox" id="fb${i}">${s}</div>`).join('<span class="fa">→</span>');
+  document.getElementById("dtLog").innerHTML="<div><b>▸ চালান চাপুন</b></div>";
+}
+document.querySelectorAll("[data-dt]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-dt]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  dtMode=b.dataset.dt;dtDraw();});
+document.getElementById("dtRun").onclick=()=>{
+  dtDraw();const lg=document.getElementById("dtLog");lg.innerHTML="";
+  DT[dtMode].run((i,c)=>{document.getElementById("fb"+i).className="fbox "+c;},
+    (t,c)=>{lg.innerHTML+=`<div>${c?`<${c}>${t}</${c}>`:t}</div>`;lg.scrollTop=lg.scrollHeight;});};
+dtDraw();
+
+/* ---------- 10 QUIZ ---------- */
+const QZ=[
+ ["অ্যাসিঙ্ক্রোনাস রেপ্লিকেশনে লিডার মরলে ঠিক কী হারায়?",
+  "যে লেখাগুলো লিডার কমিট করে ক্লায়েন্টকে সফল বলেছে কিন্তু এখনো কোনো ফলোয়ারে পৌঁছায়নি — সেগুলো চিরতরে যায়। ইউজার দেখেছে “সেভ হয়েছে”, অথচ ডেটা নেই। এই কারণেই ক্রিটিক্যাল ডেটায় অন্তত একটা সিঙ্ক্রোনাস রেপ্লিকা রাখা হয় (semi-sync)।"],
+ ["W+R>N নিয়মটা কী নিশ্চিত করে, উদাহরণ দিন?",
+  "লেখার সেট আর পড়ার সেটের মধ্যে অন্তত একটা নোড অভিন্ন থাকবে — তাই পড়ার সময় অন্তত একজন নতুন মান জানবে। N=৩, W=২, R=২ হলে ২+২=৪ > ৩, তাই ওভারল্যাপ নিশ্চিত। W=১, R=১ হলে ২ > ৩ নয় — তখন পুরোনো ডেটা পড়া সম্ভব।"],
+ ["মডুলো হ্যাশিংয়ে একটা সার্ভার যোগ করলে কী হয়, আর কনসিস্টেন্ট হ্যাশিংয়ে?",
+  "মডুলোতে N বদলায়, তাই প্রায় (N-1)/N ভাগ কী নতুন সার্ভারে চলে যায় — ক্যাশ ক্লাস্টারে এর মানে প্রায় সম্পূর্ণ cache miss আর ডেটাবেজে ধস। কনসিস্টেন্ট হ্যাশিংয়ে গড়ে মাত্র 1/N ভাগ কী নড়ে, শুধু নতুন নোডের আগের অংশটুকু।"],
+ ["ভার্চুয়াল নোড কেন লাগে, দুটো কারণ বলুন?",
+  "এক, অল্প কয়েকটা নোড বৃত্তে এলোমেলো বসলে ভাগ অসমান হয় — ভার্চুয়াল নোড প্রতিটা সার্ভারকে বহু জায়গায় ছড়িয়ে লোড সমান করে। দুই, একটা নোড মরলে তার পুরো ভার লক্ষণীয়ভাবে একজনের ঘাড়ে না পড়ে সবার মধ্যে ভাগ হয়ে যায়।"],
+ ["“আমরা AP সিস্টেম বেছেছি” — এই বাক্যটার সমস্যা কী?",
+  "অতিরিক্ত সরলীকরণ। একই সিস্টেমের ভিন্ন ফিচারে ভিন্ন পছন্দ থাকতে পারে ও থাকা উচিত — কার্টে আইটেম যোগ AP, পেমেন্ট CP। এছাড়া CAP শুধু পার্টিশনের সময়ের কথা বলে; বাকি ৯৯.৯% সময়ের ট্রেডঅফ (latency বনাম consistency) PACELC-র E অংশ।"],
+ ["Read-your-writes কনসিস্টেন্সি না থাকলে ব্যবহারকারী কী দেখবে?",
+  "নিজের করা কমেন্ট বা পোস্ট রিফ্রেশ করার পর উধাও — কারণ লেখা গেছে লিডারে, পড়া হয়েছে পিছিয়ে থাকা রেপ্লিকা থেকে। সমাধান: নিজের ডেটা পড়ার সময় লিডারে যাওয়া, বা লেখার পর কিছুক্ষণ ঐ ইউজারকে লিডারে পিন করা।"],
+ ["Raft ক্লাস্টার সবসময় ৩ বা ৫ নোডের হয় কেন, ৪ নয়?",
+  "সংখ্যাগরিষ্ঠতা লাগে (N/2)+1। ৩ নোডে ২ লাগে, ১টা মরলেও চলে। ৪ নোডে ৩ লাগে — তাও ১টা মরলেই সীমা, অর্থাৎ একটা বাড়তি মেশিনের খরচ দিয়ে কোনো বাড়তি ফল্ট টলারেন্স পাওয়া যায় না। ৫ নোডে ৩ লাগে, ২টা মরলেও চলে।"],
+ ["Raft-এ র‍্যান্ডম নির্বাচনী টাইমআউট কেন?",
+  "সবাই একসাথে টাইমআউট করলে সবাই একসাথে প্রার্থী হবে, ভোট ভাগ হয়ে কেউ সংখ্যাগরিষ্ঠতা পাবে না — split vote, আর বারবার তাই হতে থাকবে। এলোমেলো টাইমআউটে সাধারণত একজন আগে জেগে ওঠে ও এক রাউন্ডেই জিতে যায়।"],
+ ["Kafka-তে পার্টিশনের চেয়ে বেশি কনজিউমার দিলে কী হয়?",
+  "বাড়তি কনজিউমারগুলো অলস বসে থাকে — একই গ্রুপে একটা পার্টিশন একজনের বেশি কনজিউমার পড়তে পারে না। থ্রুপুট বাড়াতে হলে পার্টিশন বাড়াতে হবে। অর্থাৎ পার্টিশন সংখ্যাই আপনার সর্বোচ্চ সমান্তরালতার সীমা।"],
+ ["Kafka “ক্রম নিশ্চিত করে” — কথাটা কতটা সত্য?",
+  "শুধু একটা পার্টিশনের ভেতরে সত্য, পুরো টপিকে নয়। একটা এনটিটির (যেমন একটা অর্ডারের) সব ইভেন্ট ক্রমে দরকার হলে সেই এনটিটির ID-কে পার্টিশন কী বানাতে হবে, যাতে সব ইভেন্ট একই পার্টিশনে পড়ে।"],
+ ["সত্যিকারের exactly-once ডেলিভারি সম্ভব নয় কেন, তাহলে কী করব?",
+  "উত্তর না পেলে প্রেরক জানতে পারে না রিকোয়েস্ট পৌঁছেছিল কি না — তাই হয় রিট্রাই করতে হবে (ডুপ্লিকেটের ঝুঁকি) নয়তো করবে না (হারানোর ঝুঁকি)। ব্যবহারিক সমাধান: at-least-once ডেলিভারি + রিসিভারের দিকে idempotency key দিয়ে ডিডুপ, যাকে বলে exactly-once processing।"],
+ ["সার্কিট ব্রেকারের HALF-OPEN অবস্থাটা কেন দরকার?",
+  "OPEN থেকে সরাসরি CLOSED-এ গেলে সব ট্রাফিক একসাথে সদ্য সেরে ওঠা সার্ভিসে গিয়ে তাকে আবার মেরে ফেলবে। HALF-OPEN-এ অল্প কয়েকটা পরীক্ষামূলক রিকোয়েস্ট ছেড়ে দেখা হয় — সফল হলে ধীরে স্বাভাবিক হয়, ব্যর্থ হলে আবার OPEN।"],
+ ["ব্যাকঅফে jitter না দিলে কী বিপদ?",
+  "সব ক্লায়েন্ট একই সময়ে ব্যর্থ হয়ে একই ব্যবধান গুনবে, তাই সবাই একই মুহূর্তে রিট্রাই করবে — thundering herd। সার্ভিস সেরে ওঠার ঠিক সময়ে সবচেয়ে বড় ঢেউ এসে আবার তাকে ফেলে দেবে। jitter রিট্রাইগুলো সময়ের উপর ছড়িয়ে দেয়।"],
+ ["মাইক্রোসার্ভিসে 2PC ব্যবহার করা হয় না কেন?",
+  "কমিট শেষ না হওয়া পর্যন্ত প্রতিটা অংশগ্রহণকারী লক ধরে বসে থাকে, তাই থ্রুপুট ধসে যায়। আর কোঅর্ডিনেটর দুই ফেজের মাঝে মরলে সবাই অনির্দিষ্টকাল আটকে থাকে (blocking protocol)। তাই Saga — প্রতিটা ধাপ সাথে সাথে কমিট, ব্যর্থ হলে ক্ষতিপূরণমূলক লেনদেন।"],
+ ["Saga-র সবচেয়ে বড় দুর্বলতা কী?",
+  "মাঝপথের অসম্পূর্ণ অবস্থা বাইরে থেকে দৃশ্যমান — যেমন টাকা কেটে নেওয়া হয়েছে কিন্তু অর্ডার এখনো নিশ্চিত নয়। ক্ষতিপূরণ rollback নয়, নতুন করে উল্টো কাজ, তাই সেটাও ব্যর্থ হতে পারে ও idempotent হতে হবে। ব্যবসায়িকভাবে এই মধ্যবর্তী অবস্থা গ্রহণযোগ্য কি না, সেটাই আগে ঠিক করতে হয়।"]
+];
+document.getElementById("quiz").innerHTML=QZ.map(([q,a],i)=>
+ `<div class="q"><button onclick="this.parentNode.classList.toggle('open')">
+  <i>${bn(String(i+1).padStart(2,"0"))}</i><span>${q}</span></button>
+  <div class="a">${a}</div></div>`).join("");
+</script>
+</body>
+</html>
