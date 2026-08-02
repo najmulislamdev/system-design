@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ভলিউম ১ — ভিত্তি | সিস্টেম ডিজাইন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBF1; --card:#FFF; --ink:#141C2B; --ink-2:#3E4A5E; --muted:#77839A; --rule:#CBD3DF;
+  --l1:#E24E1B; --l2:#1F63D6; --l3:#0E8474; --l4:#7B4FE0; --l5:#C08A00; --red:#C42B1C;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --disp:"Anek Bangla","Hind Siliguri",system-ui,sans-serif;
+  --body:"Hind Siliguri","Anek Bangla",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;
+  line-height:1.8;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px,rgba(20,28,43,.07) 1px,transparent 0);background-size:26px 26px}
+
+/* layout */
+.shell{max-width:1240px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:44px}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:34px 0;align-self:start}
+.toc-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
+.toc a{display:block;text-decoration:none;color:var(--ink-2);font-size:13.5px;padding:6px 0 6px 14px;
+  border-left:2px solid var(--rule);line-height:1.4;transition:.16s}
+.toc a:hover{color:var(--ink);border-color:var(--muted)}
+.toc a.on{color:var(--l1);border-color:var(--l1);font-weight:600}
+.toc a i{font-family:var(--mono);font-style:normal;font-size:10.5px;color:var(--muted);margin-right:7px}
+main{padding:34px 0 80px;min-width:0}
+
+/* hero */
+.hero{padding:26px 0 44px;border-bottom:1px solid var(--rule);margin-bottom:44px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--l1);margin-bottom:18px}
+h1{font-family:var(--disp);font-weight:800;font-stretch:88%;font-size:clamp(34px,5.4vw,58px);
+  line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+h1 span{display:block;font-weight:400;color:var(--ink-2)}
+.lede{font-size:17.5px;color:var(--ink-2);max-width:640px;margin:0}
+
+/* chapters */
+.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:20px}
+.ch:last-of-type{border-bottom:0}
+.ch-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--l1);margin-bottom:10px}
+h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(25px,3.6vw,36px);
+  margin:0 0 8px;letter-spacing:-.015em;line-height:1.2}
+.sub{color:var(--muted);font-size:15px;margin:0 0 26px}
+h3{font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:20px;margin:32px 0 10px}
+p{margin:0 0 15px;color:var(--ink-2)}
+p.lead{color:var(--ink)}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.86em;background:#DDE3EC;padding:2px 6px;border-radius:5px;color:var(--ink)}
+ul.plain{margin:0 0 16px;padding-left:20px;color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* widget shell */
+.w{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;margin:22px 0 24px;
+  box-shadow:0 14px 34px -28px rgba(20,28,43,.55)}
+.w-h{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.w-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.ctrls{display:flex;gap:7px;flex-wrap:wrap}
+button.b{font-family:var(--body);font-size:13.5px;font-weight:600;border:1px solid var(--rule);background:#fff;
+  color:var(--ink-2);border-radius:9px;padding:7px 14px;cursor:pointer;transition:.16s}
+button.b:hover{border-color:var(--ink);color:var(--ink)}
+button.b[aria-selected="true"],button.b.pri{background:var(--l1);border-color:var(--l1);color:#fff}
+button.b:disabled{opacity:.4;cursor:default}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:12px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:middle}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);
+  font-weight:500;padding:0 10px 9px 0;border-bottom:1px solid var(--rule)}
+td{padding:10px 10px 10px 0;border-bottom:1px solid #EDF0F5;vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td.y{color:var(--l3);font-weight:600}td.n{color:var(--red);font-weight:600}
+
+/* callouts */
+.note{border-left:3px solid var(--l2);padding:4px 0 4px 16px;margin:20px 0;font-size:14.5px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--l2);display:block;margin-bottom:3px}
+.note p{margin:0;font-size:14.5px}
+.iq{background:#141C2B;color:#C3CEDD;border-radius:14px;padding:20px 24px;margin:24px 0;font-size:14.5px}
+.iq .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#FFD166;display:block;margin-bottom:8px}
+.iq p{color:#C3CEDD;margin:0 0 10px}.iq p:last-child{margin:0}
+.iq strong{color:#fff}
+
+/* dns */
+.dns-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.dns-node{flex:1;min-width:112px;border:1.5px solid var(--rule);border-radius:11px;padding:12px 10px;text-align:center;
+  transition:.3s;background:#FAFBFD}
+.dns-node.act{border-color:var(--l1);background:color-mix(in srgb,var(--l1) 9%,#fff);transform:translateY(-3px)}
+.dns-node.done{border-color:var(--l3);background:color-mix(in srgb,var(--l3) 7%,#fff)}
+.dns-node b{display:block;font-size:13px;font-weight:700;color:var(--ink)}
+.dns-node em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.dns-out{margin-top:16px;border-left:3px solid var(--l1);padding-left:15px;min-height:74px}
+.dns-out h4{margin:0 0 5px;font-size:16px;font-family:var(--disp);font-weight:700}
+.dns-out p{margin:0;font-size:14px}
+.dns-out code{font-size:12px}
+
+/* packets */
+.wire{position:relative;height:170px;background:#F7F9FC;border-radius:11px;border:1px solid var(--rule);overflow:hidden}
+.wire .lbl{position:absolute;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em}
+.pkt{position:absolute;left:14%;padding:3px 9px;border-radius:6px;font-family:var(--mono);font-size:10px;
+  color:#fff;background:var(--l2);white-space:nowrap;transition:left 1.1s linear,opacity .3s}
+.pkt.back{background:var(--l3)}.pkt.lost{background:var(--red)}
+.log{font-family:var(--mono);font-size:11.5px;line-height:1.85;background:#141C2B;color:#9FB0C6;
+  border-radius:10px;padding:14px 16px;height:150px;overflow-y:auto;margin-top:12px}
+.log b{color:#7FD4C1;font-weight:400}.log u{color:#FF8B7A;text-decoration:none}
+
+/* http bars */
+.lanes{display:flex;flex-direction:column;gap:7px}
+.lane{display:flex;align-items:center;gap:10px}
+.lane em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted);width:64px;flex:none}
+.lane .track{flex:1;height:19px;background:#E4E9F0;border-radius:5px;position:relative;overflow:hidden}
+.lane .bar{position:absolute;top:0;height:100%;width:0;background:var(--l2);border-radius:5px;
+  transition:width .1s linear,left .1s linear}
+.lane .bar.stall{background:repeating-linear-gradient(45deg,#C42B1C 0 6px,#9E2216 6px 12px)}
+.clock{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--ink)}
+
+/* lb */
+.lb-wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:18px;align-items:center}
+.srv{border:1.5px solid var(--rule);border-radius:10px;padding:10px 13px;margin-bottom:9px;background:#FAFBFD;
+  transition:.25s;font-size:13.5px}
+.srv.hit{border-color:var(--l1);background:color-mix(in srgb,var(--l1) 10%,#fff);transform:translateX(6px)}
+.srv b{font-family:var(--mono);font-size:11.5px;display:block;color:var(--ink)}
+.srv em{font-style:normal;font-size:12px;color:var(--muted)}
+
+/* btree */
+.bt svg{width:100%;height:auto;display:block}
+.bt .node{fill:#fff;stroke:var(--rule);stroke-width:1.5;transition:.3s}
+.bt .node.on{fill:color-mix(in srgb,var(--l1) 14%,#fff);stroke:var(--l1);stroke-width:2.5}
+.bt text{font-family:var(--mono);font-size:11px;fill:var(--ink-2)}
+.bt .edge{stroke:var(--rule);stroke-width:1.5;fill:none;transition:.3s}
+.bt .edge.on{stroke:var(--l1);stroke-width:2.5}
+.stat{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px}
+.stat div em{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.stat div b{font-family:var(--mono);font-size:24px;font-weight:700}
+input.num{font-family:var(--mono);font-size:13px;border:1px solid var(--rule);border-radius:8px;
+  padding:7px 11px;width:110px;background:#fff;color:var(--ink)}
+
+/* iso */
+.tx{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-family:var(--mono);font-size:12px}
+.tx .col{background:#F7F9FC;border:1px solid var(--rule);border-radius:10px;padding:12px}
+.tx .col h5{margin:0 0 8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.tx .step{padding:5px 8px;border-radius:6px;margin-bottom:5px;background:#fff;border:1px solid var(--rule);color:var(--ink-2)}
+.tx .step.bad{border-color:var(--red);color:var(--red);background:color-mix(in srgb,var(--red) 7%,#fff)}
+
+/* cache */
+.cflow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:14px 0}
+.cbox{border:1.5px solid var(--rule);border-radius:11px;padding:14px 18px;text-align:center;background:#FAFBFD;
+  min-width:96px;transition:.3s}
+.cbox.on{border-color:var(--l1);background:color-mix(in srgb,var(--l1) 10%,#fff)}
+.cbox b{display:block;font-size:13.5px}.cbox em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.arw{font-family:var(--mono);font-size:16px;color:var(--rule);transition:.3s}
+.arw.on{color:var(--l1)}
+
+/* latency */
+.lat{display:flex;flex-direction:column;gap:11px}
+.lat-row{display:grid;grid-template-columns:190px 1fr auto;gap:12px;align-items:center;font-size:13.5px}
+.lat-bar{height:15px;border-radius:4px;background:var(--l2);transition:width .6s cubic-bezier(.2,.8,.2,1);min-width:3px}
+.lat-val{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.lat-row span:first-child{color:var(--ink-2)}
+
+/* calc */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.field{margin-bottom:16px}
+.field label{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px;color:var(--ink-2)}
+.field label b{font-family:var(--mono);font-size:12.5px;color:var(--l1)}
+input[type=range]{width:100%;accent-color:var(--l1);height:4px}
+.out{background:#141C2B;border-radius:12px;padding:20px 22px}
+.out .r{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid #26324A}
+.out .r:last-child{border-bottom:0}
+.out .r span{font-size:13.5px;color:#98A6BC}
+.out .r b{font-family:var(--mono);font-size:16px;color:#fff;font-weight:700}
+.out .r b.hl{color:#FFD166}
+
+/* quiz */
+.q{border:1px solid var(--rule);border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.q>button{width:100%;text-align:left;background:none;border:0;padding:15px 18px;font-family:var(--body);
+  font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.q>button i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--l1);margin-top:4px}
+.q .a{display:none;padding:0 18px 16px 47px;font-size:14.5px;color:var(--ink-2);border-top:1px solid #EDF0F5;padding-top:14px}
+.q.open .a{display:block}
+
+footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.08em;color:var(--muted)}
+
+@media(max-width:960px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;height:auto;padding:26px 0 0;display:flex;gap:8px;overflow-x:auto}
+  .toc-k{display:none}
+  .toc a{border-left:0;border-bottom:2px solid var(--rule);white-space:nowrap;padding:6px 4px}
+  .calc,.lb-wrap,.tx{grid-template-columns:1fr}
+  .lat-row{grid-template-columns:120px 1fr;gap:8px}
+  .lat-val{grid-column:2}
+  .w{padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="toc">
+  <p class="toc-k">ভলিউম ১ · অধ্যায়</p>
+  <a href="#c1"><i>০১</i>DNS রেজলিউশন</a>
+  <a href="#c2"><i>০২</i>TCP বনাম UDP</a>
+  <a href="#c3"><i>০৩</i>HTTP/1.1, 2, 3</a>
+  <a href="#c4"><i>০৪</i>রিয়েলটাইম কমিউনিকেশন</a>
+  <a href="#c5"><i>০৫</i>লোড ব্যালান্সার L4/L7</a>
+  <a href="#c6"><i>০৬</i>ইনডেক্স ও B-tree</a>
+  <a href="#c7"><i>০৭</i>ACID ও Isolation</a>
+  <a href="#c8"><i>০৮</i>ক্যাশিং স্ট্র্যাটেজি</a>
+  <a href="#c9"><i>০৯</i>লেটেন্সি সংখ্যা</a>
+  <a href="#c10"><i>১০</i>এস্টিমেশন</a>
+  <a href="#c11"><i>১১</i>নিজেকে যাচাই</a>
+</nav>
+
+<main>
+<div class="hero">
+  <div class="eyebrow">ভলিউম ১ / ৫ · ভিত্তি · ৬–৮ সপ্তাহ</div>
+  <h1>ভিত্তি<span>নেটওয়ার্ক, ডেটাবেজ, ক্যাশ</span></h1>
+  <p class="lede">সিস্টেম ডিজাইনের প্রতিটা বড় সিদ্ধান্ত শেষমেশ এই তিনটা জিনিসের ভেতরের নিয়মে গিয়ে ঠেকে। এখানকার প্রতিটা ডায়াগ্রাম চালানো যায় — পড়ার পাশাপাশি বোতাম চাপুন, সংখ্যা বদলান, দেখুন কী হয়।</p>
+</div>
+
+<!-- ============ 1. DNS ============ -->
+<section class="ch" id="c1">
+  <div class="ch-n">অধ্যায় ০১</div>
+  <h2>DNS রেজলিউশন</h2>
+  <p class="sub">ব্রাউজারে নাম লিখলেন — IP ঠিকানা বের হলো কীভাবে?</p>
+
+  <p class="lead">DNS হলো ইন্টারনেটের ফোনবুক, কিন্তু ফোনবুকটা একটা জায়গায় রাখা নেই। এটা <strong>বিতরণ করা এবং স্তরে স্তরে সাজানো</strong> — আর এই ডিজাইনটাই সিস্টেম ডিজাইনের প্রথম বড় শিক্ষা: পৃথিবীর সবচেয়ে বেশি ব্যবহৃত লুকআপ সিস্টেমটা কোনো একক ডেটাবেজ নয়, বরং ক্যাশের স্তর আর ডেলিগেশনের গাছ।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">চালিয়ে দেখুন · <code>www.example.com</code> খোঁজা হচ্ছে</span>
+      <div class="ctrls">
+        <button class="b pri" id="dnsNext">পরের ধাপ</button>
+        <button class="b" id="dnsReset">আবার</button>
+      </div>
+    </div>
+    <div class="dns-row" id="dnsRow"></div>
+    <div class="dns-out" id="dnsOut"></div>
+  </div>
+
+  <h3>যে জিনিসগুলো ইন্টারভিউতে কাজে লাগে</h3>
+  <ul class="plain">
+    <li><strong>TTL</strong> ঠিক করে দেয় ক্যাশ কতক্ষণ থাকবে। কম TTL মানে দ্রুত failover, কিন্তু বেশি DNS ট্রাফিক। ডেপ্লয়মেন্টের আগে TTL কমিয়ে রাখাটা একটা পরিচিত কৌশল।</li>
+    <li><strong>DNS দিয়ে লোড ব্যালান্সিং</strong> করা যায় — একই নামের বিপরীতে একাধিক A রেকর্ড, বা GeoDNS দিয়ে ইউজারের কাছের ডেটাসেন্টারে পাঠানো। CDN এভাবেই কাজ শুরু করে।</li>
+    <li>DNS চলে <strong>UDP পোর্ট ৫৩</strong>-তে, কারণ একটা ছোট প্রশ্ন-উত্তরের জন্য TCP হ্যান্ডশেক করা অপচয়। উত্তর বড় হলে (৫১২ বাইটের বেশি) TCP-তে ফলব্যাক করে।</li>
+    <li>DNS <strong>eventual consistency</strong>-র বাস্তব উদাহরণ। রেকর্ড বদলালে সারা পৃথিবীতে ছড়াতে সময় লাগে — কারণ প্রতিটা রিজলভারের ক্যাশ আলাদা সময়ে মেয়াদ শেষ হয়।</li>
+  </ul>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"আপনার সার্ভার ডাউন, নতুন IP-তে সরাতে চান। কত দ্রুত ট্রাফিক সরবে?"</strong></p>
+    <p>উত্তরে TTL-এর কথা আসতেই হবে। TTL ৩৬০০ সেকেন্ড হলে এক ঘণ্টা পর্যন্ত পুরোনো IP-তে ট্রাফিক যেতে থাকবে। তাই বাস্তবে failover DNS দিয়ে না করে লোড ব্যালান্সারের পেছনে করা হয় — DNS একই থাকে, LB ভেতরে সার্ভার বদলে দেয়।</p>
+  </div>
+</section>
+
+<!-- ============ 2. TCP/UDP ============ -->
+<section class="ch" id="c2">
+  <div class="ch-n">অধ্যায় ০২</div>
+  <h2>TCP বনাম UDP</h2>
+  <p class="sub">নির্ভরযোগ্যতা বনাম গতি — সবচেয়ে পুরোনো tradeoff</p>
+
+  <p class="lead">TCP প্রতিশ্রুতি দেয়: যা পাঠিয়েছেন তা পৌঁছাবে, ঠিক ক্রমে পৌঁছাবে। UDP কোনো প্রতিশ্রুতি দেয় না — শুধু পাঠিয়ে দেয়। নিচের সিমুলেশনে দুটোই চালান, মাঝখানে একটা প্যাকেট ইচ্ছে করে হারানো হবে।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">প্যাকেট সিমুলেশন · ৩ নম্বর প্যাকেট হারিয়ে যাবে</span>
+      <div class="ctrls">
+        <button class="b" id="runTcp">TCP চালান</button>
+        <button class="b" id="runUdp">UDP চালান</button>
+      </div>
+    </div>
+    <div class="wire" id="wire">
+      <span class="lbl" style="left:14px;top:10px">CLIENT</span>
+      <span class="lbl" style="right:14px;top:10px">SERVER</span>
+    </div>
+    <div class="log" id="netLog"><b>▸ উপরের বোতাম চাপুন</b></div>
+  </div>
+
+  <table>
+    <tr><th>বৈশিষ্ট্য</th><th>TCP</th><th>UDP</th></tr>
+    <tr><td>কানেকশন</td><td>থ্রি-ওয়ে হ্যান্ডশেক লাগে</td><td>কিছু লাগে না</td></tr>
+    <tr><td>হারানো প্যাকেট</td><td class="y">আবার পাঠায়</td><td class="n">হারিয়ে যায়, শেষ</td></tr>
+    <tr><td>ক্রম</td><td class="y">নিশ্চিত</td><td class="n">উল্টাপাল্টা আসতে পারে</td></tr>
+    <tr><td>গতি</td><td>ধীর, ওভারহেড বেশি</td><td class="y">দ্রুত, হেডার মাত্র ৮ বাইট</td></tr>
+    <tr><td>Head-of-line blocking</td><td class="n">আছে</td><td class="y">নেই</td></tr>
+    <tr><td>কোথায়</td><td>API, ডেটাবেজ, ফাইল ট্রান্সফার</td><td>DNS, ভিডিও কল, গেম, QUIC</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="k">মূল অন্তর্দৃষ্টি</span>
+    <p>ভিডিও কলে একটা ফ্রেম হারালে সেটা আবার পাঠানোর কোনো মানে নেই — যতক্ষণে আসবে ততক্ষণে সেই মুহূর্ত পার হয়ে গেছে। তাই লাইভ স্ট্রিমিং UDP ব্যবহার করে। <strong>নির্ভরযোগ্যতা সবসময় ভালো নয়; কখন সেটা অপ্রাসঙ্গিক তা বোঝাটাই ডিজাইন সিদ্ধান্ত।</strong></p>
+  </div>
+</section>
+
+<!-- ============ 3. HTTP ============ -->
+<section class="ch" id="c3">
+  <div class="ch-n">অধ্যায় ০৩</div>
+  <h2>HTTP/1.1 · HTTP/2 · HTTP/3</h2>
+  <p class="sub">একই কানেকশনে ৬টা রিকোয়েস্ট — তিন প্রজন্মে তিন রকম ফল</p>
+
+  <p class="lead">নিচে ৬টা রিকোয়েস্ট একসাথে পাঠানো হচ্ছে, আর ২ নম্বর রিকোয়েস্টে একটা প্যাকেট হারাচ্ছে। প্রতিটা ভার্সন চালিয়ে ঘড়ির দিকে খেয়াল করুন — পার্থক্যটা তত্ত্ব নয়, সময়ে মাপা যায়।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">৬টা রিকোয়েস্ট · রিকোয়েস্ট ২-এ প্যাকেট লস</span>
+      <div class="ctrls">
+        <button class="b" data-hv="1" aria-selected="true">HTTP/1.1</button>
+        <button class="b" data-hv="2">HTTP/2</button>
+        <button class="b" data-hv="3">HTTP/3</button>
+        <button class="b pri" id="hRun">চালান</button>
+      </div>
+    </div>
+    <div class="lanes" id="lanes"></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:16px">
+      <span class="lat-val" id="hDesc">HTTP/1.1 — ব্রাউজার ৬টা আলাদা TCP কানেকশন খোলে</span>
+      <span class="clock" id="hClock">০ ms</span>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--l2)"></i>ডেটা ট্রান্সফার</span>
+      <span><i style="background:#C42B1C"></i>প্যাকেট লসের কারণে আটকে আছে</span>
+    </div>
+  </div>
+
+  <h3>কী বদলালো, কেন বদলালো</h3>
+  <table>
+    <tr><th></th><th>HTTP/1.1</th><th>HTTP/2</th><th>HTTP/3</th></tr>
+    <tr><td>ট্রান্সপোর্ট</td><td>TCP</td><td>TCP</td><td>QUIC (UDP-র উপর)</td></tr>
+    <tr><td>মাল্টিপ্লেক্সিং</td><td class="n">নেই — এক কানেকশনে একটা</td><td class="y">আছে</td><td class="y">আছে</td></tr>
+    <tr><td>HOL blocking</td><td>অ্যাপ্লিকেশন লেভেলে</td><td class="n">TCP লেভেলে থেকে যায়</td><td class="y">নেই</td></tr>
+    <tr><td>হেডার</td><td>প্লেইন টেক্সট, বারবার</td><td class="y">HPACK কমপ্রেশন</td><td class="y">QPACK</td></tr>
+    <tr><td>হ্যান্ডশেক</td><td>TCP + TLS আলাদা</td><td>TCP + TLS আলাদা</td><td class="y">একসাথে, 0-RTT সম্ভব</td></tr>
+    <tr><td>নেটওয়ার্ক বদল</td><td class="n">কানেকশন ভাঙে</td><td class="n">কানেকশন ভাঙে</td><td class="y">connection ID দিয়ে টিকে থাকে</td></tr>
+  </table>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"HTTP/2-তে মাল্টিপ্লেক্সিং আছে, তাহলে HTTP/3 কেন দরকার হলো?"</strong></p>
+    <p>কারণ HTTP/2 স্ট্রিমগুলো আলাদা করলেও নিচে একটাই TCP কানেকশন। TCP নিজে ক্রম নিশ্চিত করে, তাই একটা প্যাকেট হারালে <strong>TCP পুরো বাইট-স্ট্রিম আটকে দেয়</strong> — সব স্ট্রিম থেমে যায়। QUIC প্রতিটা স্ট্রিমের ক্রম আলাদাভাবে সামলায়, তাই একটার লস অন্যটাকে ছোঁয় না। মোবাইল নেটওয়ার্কে যেখানে লস বেশি, পার্থক্যটা সেখানেই সবচেয়ে বড়।</p>
+  </div>
+</section>
+
+<!-- ============ 4. Realtime ============ -->
+<section class="ch" id="c4">
+  <div class="ch-n">অধ্যায় ০৪</div>
+  <h2>রিয়েলটাইম কমিউনিকেশন</h2>
+  <p class="sub">সার্ভার থেকে ক্লায়েন্টে ডেটা ঠেলে দেওয়ার চারটা উপায়</p>
+
+  <p class="lead">HTTP-র মূল সমস্যা: ক্লায়েন্ট চাইলে সার্ভার দেয়, সার্ভার নিজে থেকে কিছু পাঠাতে পারে না। চ্যাট, নোটিফিকেশন, লাইভ স্কোর — সবখানে এই সমস্যার সমাধান লাগে। নিচে চারটা পদ্ধতির বার্তা-বিনিময় দেখুন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">মেসেজ ফ্লো</span>
+      <div class="ctrls">
+        <button class="b" data-rt="poll" aria-selected="true">Short polling</button>
+        <button class="b" data-rt="long">Long polling</button>
+        <button class="b" data-rt="sse">SSE</button>
+        <button class="b" data-rt="ws">WebSocket</button>
+      </div>
+    </div>
+    <div id="rtBox"></div>
+  </div>
+
+  <table>
+    <tr><th></th><th>দিক</th><th>কানেকশন</th><th>কোথায় ব্যবহার</th></tr>
+    <tr><td>Short polling</td><td>ক্লায়েন্ট টানে</td><td>বারবার নতুন</td><td>কম গুরুত্বপূর্ণ আপডেট, সহজ বাস্তবায়ন</td></tr>
+    <tr><td>Long polling</td><td>ক্লায়েন্ট টানে</td><td>ধরে রাখা</td><td>পুরোনো ব্রাউজার সাপোর্ট লাগলে</td></tr>
+    <tr><td>SSE</td><td>সার্ভার ঠেলে</td><td>একমুখী, খোলা</td><td>লাইভ ফিড, স্টক টিকার, নোটিফিকেশন</td></tr>
+    <tr><td>WebSocket</td><td>দুই দিকেই</td><td>দ্বিমুখী, খোলা</td><td>চ্যাট, মাল্টিপ্লেয়ার গেম, কোলাবরেটিভ এডিটর</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="k">ডিজাইন সিদ্ধান্ত</span>
+    <p>শুধু সার্ভার থেকে ডেটা আসলে <strong>SSE বেছে নিন, WebSocket নয়</strong> — SSE সাধারণ HTTP-র উপর চলে, তাই প্রক্সি-ফ্রেন্ডলি, স্বয়ংক্রিয় reconnect আছে, আর অনেক সহজ। WebSocket তখনই দরকার যখন ক্লায়েন্টও ঘনঘন পাঠায়। ইন্টারভিউতে যে সবসময় WebSocket বলে, সে tradeoff জানে না বলে ধরা পড়ে।</p>
+  </div>
+  <p>স্কেলে আসল সমস্যা অন্য জায়গায় — <strong>খোলা কানেকশন স্টেটফুল</strong>। ১০ লাখ ইউজার মানে ১০ লাখ খোলা কানেকশন, যেগুলো নির্দিষ্ট সার্ভারে বাঁধা। তাই কোন ইউজার কোন সার্ভারে বসে আছে সেটার একটা রেজিস্ট্রি লাগে (সাধারণত Redis-এ), আর সার্ভারগুলোর মধ্যে মেসেজ পাঠাতে একটা pub/sub লেয়ার লাগে। ধাপ ৩-এর চ্যাট ডিজাইনে এটাই মূল আলোচনা।</p>
+</section>
+
+<!-- ============ 5. LB ============ -->
+<section class="ch" id="c5">
+  <div class="ch-n">অধ্যায় ০৫</div>
+  <h2>লোড ব্যালান্সার — L4 বনাম L7</h2>
+  <p class="sub">প্যাকেট দেখে সিদ্ধান্ত, নাকি বার্তা পড়ে সিদ্ধান্ত</p>
+
+  <p class="lead">L4 লোড ব্যালান্সার শুধু IP আর পোর্ট দেখে — ভেতরে কী আছে জানে না, জানার দরকারও নেই। L7 পুরো HTTP রিকোয়েস্ট পড়ে ফেলে, তাই path, header, cookie দেখে সিদ্ধান্ত নিতে পারে। নিচে একই রিকোয়েস্ট দুই মোডে পাঠিয়ে দেখুন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">রিকোয়েস্ট রাউটিং</span>
+      <div class="ctrls">
+        <button class="b" data-lb="4" aria-selected="true">L4 মোড</button>
+        <button class="b" data-lb="7">L7 মোড</button>
+      </div>
+    </div>
+    <div class="lb-wrap">
+      <div>
+        <div class="ctrls" style="flex-direction:column">
+          <button class="b" data-req="/api/users">GET /api/users</button>
+          <button class="b" data-req="/static/logo.png">GET /static/logo.png</button>
+          <button class="b" data-req="/video/stream">GET /video/stream</button>
+        </div>
+      </div>
+      <div>
+        <div id="srvList"></div>
+        <p style="margin:10px 0 0;font-size:13.5px;color:var(--muted)" id="lbMsg">একটা রিকোয়েস্ট বেছে নিন।</p>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th></th><th>L4 (ট্রান্সপোর্ট)</th><th>L7 (অ্যাপ্লিকেশন)</th></tr>
+    <tr><td>যা দেখে</td><td>IP, পোর্ট</td><td>URL, header, cookie, body</td></tr>
+    <tr><td>গতি</td><td class="y">অনেক দ্রুত, CPU কম</td><td>ধীর, পার্সিং লাগে</td></tr>
+    <tr><td>TLS</td><td>পাস-থ্রু, পড়তে পারে না</td><td class="y">টার্মিনেট করে</td></tr>
+    <tr><td>Path-ভিত্তিক রাউটিং</td><td class="n">সম্ভব নয়</td><td class="y">সম্ভব</td></tr>
+    <tr><td>উদাহরণ</td><td>AWS NLB, IPVS</td><td>Nginx, Envoy, AWS ALB</td></tr>
+  </table>
+
+  <h3>অ্যালগরিদম</h3>
+  <ul class="plain">
+    <li><strong>Round robin</strong> — পালা করে। সার্ভার সমান ক্ষমতার হলে ঠিক আছে।</li>
+    <li><strong>Least connections</strong> — যার হাতে কাজ কম তাকে দাও। রিকোয়েস্টের সময় অসমান হলে ভালো।</li>
+    <li><strong>Consistent hashing</strong> — একই ইউজার একই সার্ভারে। ক্যাশ লোকালিটি বা স্টেটফুল কানেকশনের জন্য জরুরি; ধাপ ২-এ বিস্তারিত।</li>
+    <li><strong>Weighted</strong> — বড় মেশিনে বেশি ভাগ।</li>
+  </ul>
+  <p><strong>Health check</strong> ছাড়া লোড ব্যালান্সার অসম্পূর্ণ — মৃত সার্ভারে ট্রাফিক পাঠাতে থাকলে LB থাকার মানেই নেই। ইন্টারভিউতে LB আঁকার সময় health check-এর কথা বললে সেটা পরিপক্বতার সংকেত।</p>
+</section>
+
+<!-- ============ 6. B-tree ============ -->
+<section class="ch" id="c6">
+  <div class="ch-n">অধ্যায় ০৬</div>
+  <h2>ইনডেক্স ও B-tree</h2>
+  <p class="sub">১০ লাখ রো থেকে একটা রো খুঁজতে ৪টা ডিস্ক রিড কেন যথেষ্ট</p>
+
+  <p class="lead">ইনডেক্স ছাড়া ডেটাবেজকে পুরো টেবিল পড়তে হয়। ইনডেক্স থাকলে সে একটা <strong>গাছে</strong> নামে — প্রতিটা ধাপে সম্ভাবনার পরিসর কয়েকশ গুণ কমে যায়। নিচে একটা কী খুঁজে দেখুন, পথটা হাইলাইট হবে।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">B-tree সার্চ · টেবিলে ১০,০০,০০০ রো</span>
+      <div class="ctrls">
+        <input class="num" id="btKey" type="number" value="742" min="1" max="1000">
+        <button class="b pri" id="btGo">খুঁজুন</button>
+      </div>
+    </div>
+    <div class="bt"><svg viewBox="0 0 760 260" id="btSvg"></svg></div>
+    <div class="stat">
+      <div><em>ইনডেক্স দিয়ে</em><b id="btIdx" style="color:var(--l3)">—</b></div>
+      <div><em>ফুল টেবিল স্ক্যান</em><b id="btScan" style="color:var(--red)">—</b></div>
+      <div><em>যত গুণ কম কাজ</em><b id="btRatio">—</b></div>
+    </div>
+  </div>
+
+  <h3>কেন গাছটা এত চ্যাপ্টা</h3>
+  <p>ডিস্ক থেকে ডেটা পড়া হয় <strong>পেজ</strong> ধরে, সাধারণত ৪ বা ৮ কিলোবাইট। একটা পেজে যদি ৫০০টা কী আঁটে, তাহলে গাছের fanout ৫০০। তখন —</p>
+  <ul class="plain">
+    <li>১ স্তর → ৫০০ রো</li>
+    <li>২ স্তর → ২,৫০,০০০ রো</li>
+    <li>৩ স্তর → ১২.৫ কোটি রো</li>
+    <li>৪ স্তর → ৬,২৫০ কোটি রো</li>
+  </ul>
+  <p>মানে প্রায় যেকোনো বাস্তব টেবিলের জন্য <strong>৩–৪টা পেজ রিডেই</strong> যেকোনো রো পাওয়া যায়। এই কারণেই B-tree বাইনারি ট্রি-র চেয়ে ভালো — বাইনারি ট্রি-তে ১০ লাখ রো মানে ২০ স্তর, মানে ২০টা আলাদা ডিস্ক রিড।</p>
+
+  <div class="note">
+    <span class="k">যেখানে ইনডেক্স কাজ করে না</span>
+    <p>কম্পোজিট ইনডেক্স <code>(city, age)</code> থাকলে শুধু <code>age</code> দিয়ে খুঁজলে ইনডেক্স ব্যবহার হয় না — বাঁদিক থেকে ক্রম মেনে চলতে হয়। একইভাবে কলামের উপর ফাংশন লাগালে (<code>WHERE YEAR(created_at)=2024</code>) ইনডেক্স বাদ পড়ে যায়।</p>
+  </div>
+  <p>আর ইনডেক্সের দামও আছে: প্রতিটা <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>-এ গাছটাও আপডেট করতে হয়। তাই write-heavy টেবিলে অতিরিক্ত ইনডেক্স রাখা ক্ষতিকর। <strong>ইনডেক্স হলো read গতির জন্য write গতি বিসর্জন</strong> — এটাই ট্রেডঅফ, এবং ইন্টারভিউতে ঠিক এই বাক্যটাই তারা শুনতে চায়।</p>
+</section>
+
+<!-- ============ 7. ACID ============ -->
+<section class="ch" id="c7">
+  <div class="ch-n">অধ্যায় ০৭</div>
+  <h2>ACID ও Isolation Levels</h2>
+  <p class="sub">দুটো ট্রানজেকশন একসাথে চললে কী কী ভুল হতে পারে</p>
+
+  <p class="lead"><strong>A</strong>tomicity — সব হবে অথবা কিছুই হবে না। <strong>C</strong>onsistency — নিয়ম ভাঙবে না। <strong>I</strong>solation — একসাথে চলা ট্রানজেকশন একে অপরকে বিভ্রান্ত করবে না। <strong>D</strong>urability — কমিট হলে বিদ্যুৎ গেলেও থাকবে।</p>
+  <p>এর মধ্যে Isolation-ই একমাত্র যেটার <strong>মাত্রা</strong> আছে, আর সেই মাত্রা বেছে নেওয়াটা ডিজাইন সিদ্ধান্ত। নিচে প্রতিটা লেভেল বেছে দেখুন কোন সমস্যা টিকে থাকে।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">Isolation লেভেল</span>
+      <div class="ctrls">
+        <button class="b" data-iso="0" aria-selected="true">Read Uncommitted</button>
+        <button class="b" data-iso="1">Read Committed</button>
+        <button class="b" data-iso="2">Repeatable Read</button>
+        <button class="b" data-iso="3">Serializable</button>
+      </div>
+    </div>
+    <div id="isoBox"></div>
+  </div>
+
+  <table>
+    <tr><th>লেভেল</th><th>Dirty read</th><th>Non-repeatable read</th><th>Phantom read</th></tr>
+    <tr><td>Read Uncommitted</td><td class="n">সম্ভব</td><td class="n">সম্ভব</td><td class="n">সম্ভব</td></tr>
+    <tr><td>Read Committed</td><td class="y">নেই</td><td class="n">সম্ভব</td><td class="n">সম্ভব</td></tr>
+    <tr><td>Repeatable Read</td><td class="y">নেই</td><td class="y">নেই</td><td class="n">সম্ভব*</td></tr>
+    <tr><td>Serializable</td><td class="y">নেই</td><td class="y">নেই</td><td class="y">নেই</td></tr>
+  </table>
+  <p style="font-size:13.5px;color:var(--muted)">* SQL স্ট্যান্ডার্ড অনুযায়ী সম্ভব, তবে MySQL InnoDB তার Repeatable Read-এ next-key locking দিয়ে phantom আটকায়। PostgreSQL-এর ডিফল্ট Read Committed। <strong>এই দুটো তথ্য ইন্টারভিউতে বললে আলাদা করে নজরে পড়ে।</strong></p>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"সবাই Serializable ব্যবহার করে না কেন?"</strong></p>
+    <p>কারণ isolation যত শক্ত, লকিং তত বেশি আর কনকারেন্সি তত কম। Serializable-এ থ্রুপুট ধসে যায় এবং deadlock বাড়ে। বাস্তবে ৯৫% অ্যাপ Read Committed-এ চলে, আর যেখানে সত্যিই দরকার — টিকিট বুকিং, ব্যালান্স ট্রান্সফার — শুধু সেই কয়েকটা ট্রানজেকশনে শক্ত লেভেল বা explicit lock ব্যবহার করা হয়।</p>
+  </div>
+</section>
+
+<!-- ============ 8. Cache ============ -->
+<section class="ch" id="c8">
+  <div class="ch-n">অধ্যায় ০৮</div>
+  <h2>ক্যাশিং স্ট্র্যাটেজি</h2>
+  <p class="sub">তিনটা প্যাটার্ন, তিন রকম ঝুঁকি</p>
+
+  <p class="lead">ক্যাশ মানে শুধু "দ্রুত মেমোরি" নয় — মূল প্রশ্ন হলো <strong>লেখাটা কোথায় আগে যাবে</strong>। এই একটা সিদ্ধান্তই ঠিক করে দেয় আপনার ডেটা কতটা তাজা আর কতটা নিরাপদ।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">ফ্লো দেখুন</span>
+      <div class="ctrls">
+        <button class="b" data-cs="aside" aria-selected="true">Cache-aside</button>
+        <button class="b" data-cs="through">Write-through</button>
+        <button class="b" data-cs="back">Write-back</button>
+      </div>
+    </div>
+    <div class="cflow" id="cFlow">
+      <div class="cbox" id="cApp"><b>App</b><em>SERVICE</em></div>
+      <div class="arw" id="a1">→</div>
+      <div class="cbox" id="cCache"><b>Cache</b><em>REDIS</em></div>
+      <div class="arw" id="a2">→</div>
+      <div class="cbox" id="cDb"><b>Database</b><em>POSTGRES</em></div>
+    </div>
+    <div id="csOut" style="border-left:3px solid var(--l1);padding-left:15px;margin-top:8px"></div>
+  </div>
+
+  <h3>যে সমস্যাগুলো ইন্টারভিউয়ার জিজ্ঞেস করবেন</h3>
+  <p><strong>Cache stampede —</strong> একটা জনপ্রিয় কী-র মেয়াদ শেষ হওয়া মাত্র হাজারটা রিকোয়েস্ট একসাথে মিস করে ডেটাবেজে ঝাঁপিয়ে পড়ে। সমাধান তিনটা: একটা রিকোয়েস্টকে লক দিয়ে ডেটা আনতে দেওয়া আর বাকিদের অপেক্ষা করানো; মেয়াদ শেষের আগেই এলোমেলোভাবে (probabilistic) রিফ্রেশ করা; অথবা পুরোনো ডেটা দিয়ে দিয়ে পেছনে রিফ্রেশ করা (stale-while-revalidate)।</p>
+  <p><strong>Cache penetration —</strong> এমন কী চাওয়া হচ্ছে যা ডেটাবেজেও নেই, তাই ক্যাশে কখনো বসে না, প্রতিবার ডেটাবেজে যায়। সমাধান: "নেই" ফলাফলটাও অল্প TTL দিয়ে ক্যাশ করা, বা Bloom filter দিয়ে আগেই ছেঁকে ফেলা।</p>
+  <p><strong>Eviction —</strong> মেমোরি ভরে গেলে কাকে বের করবেন? <code>LRU</code> সবচেয়ে প্রচলিত (যেটা সবচেয়ে আগে ব্যবহার হয়েছে), <code>LFU</code> কম ব্যবহৃতটা বাদ দেয়, <code>TTL</code> শুধু সময় দেখে।</p>
+
+  <div class="note">
+    <span class="k">সবচেয়ে কঠিন অংশ</span>
+    <p>ক্যাশ ইনভ্যালিডেশন। ডেটাবেজে ডেটা বদলালে ক্যাশের পুরোনো কপি মুছতে হবে — কিন্তু মুছতে গিয়ে যদি অন্য একটা রিকোয়েস্ট মাঝখানে পুরোনো ডেটা লিখে ফেলে, তাহলে চিরকালের জন্য ভুল ডেটা বসে থাকবে। সাধারণ সমাধান: আপডেটের সময় ক্যাশ <strong>আপডেট না করে ডিলিট করা</strong>, আর সবসময় ছোট TTL রাখা যাতে ভুল হলেও তা চিরস্থায়ী না হয়।</p>
+  </div>
+</section>
+
+<!-- ============ 9. Latency ============ -->
+<section class="ch" id="c9">
+  <div class="ch-n">অধ্যায় ০৯</div>
+  <h2>লেটেন্সি সংখ্যা</h2>
+  <p class="sub">যে সংখ্যাগুলো না জানলে estimation করা যায় না</p>
+
+  <p class="lead">এই সংখ্যাগুলোর আসল কাজ মুখস্থ বলা নয় — <strong>অনুপাত</strong> বোঝা। মেমোরি আর ডিস্কের মধ্যে ১০০০ গুণ পার্থক্য, ডেটাসেন্টার আর মহাদেশের মধ্যে ৩০০ গুণ। এই অনুপাতগুলো জানা থাকলে কোথায় ক্যাশ বসাতে হবে সেটা নিজে থেকেই স্পষ্ট হয়।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">লগ স্কেলে তুলনা</span>
+      <div class="ctrls">
+        <button class="b" data-sc="real" aria-selected="true">আসল সময়</button>
+        <button class="b" data-sc="human">মানুষের স্কেলে</button>
+      </div>
+    </div>
+    <div class="lat" id="latBox"></div>
+    <p style="margin:16px 0 0;font-size:13.5px;color:var(--muted)" id="latNote">প্রতিটা বার লগ স্কেলে — পাশের বারের চেয়ে অনেক গুণ বড় হতে পারে।</p>
+  </div>
+
+  <div class="iq">
+    <span class="k">যেভাবে কাজে লাগাবেন</span>
+    <p>"এই এন্ডপয়েন্টে ৫০ ms লেটেন্সি চাই" — এই দাবিটা বাস্তবসম্মত কি না তা এই সংখ্যাগুলো দিয়েই যাচাই হয়। ইউজার যদি সিঙ্গাপুরে আর সার্ভার ভার্জিনিয়ায় হয়, শুধু নেটওয়ার্ক রাউন্ড ট্রিপেই ২০০ ms চলে যাবে — তখন উত্তর সার্ভার অপ্টিমাইজেশন নয়, <strong>ইউজারের কাছাকাছি এজ লোকেশন</strong>। এই যুক্তিটা দিতে পারলে ইন্টারভিউয়ার বোঝেন আপনি সংখ্যাগুলো ব্যবহার করতে জানেন।</p>
+  </div>
+</section>
+
+<!-- ============ 10. Estimation ============ -->
+<section class="ch" id="c10">
+  <div class="ch-n">অধ্যায় ১০</div>
+  <h2>Back-of-the-envelope এস্টিমেশন</h2>
+  <p class="sub">ইন্টারভিউর ৫ থেকে ১০ মিনিট — স্লাইডার নাড়িয়ে অনুভূতি তৈরি করুন</p>
+
+  <p class="lead">লক্ষ্য নিখুঁত হিসাব নয়, <strong>মাত্রার ধারণা</strong>। ১০০ QPS নাকি ১০ লাখ QPS — এই পার্থক্যটাই ঠিক করে দেয় আপনি একটা সার্ভার আঁকবেন নাকি শার্ডেড ক্লাস্টার। নিচের স্লাইডার নাড়ান, দেখুন সংখ্যাগুলো কোথায় গিয়ে ঠেকে।</p>
+
+  <div class="w">
+    <div class="calc">
+      <div>
+        <div class="field"><label>দৈনিক সক্রিয় ইউজার (DAU) <b id="vDau">১ কোটি</b></label>
+          <input type="range" id="dau" min="4" max="9" step="0.1" value="7"></div>
+        <div class="field"><label>প্রতি ইউজার দৈনিক রিকোয়েস্ট <b id="vReq">২০</b></label>
+          <input type="range" id="req" min="1" max="200" step="1" value="20"></div>
+        <div class="field"><label>read : write অনুপাত <b id="vRw">১০০ : ১</b></label>
+          <input type="range" id="rw" min="1" max="500" step="1" value="100"></div>
+        <div class="field"><label>প্রতি write-এর আকার <b id="vSz">১ KB</b></label>
+          <input type="range" id="sz" min="0" max="4" step="0.1" value="0"></div>
+        <div class="field"><label>পিক গুণক <b id="vPk">৩×</b></label>
+          <input type="range" id="pk" min="1" max="10" step="0.5" value="3"></div>
+      </div>
+      <div class="out">
+        <div class="r"><span>গড় QPS</span><b id="oQps">—</b></div>
+        <div class="r"><span>পিক QPS</span><b id="oPeak" class="hl">—</b></div>
+        <div class="r"><span>Write QPS</span><b id="oWq">—</b></div>
+        <div class="r"><span>দৈনিক নতুন ডেটা</span><b id="oDay">—</b></div>
+        <div class="r"><span>৫ বছরে স্টোরেজ</span><b id="oFive" class="hl">—</b></div>
+        <div class="r"><span>প্রয়োজনীয় অ্যাপ সার্ভার</span><b id="oSrv">—</b></div>
+        <div class="r"><span>রায়</span><b id="oVerdict" style="font-size:13px">—</b></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>যে ধরে নেওয়াগুলো ইন্টারভিউতে বলা উচিত</h3>
+  <ul class="plain">
+    <li>এক দিনে ৮৬,৪০০ সেকেন্ড — হিসাবের সুবিধায় <strong>১ লাখ</strong> ধরুন। কেউ আপত্তি করবে না, বরং দ্রুত এগোনো যাবে।</li>
+    <li>পিক ট্রাফিক গড়ের <strong>২–৩ গুণ</strong>। ভাইরাল ইভেন্ট থাকলে ১০ গুণ।</li>
+    <li>একটা অ্যাপ সার্ভার মোটামুটি <strong>১,০০০ QPS</strong> সামলায় (কাজ হালকা হলে)। এটা আন্দাজ, কিন্তু কথা এগোনোর জন্য যথেষ্ট।</li>
+    <li>রেপ্লিকা ধরলে স্টোরেজ <strong>৩ গুণ</strong>, আর ইনডেক্স ও ওভারহেড মিলিয়ে আরও কিছু বেশি।</li>
+    <li>১ KB ≈ ১০<sup>৩</sup>, ১ MB ≈ ১০<sup>৬</sup>, ১ GB ≈ ১০<sup>৯</sup>, ১ TB ≈ ১০<sup>১২</sup> — বাইনারি হিসাব ইন্টারভিউতে টানবেন না, সময় নষ্ট।</li>
+  </ul>
+
+  <div class="note">
+    <span class="k">সবচেয়ে বড় ভুল</span>
+    <p>এস্টিমেশন করে সংখ্যাটা ব্যবহার না করা। হিসাব করে "৩০,০০০ QPS" বের করে যদি এক সার্ভারের আর্কিটেকচার আঁকেন, তাহলে হিসাবটা অর্থহীন। প্রতিটা সংখ্যার পর <strong>"অতএব"</strong> বলুন — "অতএব একটা ডেটাবেজে হবে না, শার্ড করতে হবে।"</p>
+  </div>
+</section>
+
+<!-- ============ 11. Quiz ============ -->
+<section class="ch" id="c11">
+  <div class="ch-n">অধ্যায় ১১</div>
+  <h2>নিজেকে যাচাই করুন</h2>
+  <p class="sub">উত্তর দেখার আগে জোরে বলে উত্তর দিন — এটাই আসল প্র্যাকটিস</p>
+  <div id="quiz"></div>
+  <div class="note" style="border-color:var(--l3)">
+    <span class="k" style="color:var(--l3)">ভলিউম ১ শেষ</span>
+    <p>এই ১১টা প্রশ্নের উত্তর নোট ছাড়া দিতে পারলে ভিত্তি তৈরি। পরের ভলিউম — <strong>ডিস্ট্রিবিউটেড সিস্টেম</strong>: রেপ্লিকেশন, consistent hashing, CAP ও PACELC, Raft কনসেনসাস, Kafka, আর রেজিলিয়েন্স প্যাটার্ন।</p>
+  </div>
+</section>
+
+<footer>
+  <span>ভলিউম ১ / ৫ · ভিত্তি</span>
+  <span>পরবর্তী → ডিস্ট্রিবিউটেড সিস্টেম</span>
+</footer>
+</main>
+</div>
+
+<script>
+const bn = n => String(n).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+
+/* ---------- TOC scroll spy ---------- */
+const links=[...document.querySelectorAll(".toc a")];
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting){links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id));}
+})},{rootMargin:"-20% 0px -70% 0px"});
+document.querySelectorAll(".ch").forEach(s=>obs.observe(s));
+
+/* ---------- 1. DNS ---------- */
+const DNS=[
+ {n:"ব্রাউজার ক্যাশ",e:"~0 ms",t:"ব্রাউজার নিজের ক্যাশ",
+  d:"সবচেয়ে আগে ব্রাউজার নিজের ভেতরের DNS ক্যাশ দেখে। পেলে এখানেই শেষ — কোনো নেটওয়ার্ক কল হয় না। Chrome-এ chrome://net-internals/#dns দিয়ে দেখা যায়।"},
+ {n:"OS ক্যাশ",e:"~0 ms",t:"অপারেটিং সিস্টেম",
+  d:"না পেলে OS-এর resolver ক্যাশ, আর hosts ফাইল দেখা হয়। লোকাল ডেভেলপমেন্টে hosts ফাইল দিয়ে ডোমেইন ঘুরিয়ে দেওয়া যায় এই ধাপের কারণেই।"},
+ {n:"রিকার্সিভ রিজলভার",e:"~20 ms",t:"ISP বা 8.8.8.8",
+  d:"এখান থেকে আসল কাজ শুরু। রিজলভার সব খোঁজাখুঁজির দায়িত্ব নেয় এবং ফলাফল ক্যাশ করে রাখে — তাই জনপ্রিয় ডোমেইনের উত্তর প্রায় সবসময় এখানেই তৈরি থাকে।"},
+ {n:"রুট সার্ভার",e:"~30 ms",t:". (১৩টা ক্লাস্টার)",
+  d:"রুট সার্ভার IP জানে না। সে শুধু বলে — “.com এর দায়িত্বে কে আছে তা আমি জানি, তার ঠিকানা নাও।” এটাকে বলে referral। পৃথিবীতে ১৩টা লজিক্যাল রুট সার্ভার, anycast দিয়ে শত শত ফিজিক্যাল কপি।"},
+ {n:"TLD সার্ভার",e:"~30 ms",t:".com",
+  d:".com সার্ভারও IP দেয় না। সে বলে — “example.com এর authoritative name server হলো ns1.example.com।” আবার একটা referral।"},
+ {n:"অথরিটেটিভ NS",e:"~30 ms",t:"চূড়ান্ত উত্তর",
+  d:"এই সার্ভারই আসল মালিক। সে A রেকর্ড ফেরত দেয়: 93.184.216.34, সঙ্গে একটা TTL। রিজলভার এটা ক্যাশ করে রাখে, ব্রাউজারও রাখে — পরের বার আর এতদূর আসতে হয় না।"}
+];
+let dnsI=-1;
+const dnsRow=document.getElementById("dnsRow"),dnsOut=document.getElementById("dnsOut");
+DNS.forEach((s,i)=>{const d=document.createElement("div");d.className="dns-node";
+  d.innerHTML=`<b>${s.n}</b><em>${s.t}</em>`;dnsRow.appendChild(d)});
+function dnsRender(){
+  [...dnsRow.children].forEach((el,i)=>{
+    el.className="dns-node"+(i<dnsI?" done":i===dnsI?" act":"")});
+  if(dnsI<0){dnsOut.innerHTML=`<h4>শুরু করুন</h4><p>ইউজার ব্রাউজারে <code>www.example.com</code> লিখেছে। এখন IP খুঁজতে হবে।</p>`;return;}
+  const s=DNS[dnsI];
+  dnsOut.innerHTML=`<h4>${bn(dnsI+1)}. ${s.n} <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">${s.e}</span></h4><p>${s.d}</p>`;
+  if(dnsI===DNS.length-1) dnsOut.innerHTML+=`<p style="margin-top:8px"><code>www.example.com → 93.184.216.34</code> · মোট প্রায় ${bn(110)} ms, ক্যাশ হিট হলে প্রায় ${bn(0)} ms</p>`;
+}
+document.getElementById("dnsNext").onclick=()=>{if(dnsI<DNS.length-1){dnsI++;dnsRender()}};
+document.getElementById("dnsReset").onclick=()=>{dnsI=-1;dnsRender()};
+dnsRender();
+
+/* ---------- 2. TCP/UDP ---------- */
+const wire=document.getElementById("wire"),netLog=document.getElementById("netLog");
+let busy=false;
+function logln(t,cls){netLog.innerHTML+=`<div>${cls?`<${cls}>${t}</${cls}>`:t}</div>`;netLog.scrollTop=netLog.scrollHeight;}
+function fly(label,back,lost,top){
+  return new Promise(r=>{
+    const p=document.createElement("div");
+    p.className="pkt"+(back?" back":"")+(lost?" lost":"");
+    p.textContent=label;p.style.top=top+"px";p.style.left=back?"72%":"14%";
+    wire.appendChild(p);
+    requestAnimationFrame(()=>{setTimeout(()=>{
+      p.style.left=lost?"45%":(back?"14%":"72%");
+      if(lost)setTimeout(()=>{p.style.opacity="0";p.textContent="✕ lost"},700);
+    },20)});
+    setTimeout(()=>{p.remove();r()},lost?1500:1200);
+  });
+}
+async function runTcp(){
+  if(busy)return;busy=true;wire.querySelectorAll(".pkt").forEach(e=>e.remove());
+  netLog.innerHTML="";logln("▸ TCP — নির্ভরযোগ্য, ক্রমানুসারে","b");
+  logln("হ্যান্ডশেক শুরু");
+  await fly("SYN",0,0,42);await fly("SYN-ACK",1,0,42);await fly("ACK",0,0,42);
+  logln("কানেকশন প্রতিষ্ঠিত · এখন ডেটা");
+  for(let i=1;i<=4;i++){
+    if(i===3){logln("প্যাকেট ৩ পাঠানো হলো…");await fly("DATA 3",0,1,80);
+      logln("প্যাকেট ৩ হারিয়ে গেছে — ACK আসেনি","u");
+      logln("টাইমআউট… আবার পাঠানো হচ্ছে","u");
+      await fly("DATA 3 (retry)",0,0,80);logln("ACK 3 এলো ✓");await fly("ACK 3",1,0,80);continue;}
+    await fly("DATA "+i,0,0,80);logln(`প্যাকেট ${i} পৌঁছেছে ✓`);
+  }
+  logln("▸ ফল: ৪টা প্যাকেটই ঠিক ক্রমে পৌঁছেছে, তবে দেরি হয়েছে","b");
+  busy=false;
+}
+async function runUdp(){
+  if(busy)return;busy=true;wire.querySelectorAll(".pkt").forEach(e=>e.remove());
+  netLog.innerHTML="";logln("▸ UDP — হ্যান্ডশেক নেই, সরাসরি পাঠাও","b");
+  const jobs=[];
+  for(let i=1;i<=4;i++){
+    jobs.push(new Promise(r=>setTimeout(async()=>{
+      await fly("DGRAM "+i,0,i===3,42+i*22);
+      if(i===3)logln("ডেটাগ্রাম ৩ হারিয়ে গেছে — কেউ জানল না","u");
+      else logln(`ডেটাগ্রাম ${i} পৌঁছেছে`);r();},i*230)));
+  }
+  await Promise.all(jobs);
+  logln("▸ ফল: ৩টা পৌঁছেছে, একটা নেই। কোনো retry নেই, ক্রমেরও নিশ্চয়তা নেই","b");
+  logln("▸ কিন্তু সময় লেগেছে TCP-র প্রায় অর্ধেক","b");
+  busy=false;
+}
+document.getElementById("runTcp").onclick=runTcp;
+document.getElementById("runUdp").onclick=runUdp;
+
+/* ---------- 3. HTTP ---------- */
+let hv=1,hTimer=null;
+const lanes=document.getElementById("lanes");
+for(let i=1;i<=6;i++){
+  const d=document.createElement("div");d.className="lane";
+  d.innerHTML=`<em>REQ ${i}</em><div class="track"><div class="bar" id="bar${i}"></div></div>`;
+  lanes.appendChild(d);
+}
+const HDESC={1:"HTTP/1.1 — ব্রাউজার আলাদা কানেকশন খোলে, কিন্তু প্রতিটাতে একবারে একটাই রিকোয়েস্ট",
+ 2:"HTTP/2 — একটাই কানেকশনে সব একসাথে, কিন্তু TCP প্যাকেট হারালে সবাই আটকে যায়",
+ 3:"HTTP/3 — QUIC স্ট্রিমগুলো স্বাধীন, তাই শুধু রিকোয়েস্ট ২ আটকায়"};
+document.querySelectorAll("[data-hv]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-hv]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  hv=+b.dataset.hv;document.getElementById("hDesc").textContent=HDESC[hv];hReset();});
+function hReset(){clearInterval(hTimer);for(let i=1;i<=6;i++){
+  const b=document.getElementById("bar"+i);b.style.width="0";b.style.left="0";b.className="bar";}
+  document.getElementById("hClock").textContent="০ ms";}
+function hRun(){
+  hReset();let t=0;const DUR=100,LOSS=120;
+  const plan=[];
+  for(let i=1;i<=6;i++){
+    if(hv===1) plan.push({i,start:(i<=6?0:0)+ (i-1)*0 , s:(i-1)*DUR/6*0 });
+  }
+  hTimer=setInterval(()=>{
+    t+=10;document.getElementById("hClock").textContent=bn(t)+" ms";
+    for(let i=1;i<=6;i++){
+      const bar=document.getElementById("bar"+i);let st,en,stall=false;
+      if(hv===1){ // serial-ish: 2 at a time
+        const slot=Math.floor((i-1)/2);st=slot*(DUR+ (i===2||i===1?0:0));
+        st=slot*DUR + (i===2?0:0);
+        if(i===2){en=st+DUR+LOSS;stall=t>st+DUR;}else en=st+DUR;
+      } else if(hv===2){
+        st=0;
+        if(i===2){en=DUR+LOSS;stall=t>DUR;}
+        else{en=DUR+LOSS;stall=t>DUR;} // TCP HOL: everyone waits
+      } else {
+        st=0;
+        if(i===2){en=DUR+LOSS;stall=t>DUR;}else en=DUR;
+      }
+      const prog=Math.min(1,Math.max(0,(t-st)/(en-st)));
+      bar.style.width=(prog*100)+"%";
+      bar.className="bar"+(stall&&prog<1?" stall":"");
+    }
+    const total=hv===1?3*DUR+LOSS:DUR+LOSS;
+    if(t>=total+40){clearInterval(hTimer);
+      for(let i=1;i<=6;i++){const b=document.getElementById("bar"+i);b.style.width="100%";b.className="bar";}
+      document.getElementById("hClock").textContent=bn(total)+" ms";}
+  },10);
+}
+document.getElementById("hRun").onclick=hRun;
+
+/* ---------- 4. Realtime ---------- */
+const RT={
+ poll:{t:"Short polling",d:"ক্লায়েন্ট প্রতি কয়েক সেকেন্ডে জিজ্ঞেস করে “নতুন কিছু আছে?”। বেশিরভাগ উত্তর খালি — তাই ব্যান্ডউইথ আর সার্ভার সাইকেল নষ্ট হয়। তবে বানানো সবচেয়ে সহজ, আর কোনো স্টেট রাখতে হয় না।",
+  seq:[["→","GET /messages"],["←","[] খালি"],["⏱","৩ সেকেন্ড অপেক্ষা"],["→","GET /messages"],["←","[] খালি"],["⏱","৩ সেকেন্ড অপেক্ষা"],["→","GET /messages"],["←","[নতুন মেসেজ] ✓"]]},
+ long:{t:"Long polling",d:"ক্লায়েন্ট জিজ্ঞেস করে, সার্ভার উত্তর <em>ধরে রাখে</em> যতক্ষণ না নতুন কিছু আসে। এলে সাথে সাথে পাঠিয়ে কানেকশন বন্ধ করে, ক্লায়েন্ট আবার জিজ্ঞেস করে। প্রায় রিয়েলটাইম, কিন্তু প্রতিটা মেসেজে নতুন HTTP কানেকশন।",
+  seq:[["→","GET /messages"],["⏳","সার্ভার ধরে রেখেছে…"],["←","[নতুন মেসেজ] ✓"],["→","GET /messages (আবার)"],["⏳","সার্ভার ধরে রেখেছে…"],["←","[নতুন মেসেজ] ✓"]]},
+ sse:{t:"Server-Sent Events",d:"একটাই HTTP কানেকশন খোলা থাকে, সার্ভার যখন খুশি ইভেন্ট পাঠাতে থাকে। একমুখী — ক্লায়েন্ট এই চ্যানেলে কিছু পাঠাতে পারে না। রিকানেক্ট স্বয়ংক্রিয়, আর সাধারণ HTTP বলে প্রক্সি ও ফায়ারওয়াল সমস্যা করে না।",
+  seq:[["→","GET /stream (Accept: text/event-stream)"],["←","কানেকশন খোলা রইল"],["←","event: message ✓"],["←","event: message ✓"],["←","event: heartbeat"],["←","event: message ✓"]]},
+ ws:{t:"WebSocket",d:"HTTP দিয়ে শুরু হয়, তারপর <em>Upgrade</em> হয়ে সম্পূর্ণ দ্বিমুখী TCP চ্যানেলে পরিণত হয়। দুই পক্ষই যেকোনো সময় পাঠাতে পারে, হেডার ওভারহেড প্রায় নেই। বিনিময়ে কানেকশনটা স্টেটফুল — স্কেলিং কঠিন।",
+  seq:[["→","GET /ws (Upgrade: websocket)"],["←","101 Switching Protocols"],["↔","চ্যানেল খোলা"],["→","আমি টাইপ করছি…"],["←","নতুন মেসেজ ✓"],["→","মেসেজ পাঠালাম"],["←","ডেলিভারি রিসিট ✓"]]}
+};
+function rtRender(k){
+  const r=RT[k];
+  document.getElementById("rtBox").innerHTML=
+   `<p style="margin:0 0 14px;font-size:14.5px">${r.d}</p>
+    <div style="font-family:var(--mono);font-size:12.5px;background:#F7F9FC;border:1px solid var(--rule);border-radius:11px;padding:14px 16px">
+    ${r.seq.map(([a,b])=>`<div style="display:flex;gap:12px;padding:5px 0;border-bottom:1px solid #EDF0F5">
+      <span style="width:22px;color:${a==="→"?"var(--l2)":a==="←"?"var(--l3)":"var(--muted)"};flex:none">${a}</span>
+      <span style="color:var(--ink-2)">${b}</span></div>`).join("")}</div>`;
+}
+document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-rt]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  rtRender(b.dataset.rt);});
+rtRender("poll");
+
+/* ---------- 5. Load balancer ---------- */
+const SRV=[{n:"app-1",r:"API সার্ভার",tag:"api"},{n:"app-2",r:"API সার্ভার",tag:"api"},
+ {n:"static-1",r:"স্ট্যাটিক ফাইল সার্ভার",tag:"static"},{n:"media-1",r:"ভিডিও সার্ভার",tag:"video"}];
+let lbMode=4,rr=0;
+const srvList=document.getElementById("srvList");
+srvList.innerHTML=SRV.map((s,i)=>`<div class="srv" id="sv${i}"><b>${s.n}</b><em>${s.r}</em></div>`).join("");
+document.querySelectorAll("[data-lb]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-lb]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  lbMode=+b.dataset.lb;
+  document.getElementById("lbMsg").textContent=lbMode===4
+    ?"L4 মোড: পেলোড দেখা যাচ্ছে না, তাই শুধু পালা করে বিলি।"
+    :"L7 মোড: URL পড়া যাচ্ছে, তাই সঠিক সার্ভারে পাঠানো সম্ভব।";});
+document.querySelectorAll("[data-req]").forEach(b=>b.onclick=()=>{
+  const path=b.dataset.req;SRV.forEach((s,i)=>document.getElementById("sv"+i).classList.remove("hit"));
+  let idx,msg;
+  if(lbMode===4){idx=rr%SRV.length;rr++;
+    msg=`L4: <code>${path}</code> — কিন্তু LB শুধু IP:পোর্ট দেখে। round robin অনুযায়ী <b>${SRV[idx].n}</b>। `+
+        (SRV[idx].tag!=="api"&&path.startsWith("/api")?"⚠ ভুল সার্ভারে গেল — এই সীমাবদ্ধতাটাই L4-এর মূল দুর্বলতা।":"");
+  }else{
+    idx=path.startsWith("/api")?rr++%2:path.startsWith("/static")?2:3;
+    msg=`L7: <code>${path}</code> পড়ে বুঝল এটা ${path.startsWith("/api")?"API কল":path.startsWith("/static")?"স্ট্যাটিক ফাইল":"ভিডিও স্ট্রিম"} → <b>${SRV[idx].n}</b>। সঠিক জায়গায় পৌঁছাল।`;
+  }
+  document.getElementById("sv"+idx).classList.add("hit");
+  document.getElementById("lbMsg").innerHTML=msg;});
+
+/* ---------- 6. B-tree ---------- */
+const svg=document.getElementById("btSvg");
+const TREE={root:{k:"≤400 | ≤700 | >700",x:380,y:30},
+ lvl2:[{k:"≤150|≤400",x:130,y:110},{k:"≤550|≤700",x:380,y:110},{k:"≤850|≤1000",x:630,y:110}],
+ lvl3:[{k:"1–150",x:60,y:196},{k:"151–400",x:200,y:196},{k:"401–550",x:330,y:196},
+       {k:"551–700",x:450,y:196},{k:"701–850",x:570,y:196},{k:"851–1000",x:690,y:196}]};
+function drawTree(){
+  let h="";
+  const box=(n,id)=>`<g><rect class="node" id="${id}" x="${n.x-58}" y="${n.y-16}" width="116" height="32" rx="7"/>
+    <text x="${n.x}" y="${n.y+4}" text-anchor="middle">${n.k}</text></g>`;
+  TREE.lvl2.forEach((n,i)=>h+=`<path class="edge" id="e2_${i}" d="M380 46 L${n.x} ${n.y-16}"/>`);
+  TREE.lvl3.forEach((n,i)=>{const p=TREE.lvl2[Math.floor(i/2)];
+    h+=`<path class="edge" id="e3_${i}" d="M${p.x} ${p.y+16} L${n.x} ${n.y-16}"/>`;});
+  h+=box(TREE.root,"n1");
+  TREE.lvl2.forEach((n,i)=>h+=box(n,"n2_"+i));
+  TREE.lvl3.forEach((n,i)=>h+=box(n,"n3_"+i));
+  h+=`<text x="380" y="243" text-anchor="middle" style="font-size:10px;fill:#77839A">লিফ নোড → রো পয়েন্টার</text>`;
+  svg.innerHTML=h;
+}
+drawTree();
+function btSearch(){
+  let k=+document.getElementById("btKey").value;k=Math.max(1,Math.min(1000,k));
+  document.getElementById("btKey").value=k;
+  svg.querySelectorAll(".node,.edge").forEach(e=>e.classList.remove("on"));
+  const l2=k<=400?0:k<=700?1:2;
+  const bounds=[[150,400],[550,700],[850,1000]];
+  const l3=l2*2+(k<=bounds[l2][0]?0:1);
+  setTimeout(()=>document.getElementById("n1").classList.add("on"),100);
+  setTimeout(()=>{document.getElementById("e2_"+l2).classList.add("on");
+    document.getElementById("n2_"+l2).classList.add("on")},500);
+  setTimeout(()=>{document.getElementById("e3_"+l3).classList.add("on");
+    document.getElementById("n3_"+l3).classList.add("on")},900);
+  setTimeout(()=>{
+    document.getElementById("btIdx").textContent=bn(4)+" রিড";
+    document.getElementById("btScan").textContent=bn("1,000,000")+" রিড";
+    document.getElementById("btRatio").textContent=bn("250,000")+"×";},1200);
+}
+document.getElementById("btGo").onclick=btSearch;
+
+/* ---------- 7. Isolation ---------- */
+const ISO=[
+ {n:"Read Uncommitted",d:"সবচেয়ে দুর্বল। অন্য ট্রানজেকশনের <em>কমিট না হওয়া</em> ডেটাও পড়ে ফেলে। বাস্তবে প্রায় কেউ ব্যবহার করে না।",
+  a:["BEGIN","UPDATE balance = 500","(এখনো কমিট হয়নি)","ROLLBACK ✕"],
+  b:["BEGIN","SELECT balance → 500","⚠ dirty read — এই ৫০০ কখনো ছিলই না","COMMIT"],bad:[2]},
+ {n:"Read Committed",d:"শুধু কমিট হওয়া ডেটা পড়ে — dirty read শেষ। কিন্তু একই ট্রানজেকশনে দুবার পড়লে দুই উত্তর আসতে পারে। PostgreSQL-এর ডিফল্ট।",
+  a:["BEGIN","SELECT balance → 100","","SELECT balance → 500","⚠ non-repeatable read"],
+  b:["","","UPDATE balance = 500; COMMIT","",""],bad:[4]},
+ {n:"Repeatable Read",d:"ট্রানজেকশন শুরুর সময়ের একটা স্ন্যাপশট ধরে রাখে — একই রো বারবার পড়লে একই উত্তর। কিন্তু <em>নতুন রো</em> ঢুকে পড়তে পারে। MySQL InnoDB-র ডিফল্ট।",
+  a:["BEGIN","SELECT COUNT(*) → 10","","SELECT COUNT(*) → 11","⚠ phantom read"],
+  b:["","","INSERT নতুন রো; COMMIT","",""],bad:[4]},
+ {n:"Serializable",d:"যেন ট্রানজেকশনগুলো একটার পর একটা চলেছে — কোনো অসঙ্গতি নেই। দাম: লকিং বেড়ে যায়, কনকারেন্সি কমে, deadlock ও রিট্রাই বাড়ে।",
+  a:["BEGIN","SELECT COUNT(*) → 10","","SELECT COUNT(*) → 10","✓ সবসময় একই"],
+  b:["","","INSERT অপেক্ষা করছে…","(লক ছাড়ার পর চলবে)",""],bad:[]}
+];
+function isoRender(i){
+  const s=ISO[i];
+  document.getElementById("isoBox").innerHTML=
+   `<p style="margin:0 0 14px;font-size:14.5px">${s.d}</p>
+    <div class="tx"><div class="col"><h5>TRANSACTION A</h5>
+      ${s.a.map((x,j)=>x?`<div class="step${s.bad.includes(j)?" bad":""}">${x}</div>`:`<div class="step" style="opacity:.25">·</div>`).join("")}</div>
+      <div class="col"><h5>TRANSACTION B</h5>
+      ${s.b.map(x=>x?`<div class="step">${x}</div>`:`<div class="step" style="opacity:.25">·</div>`).join("")}</div></div>`;
+}
+document.querySelectorAll("[data-iso]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-iso]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  isoRender(+b.dataset.iso);});
+isoRender(0);
+
+/* ---------- 8. Cache ---------- */
+const CS={
+ aside:{t:"Cache-aside (Lazy loading)",
+  d:"অ্যাপ নিজে ক্যাশ ম্যানেজ করে। পড়ার সময় আগে ক্যাশ দেখে; না পেলে ডেটাবেজ থেকে এনে ক্যাশে বসায়। লেখার সময় সরাসরি ডেটাবেজে লিখে ক্যাশের কী-টা <b>মুছে দেয়</b>।<br><br><b>ভালো:</b> ক্যাশ পড়ে গেলেও সিস্টেম চলে; শুধু যা চাওয়া হয় তাই ক্যাশ হয়।<br><b>খারাপ:</b> প্রতিটা প্রথম রিকোয়েস্ট ধীর (cold start); ডিলিট ব্যর্থ হলে বাসি ডেটা।<br><b>কোথায়:</b> সবচেয়ে বেশি ব্যবহৃত — Redis + যেকোনো ডেটাবেজ।",
+  seq:[["cApp","cCache"],["cApp","cDb"],["cApp","cCache"]]},
+ through:{t:"Write-through",
+  d:"প্রতিটা লেখা একই সাথে ক্যাশ আর ডেটাবেজ দুটোতেই যায়, দুটো শেষ হলে তবেই সফল বলা হয়।<br><br><b>ভালো:</b> ক্যাশ কখনো বাসি হয় না।<br><b>খারাপ:</b> প্রতিটা write ধীর; এমন ডেটাও ক্যাশে বসে যা হয়তো কেউ পড়বেই না।<br><b>কোথায়:</b> read-heavy ডেটা যেখানে বাসি ডেটা একদম গ্রহণযোগ্য নয় — যেমন ইউজার প্রোফাইল, কনফিগারেশন।",
+  seq:[["cApp","cCache"],["cCache","cDb"]]},
+ back:{t:"Write-back (Write-behind)",
+  d:"লেখা শুধু ক্যাশে যায়, সাথে সাথেই সফল বলা হয়। ডেটাবেজে যায় পরে, ব্যাচে।<br><br><b>ভালো:</b> সবচেয়ে দ্রুত write; write-heavy লোডে ডেটাবেজের চাপ নাটকীয়ভাবে কমে।<br><b>খারাপ:</b> ফ্লাশ হওয়ার আগে ক্যাশ নোড মরলে <b>ডেটা চিরতরে হারায়</b>।<br><b>কোথায়:</b> ভিউ কাউন্ট, লাইক, অ্যানালিটিক্স — যেখানে কয়েকটা ইভেন্ট হারালেও ক্ষতি নেই।",
+  seq:[["cApp","cCache"],["cCache","cDb"]]}
+};
+function csRender(k){
+  const s=CS[k];
+  document.getElementById("csOut").innerHTML=
+    `<h4 style="margin:0 0 6px;font-family:var(--disp);font-size:17px;font-weight:700">${s.t}</h4>
+     <p style="margin:0;font-size:14.5px">${s.d}</p>`;
+  ["cApp","cCache","cDb"].forEach(id=>document.getElementById(id).classList.remove("on"));
+  ["a1","a2"].forEach(id=>document.getElementById(id).classList.remove("on"));
+  let i=0;
+  const seq=k==="aside"?["cApp","a1","cCache","a2","cDb"]:["cApp","a1","cCache","a2","cDb"];
+  const iv=setInterval(()=>{
+    if(i>=seq.length){clearInterval(iv);return;}
+    document.getElementById(seq[i]).classList.add("on");i++;},260);
+}
+document.querySelectorAll("[data-cs]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-cs]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  csRender(b.dataset.cs);});
+csRender("aside");
+
+/* ---------- 9. Latency ---------- */
+const LAT=[
+ {n:"L1 ক্যাশ রেফারেন্স",ns:1,r:"১ ns",h:"১ সেকেন্ড"},
+ {n:"শাখা ভুল অনুমান",ns:3,r:"৩ ns",h:"৩ সেকেন্ড"},
+ {n:"L2 ক্যাশ রেফারেন্স",ns:4,r:"৪ ns",h:"৪ সেকেন্ড"},
+ {n:"মিউটেক্স লক/আনলক",ns:17,r:"১৭ ns",h:"১৭ সেকেন্ড"},
+ {n:"মেইন মেমোরি রিড",ns:100,r:"১০০ ns",h:"~২ মিনিট"},
+ {n:"১ KB কমপ্রেস (Zippy)",ns:2000,r:"২ µs",h:"~৩৩ মিনিট"},
+ {n:"SSD র‍্যান্ডম রিড",ns:16000,r:"১৬ µs",h:"~৪.৫ ঘণ্টা"},
+ {n:"১ MB মেমোরি থেকে পড়া",ns:100000,r:"১০০ µs",h:"~১ দিন"},
+ {n:"একই ডেটাসেন্টারে রাউন্ড ট্রিপ",ns:500000,r:"৫০০ µs",h:"~৬ দিন"},
+ {n:"১ MB SSD থেকে পড়া",ns:1000000,r:"১ ms",h:"~১২ দিন"},
+ {n:"ডিস্ক seek (HDD)",ns:10000000,r:"১০ ms",h:"~৪ মাস"},
+ {n:"ক্যালিফোর্নিয়া → নেদারল্যান্ডস",ns:150000000,r:"১৫০ ms",h:"~৪.৭ বছর"}
+];
+function latRender(mode){
+  const max=Math.log10(LAT[LAT.length-1].ns);
+  document.getElementById("latBox").innerHTML=LAT.map(l=>{
+    const w=(Math.log10(l.ns)+1)/(max+1)*100;
+    const c=l.ns<1000?"var(--l3)":l.ns<1000000?"var(--l2)":"var(--l1)";
+    return `<div class="lat-row"><span>${l.n}</span>
+      <div class="lat-bar" style="width:${w}%;background:${c}"></div>
+      <span class="lat-val">${mode==="real"?l.r:l.h}</span></div>`}).join("");
+  document.getElementById("latNote").innerHTML= mode==="real"
+    ? "প্রতিটা বার লগ স্কেলে — পাশের বারের চেয়ে বহু গুণ বড় হতে পারে।"
+    : "সব সময়কে ১০০ কোটি গুণ করা হয়েছে, যেন ১ ন্যানোসেকেন্ড = ১ সেকেন্ড। <strong>এভাবেই বোঝা যায় নেটওয়ার্ক কল কতটা ভয়ংকর দামি।</strong>";
+}
+document.querySelectorAll("[data-sc]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-sc]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  latRender(b.dataset.sc);});
+latRender("real");
+
+/* ---------- 10. Calculator ---------- */
+const ids=["dau","req","rw","sz","pk"];
+function fmtN(n){
+  if(n>=1e7)return bn((n/1e7).toFixed(1))+" কোটি";
+  if(n>=1e5)return bn((n/1e5).toFixed(1))+" লাখ";
+  if(n>=1000)return bn((n/1000).toFixed(1))+"K";
+  return bn(Math.round(n));
+}
+function fmtB(b){
+  if(b>=1e15)return bn((b/1e15).toFixed(1))+" PB";
+  if(b>=1e12)return bn((b/1e12).toFixed(1))+" TB";
+  if(b>=1e9)return bn((b/1e9).toFixed(1))+" GB";
+  if(b>=1e6)return bn((b/1e6).toFixed(1))+" MB";
+  return bn(Math.round(b/1000))+" KB";
+}
+function calc(){
+  const dau=Math.pow(10,+dauEl.value), req=+reqEl.value, rw=+rwEl.value,
+        sz=Math.pow(10,+szEl.value)*1000, pk=+pkEl.value;
+  const total=dau*req, qps=total/86400, peak=qps*pk, wq=qps/(rw+1);
+  const dayB=wq*86400*sz, five=dayB*365*5*3;
+  const srv=Math.max(2,Math.ceil(peak/1000));
+  vDau.textContent=fmtN(dau); vReq.textContent=bn(req);
+  vRw.textContent=bn(rw)+" : ১"; vSz.textContent=fmtB(sz).replace(" ","");
+  vPk.textContent=bn(pk)+"×";
+  oQps.textContent=fmtN(Math.round(qps));
+  oPeak.textContent=fmtN(Math.round(peak));
+  oWq.textContent=fmtN(Math.round(wq));
+  oDay.textContent=fmtB(dayB);
+  oFive.textContent=fmtB(five);
+  oSrv.textContent=bn(srv)+" টি";
+  let v;
+  if(peak<1000) v="একটা সার্ভার + একটা DB-ই যথেষ্ট";
+  else if(peak<20000) v="LB + কয়েকটা সার্ভার + read replica + ক্যাশ";
+  else if(peak<200000) v="ক্যাশ বাধ্যতামূলক, DB শার্ড করতে হবে";
+  else v="মাল্টি-রিজিয়ন, শার্ডেড, ভারী ক্যাশিং — সব লাগবে";
+  oVerdict.textContent=v;
+}
+const [dauEl,reqEl,rwEl,szEl,pkEl]=ids.map(i=>document.getElementById(i));
+ids.forEach(i=>document.getElementById(i).oninput=calc);
+calc();
+
+/* ---------- 11. Quiz ---------- */
+const QZ=[
+ ["DNS-এ TTL কমিয়ে রাখলে কী সুবিধা, কী অসুবিধা?",
+  "সুবিধা: IP বদলালে দ্রুত সবাই নতুনটা পায়, তাই failover দ্রুত। অসুবিধা: ক্যাশ কম কাজে লাগে, তাই DNS রিকোয়েস্ট ও লেটেন্সি বাড়ে। বাস্তবে ডেপ্লয়মেন্টের আগে TTL কমানো হয়, পরে আবার বাড়ানো হয়।"],
+ ["ভিডিও কল UDP ব্যবহার করে কেন, TCP নয়?",
+  "হারানো ফ্রেম আবার পাঠানোর কোনো মূল্য নেই — ততক্ষণে সেই মুহূর্ত পার। TCP জোর করে retransmit করে বলে পুরো স্ট্রিম আটকে যায় (head-of-line blocking), ফলে ভিডিও জমে যায়। একটা ফ্রেম হারানোর চেয়ে সেটাই খারাপ।"],
+ ["HTTP/2 থাকতে HTTP/3 কেন লাগল?",
+  "HTTP/2-র স্ট্রিমগুলো লজিক্যালি আলাদা হলেও নিচে একটাই TCP কানেকশন, আর TCP ক্রম নিশ্চিত করে। তাই একটা প্যাকেট হারালে TCP পুরো স্ট্রিম আটকে দেয়। QUIC প্রতিটা স্ট্রিমের ক্রম আলাদা রাখে, তাই একটার লস বাকিদের ছোঁয় না।"],
+ ["শুধু সার্ভার থেকে ডেটা আসবে — WebSocket না SSE?",
+  "SSE। এটা সাধারণ HTTP-র উপর চলে, তাই প্রক্সি-ফ্রেন্ডলি, রিকানেক্ট স্বয়ংক্রিয়, বাস্তবায়ন সহজ। WebSocket তখনই নিন যখন ক্লায়েন্টও ঘনঘন পাঠাবে (চ্যাট, গেম)।"],
+ ["L4 লোড ব্যালান্সার দিয়ে path-ভিত্তিক রাউটিং করা যায় না কেন?",
+  "L4 শুধু IP আর পোর্ট দেখে, HTTP পেলোড খোলে না — বিশেষত TLS এনক্রিপ্টেড থাকলে দেখার উপায়ই নেই। path পড়তে হলে TLS টার্মিনেট করে HTTP পার্স করতে হবে, সেটাই L7।"],
+ ["১০ লাখ রো-র টেবিলে ইনডেক্স থাকলে কতগুলো ডিস্ক রিড লাগে, কেন?",
+  "৩–৪টা। B-tree-র fanout কয়েকশ (এক পেজে অনেক কী আঁটে), তাই গাছটা খুব চ্যাপ্টা — প্রতি স্তরে ১টা পেজ রিড। এই কারণেই B-tree বাইনারি ট্রি-র চেয়ে ভালো, যেখানে ২০ স্তর লাগত।"],
+ ["Write-heavy টেবিলে বেশি ইনডেক্স রাখা খারাপ কেন?",
+  "প্রতিটা INSERT/UPDATE/DELETE-এ প্রতিটা ইনডেক্স ট্রি আপডেট ও রিব্যালান্স করতে হয়। ইনডেক্স মানে read গতির বিনিময়ে write গতি বিসর্জন — তাই যত ইনডেক্স, তত ধীর write।"],
+ ["সবাই Serializable isolation ব্যবহার করে না কেন?",
+  "লকিং বেড়ে গিয়ে কনকারেন্সি ও থ্রুপুট ধসে যায়, deadlock ও রিট্রাই বাড়ে। বাস্তবে বেশিরভাগ অ্যাপ Read Committed-এ চলে, আর শুধু ক্রিটিক্যাল ট্রানজেকশনে (ব্যালান্স ট্রান্সফার, সিট বুকিং) শক্ত লেভেল ব্যবহার হয়।"],
+ ["Cache stampede কী, তিনটা সমাধান বলুন?",
+  "জনপ্রিয় কী-র মেয়াদ শেষ হওয়া মাত্র হাজারটা রিকোয়েস্ট একসাথে মিস করে ডেটাবেজে পড়ে। সমাধান: (১) লক দিয়ে একটাকে আনতে দেওয়া, বাকিদের অপেক্ষা; (২) মেয়াদের আগেই probabilistic রিফ্রেশ; (৩) stale-while-revalidate — পুরোনো দিতে দিতে পেছনে রিফ্রেশ।"],
+ ["ক্যাশ আপডেট না করে ডিলিট করা হয় কেন?",
+  "আপডেট করলে দুটো সমান্তরাল রাইটের ক্রম উল্টে গিয়ে পুরোনো মান স্থায়ীভাবে ক্যাশে বসে যেতে পারে। ডিলিট করলে সবচেয়ে খারাপ যা হয় তা হলো পরের রিকোয়েস্টে একটা cache miss — যা নিরীহ।"],
+ ["১ কোটি DAU, প্রতিজন দিনে ২০ রিকোয়েস্ট — পিক QPS কত?",
+  "১ কোটি × ২০ = ২০ কোটি রিকোয়েস্ট/দিন। ৮৬,৪০০ (≈১ লাখ) দিয়ে ভাগ করলে গড় ≈ ২,৩০০ QPS। পিক ৩ গুণ ধরলে ≈ ৭,০০০ QPS। অতএব একাধিক অ্যাপ সার্ভার, ক্যাশ, আর read replica লাগবে।"]
+];
+document.getElementById("quiz").innerHTML=QZ.map(([q,a],i)=>
+ `<div class="q"><button onclick="this.parentNode.classList.toggle('open')">
+  <i>${bn(String(i+1).padStart(2,"0"))}</i><span>${q}</span></button>
+  <div class="a">${a}</div></div>`).join("");
+</script>
+</body>
+</html>
