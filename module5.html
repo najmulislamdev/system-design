@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ভলিউম ৫ — ইন্টারভিউ এক্সিকিউশন | সিস্টেম ডিজাইন</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23141C2B'/><circle cx='9' cy='16' r='3.2' fill='%23E24E1B'/><circle cx='16' cy='16' r='3.2' fill='%231F63D6'/><circle cx='23' cy='16' r='3.2' fill='%230E8474'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -21,7 +22,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);f
   line-height:1.8;-webkit-font-smoothing:antialiased;
   background-image:radial-gradient(circle at 1px 1px,rgba(20,28,43,.07) 1px,transparent 0);background-size:26px 26px}
 .shell{max-width:1240px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:44px}
-nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:34px 0;align-self:start}
+nav.toc{position:sticky;top:46px;height:calc(100vh - 46px);overflow-y:auto;padding:34px 0;align-self:start}
 .toc-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
 .toc a{display:block;text-decoration:none;color:var(--ink-2);font-size:13.5px;padding:6px 0 6px 14px;
   border-left:2px solid var(--rule);line-height:1.4;transition:.16s}
@@ -35,7 +36,7 @@ h1{font-family:var(--disp);font-weight:800;font-stretch:88%;font-size:clamp(32px
   line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
 h1 span{display:block;font-weight:400;color:var(--ink-2)}
 .lede{font-size:17.5px;color:var(--ink-2);max-width:640px;margin:0}
-.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:20px}
+.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:66px}
 .ch:last-of-type{border-bottom:0}
 .ch-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc);margin-bottom:10px}
 h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(25px,3.6vw,36px);
@@ -158,9 +159,45 @@ footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;disp
   .w{padding:18px 16px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- site bar ---------- */
+.sitebar{position:sticky;top:0;z-index:70;backdrop-filter:blur(10px);
+  background:rgba(231,235,241,.92);border-bottom:1px solid var(--rule)}
+.sb-in{max-width:1240px;margin:0 auto;padding:0 22px;height:46px;display:flex;align-items:center;gap:14px}
+.sb-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);
+  font-weight:700;font-size:13.5px;flex:none}
+.sb-brand .dots{display:flex;gap:3px}
+.sb-brand .dots i{width:7px;height:7px;border-radius:50%}
+.sb-nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-nav a{text-decoration:none;color:var(--muted);font-family:var(--mono);font-size:11px;
+  letter-spacing:.06em;padding:5px 10px;border-radius:8px;white-space:nowrap;transition:.16s}
+.sb-nav a:hover{color:var(--ink);background:rgba(20,28,43,.06)}
+.sb-nav a[aria-current="page"]{color:#fff;background:var(--ink)}
+footer a{color:var(--ink-2);text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.08em;transition:.16s}
+footer a:hover{color:var(--ink)}
+@media(max-width:640px){.sb-brand .t{display:none}.sb-in{gap:8px}}
 </style>
 </head>
 <body>
+
+<div class="sitebar">
+  <div class="sb-in">
+    <a class="sb-brand" href="index.html">
+      <span class="dots"><i style="background:#E24E1B"></i><i style="background:#1F63D6"></i><i style="background:#0E8474"></i></span>
+      <span class="t">সিস্টেম ডিজাইন</span>
+    </a>
+    <nav class="sb-nav">
+      <a href="index.html">হোম</a>
+      <a href="roadmap.html">রোডম্যাপ</a>
+      <a href="module1.html">ভলিউম ১</a>
+      <a href="module2.html">ভলিউম ২</a>
+      <a href="module3.html">ভলিউম ৩</a>
+      <a href="module4.html">ভলিউম ৪</a>
+      <a href="module5.html" aria-current="page">ভলিউম ৫</a>
+    </nav>
+  </div>
+</div>
 <div class="shell">
 
 <nav class="toc">
@@ -449,8 +486,9 @@ footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;disp
 </section>
 
 <footer>
+  <a href="module4.html">← ভলিউম ৪ · Low Level Design</a>
   <span>ভলিউম ৫ / ৫ · ইন্টারভিউ এক্সিকিউশন</span>
-  <span>সিরিজ সম্পূর্ণ</span>
+  <a href="roadmap.html">রোডম্যাপে ফিরে যান →</a>
 </footer>
 </main>
 </div>

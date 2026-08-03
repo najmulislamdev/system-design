@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>সিস্টেম ডিজাইন রোডম্যাপ — বিগিনার থেকে FAANG</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23141C2B'/><circle cx='9' cy='16' r='3.2' fill='%23E24E1B'/><circle cx='16' cy='16' r='3.2' fill='%231F63D6'/><circle cx='23' cy='16' r='3.2' fill='%230E8474'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -38,7 +39,7 @@ body{
 
 /* ---------- sticky progress bar ---------- */
 .topbar{
-  position:sticky;top:0;z-index:60;backdrop-filter:blur(10px);
+  position:sticky;top:46px;z-index:60;backdrop-filter:blur(10px);
   background:rgba(231,235,241,.88);border-bottom:1px solid var(--rule);
 }
 .topbar .wrap{display:flex;align-items:center;gap:16px;height:56px}
@@ -123,6 +124,10 @@ h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(24px
 .p-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 .tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:4px 11px;border-radius:99px;
   background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c);font-weight:500}
+.p-go{display:inline-flex;align-items:center;gap:8px;margin-top:16px;text-decoration:none;
+  font-weight:600;font-size:13.5px;padding:9px 17px;border-radius:10px;background:var(--c);color:#fff;
+  transition:.18s}
+.p-go:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .p-ring{text-align:center;flex:none}
 .p-ring .n{font-family:var(--mono);font-size:30px;font-weight:700;color:var(--c);line-height:1}
 .p-ring .t{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
@@ -215,15 +220,51 @@ footer span{font-family:var(--mono);font-size:11px;letter-spacing:.08em}
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto}
 }
+
+/* ---------- site bar ---------- */
+.sitebar{position:sticky;top:0;z-index:70;backdrop-filter:blur(10px);
+  background:rgba(231,235,241,.92);border-bottom:1px solid var(--rule)}
+.sb-in{max-width:1080px;margin:0 auto;padding:0 22px;height:46px;display:flex;align-items:center;gap:14px}
+.sb-brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);
+  font-weight:700;font-size:13.5px;flex:none}
+.sb-brand .dots{display:flex;gap:3px}
+.sb-brand .dots i{width:7px;height:7px;border-radius:50%}
+.sb-nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-nav a{text-decoration:none;color:var(--muted);font-family:var(--mono);font-size:11px;
+  letter-spacing:.06em;padding:5px 10px;border-radius:8px;white-space:nowrap;transition:.16s}
+.sb-nav a:hover{color:var(--ink);background:rgba(20,28,43,.06)}
+.sb-nav a[aria-current="page"]{color:#fff;background:var(--ink)}
+footer a{color:var(--ink-2);text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.08em;transition:.16s}
+footer a:hover{color:var(--ink)}
+@media(max-width:640px){.sb-brand .t{display:none}.sb-in{gap:8px}}
 </style>
 </head>
 <body>
+
+<div class="sitebar">
+  <div class="sb-in">
+    <a class="sb-brand" href="index.html">
+      <span class="dots"><i style="background:#E24E1B"></i><i style="background:#1F63D6"></i><i style="background:#0E8474"></i></span>
+      <span class="t">সিস্টেম ডিজাইন</span>
+    </a>
+    <nav class="sb-nav">
+      <a href="index.html">হোম</a>
+      <a href="roadmap.html" aria-current="page">রোডম্যাপ</a>
+      <a href="module1.html">ভলিউম ১</a>
+      <a href="module2.html">ভলিউম ২</a>
+      <a href="module3.html">ভলিউম ৩</a>
+      <a href="module4.html">ভলিউম ৪</a>
+      <a href="module5.html">ভলিউম ৫</a>
+    </nav>
+  </div>
+</div>
 
 <div class="topbar">
   <div class="wrap">
     <span class="tb-label">সামগ্রিক অগ্রগতি</span>
     <div class="tb-track"><div class="tb-fill" id="tbFill"></div></div>
-    <span class="tb-pct" id="tbPct">0%</span>
+    <span class="tb-pct" id="tbPct">০%</span>
     <button class="tb-reset" id="reset">রিসেট</button>
   </div>
 </div>
@@ -321,6 +362,7 @@ footer span{font-family:var(--mono);font-size:11px;letter-spacing:.08em}
 </section>
 
 <footer>
+  <a href="index.html">← হোম</a>
   <span>SYSTEM DESIGN ROADMAP · BN</span>
   <span id="footNote">অগ্রগতি শুধু এই ট্যাবে থাকে — পেজ রিফ্রেশ করলে মুছে যাবে</span>
 </footer>
@@ -469,6 +511,8 @@ const TIMELINE = [
    s:"নিজের ডিজাইনের সমালোচনা করতে পারা সিনিয়রিটির সবচেয়ে বড় সিগন্যাল।"}
 ];
 
+const bn = n => String(n).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+
 const state = {sel:1, done:{}};
 PHASES.forEach(p=>{
   const n = p.items ? p.items.length : p.tiers.reduce((a,t)=>a+t.i.length,0);
@@ -490,7 +534,7 @@ function buildMap(){
     b.className="station"; b.style.left=p.x+"%"; b.style.top=p.y+"%";
     b.style.setProperty("--c",p.hex); b.style.setProperty("--p",pct(p.id));
     b.setAttribute("aria-selected", state.sel===p.id);
-    b.innerHTML = `<span class="dot"><span>${p.id}</span></span>
+    b.innerHTML = `<span class="dot"><span>${bn(p.id)}</span></span>
       <span class="st-label">${p.name}<em>${p.weeks}</em></span>`;
     b.onclick = ()=>{ state.sel=p.id; render(); };
     map.appendChild(b);
@@ -505,10 +549,10 @@ function buildMapM(){
     const dash = p.id===4 ? " dashed" : "";
     const last = idx===PHASES.length-1 ? " hide" : "";
     b.innerHTML = `<span class="mst-rail">
-        <span class="dot"><span>${p.id}</span></span>
+        <span class="dot"><span>${bn(p.id)}</span></span>
         <span class="mst-line${dash}${last}"></span>
       </span>
-      <span class="mst-body"><h4>${p.name}</h4><em>${p.weeks} · ${pct(p.id)}%</em></span>`;
+      <span class="mst-body"><h4>${p.name}</h4><em>${p.weeks} · ${bn(pct(p.id))}%</em></span>`;
     b.onclick = ()=>{ state.sel=p.id; render(); };
     m.appendChild(b);
   });
@@ -527,11 +571,12 @@ function buildPanel(){
   document.getElementById("panel").innerHTML = `
     <div class="p-head" style="--c:${p.hex}">
       <div>
-        <h3>ধাপ ${p.id} — ${p.name}</h3>
+        <h3>ধাপ ${bn(p.id)} — ${p.name}</h3>
         <p>${p.goal}</p>
         <div class="p-meta">${p.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        <a class="p-go" href="module${p.id}.html">${p.name} ভলিউমটি পড়ুন <span style="font-family:var(--mono)">→</span></a>
       </div>
-      <div class="p-ring"><div class="n">${pct(p.id)}%</div><div class="t">${p.weeks}</div></div>
+      <div class="p-ring"><div class="n">${bn(pct(p.id))}%</div><div class="t">${p.weeks}</div></div>
     </div>
     <div class="p-body">
       <div class="p-col" style="--c:${p.hex}">
@@ -572,11 +617,11 @@ function refresh(){
   const all = Object.values(state.done).flat();
   const p = Math.round(all.filter(Boolean).length/all.length*100);
   document.getElementById("tbFill").style.width = p+"%";
-  document.getElementById("tbPct").textContent = p+"%";
+  document.getElementById("tbPct").textContent = bn(p)+"%";
   document.querySelectorAll("#map .station").forEach((el,i)=>
     el.style.setProperty("--p", pct(PHASES[i].id)));
   const cur = PHASES.find(x=>x.id===state.sel);
-  const ring = document.querySelector(".p-ring .n"); if(ring) ring.textContent = pct(cur.id)+"%";
+  const ring = document.querySelector(".p-ring .n"); if(ring) ring.textContent = bn(pct(cur.id))+"%";
   buildMapM();
 }
 function render(){ buildMap(); buildMapM(); buildPanel(); refresh(); }
