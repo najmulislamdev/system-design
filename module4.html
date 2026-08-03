@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ভলিউম ৪ — Low Level Design | সিস্টেম ডিজাইন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBF1; --card:#FFF; --ink:#141C2B; --ink-2:#3E4A5E; --muted:#77839A; --rule:#CBD3DF;
+  --acc:#7B4FE0; --l1:#E24E1B; --l2:#1F63D6; --l3:#0E8474; --l5:#C08A00; --red:#C42B1C;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --disp:"Anek Bangla","Hind Siliguri",system-ui,sans-serif;
+  --body:"Hind Siliguri","Anek Bangla",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;
+  line-height:1.8;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px,rgba(20,28,43,.07) 1px,transparent 0);background-size:26px 26px}
+.shell{max-width:1240px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:44px}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:34px 0;align-self:start}
+.toc-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
+.toc a{display:block;text-decoration:none;color:var(--ink-2);font-size:13.5px;padding:6px 0 6px 14px;
+  border-left:2px solid var(--rule);line-height:1.4;transition:.16s}
+.toc a:hover{color:var(--ink);border-color:var(--muted)}
+.toc a.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+.toc a i{font-family:var(--mono);font-style:normal;font-size:10.5px;color:var(--muted);margin-right:7px}
+main{padding:34px 0 80px;min-width:0}
+.hero{padding:26px 0 44px;border-bottom:1px solid var(--rule);margin-bottom:44px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--acc);margin-bottom:18px}
+h1{font-family:var(--disp);font-weight:800;font-stretch:88%;font-size:clamp(32px,5.2vw,56px);
+  line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+h1 span{display:block;font-weight:400;color:var(--ink-2)}
+.lede{font-size:17.5px;color:var(--ink-2);max-width:640px;margin:0}
+.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:20px}
+.ch:last-of-type{border-bottom:0}
+.ch-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc);margin-bottom:10px}
+h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(25px,3.6vw,36px);
+  margin:0 0 8px;letter-spacing:-.015em;line-height:1.2}
+.sub{color:var(--muted);font-size:15px;margin:0 0 26px}
+h3{font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:20px;margin:32px 0 10px}
+h4.mini{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);
+  text-transform:uppercase;margin:26px 0 10px}
+p{margin:0 0 15px;color:var(--ink-2)}
+p.lead{color:var(--ink)}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.86em;background:#DDE3EC;padding:2px 6px;border-radius:5px;color:var(--ink)}
+ul.plain{margin:0 0 16px;padding-left:20px;color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+.w{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;margin:22px 0 24px;
+  box-shadow:0 14px 34px -28px rgba(20,28,43,.55)}
+.w-h{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.w-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.ctrls{display:flex;gap:7px;flex-wrap:wrap}
+button.b{font-family:var(--body);font-size:13.5px;font-weight:600;border:1px solid var(--rule);background:#fff;
+  color:var(--ink-2);border-radius:9px;padding:7px 14px;cursor:pointer;transition:.16s}
+button.b:hover{border-color:var(--ink);color:var(--ink)}
+button.b[aria-selected="true"],button.b.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+button.b.warn{border-color:var(--red);color:var(--red)}
+button.b.good[aria-selected="true"]{background:var(--l3);border-color:var(--l3)}
+button.b.bad[aria-selected="true"]{background:var(--red);border-color:var(--red)}
+button.b:disabled{opacity:.35;cursor:default}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);
+  font-weight:500;padding:0 10px 9px 0;border-bottom:1px solid var(--rule)}
+td{padding:10px 10px 10px 0;border-bottom:1px solid #EDF0F5;vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td.y{color:var(--l3);font-weight:600}td.n{color:var(--red);font-weight:600}
+.note{border-left:3px solid var(--l2);padding:4px 0 4px 16px;margin:20px 0;font-size:14.5px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--l2);display:block;margin-bottom:3px}
+.note p{margin:0;font-size:14.5px}
+.iq{background:#141C2B;color:#C3CEDD;border-radius:14px;padding:20px 24px;margin:24px 0;font-size:14.5px}
+.iq .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#FFD166;display:block;margin-bottom:8px}
+.iq p{color:#C3CEDD;margin:0 0 10px}.iq p:last-child{margin:0}
+.iq strong{color:#fff}
+pre.code{font-family:var(--mono);font-size:12.5px;line-height:1.75;background:#141C2B;color:#C3CEDD;
+  border-radius:11px;padding:16px 18px;overflow-x:auto;margin:12px 0}
+pre.code .kw{color:#C792EA}pre.code .cl{color:#82AAFF}pre.code .st{color:#C3E88D}
+pre.code .cm{color:#5F7191;font-style:italic}pre.code .bad{color:#FF8B7A}pre.code .ok{color:#7FD4C1}
+.out-box{border-left:3px solid var(--acc);padding-left:15px;margin-top:14px}
+.out-box h4{margin:0 0 5px;font-size:16.5px;font-family:var(--disp);font-weight:700}
+.out-box p{margin:0;font-size:14.5px}
+.log{font-family:var(--mono);font-size:11.5px;line-height:1.85;background:#141C2B;color:#9FB0C6;
+  border-radius:10px;padding:14px 16px;height:140px;overflow-y:auto;margin-top:12px}
+.log b{color:#7FD4C1;font-weight:400}.log u{color:#FF8B7A;text-decoration:none}
+.log em{color:#FFD166;font-style:normal}
+
+/* uml diagram */
+.uml svg{width:100%;height:auto;display:block}
+.uml .cls{fill:#FAFBFD;stroke:#CBD3DF;stroke-width:1.5}
+.uml .cls.ab{fill:#F3EEFD;stroke:#7B4FE0;stroke-width:2}
+.uml .cls.hi{fill:#E4F2EF;stroke:#0E8474;stroke-width:2}
+.uml text{font-family:"JetBrains Mono";font-size:10.5px;fill:#3E4A5E}
+.uml text.t{font-size:11.5px;fill:#141C2B;font-weight:700}
+.uml text.i{font-size:9px;fill:#77839A}
+.uml .ln{stroke:#9AA7BA;stroke-width:1.4;fill:none}
+
+/* elevator */
+.elev{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:stretch}
+.shaft{position:relative;width:92px;background:#F2F5F9;border:1px solid var(--rule);border-radius:11px;
+  height:340px;overflow:hidden}
+.floorline{position:absolute;left:0;right:0;height:1px;background:var(--rule)}
+.floornum{position:absolute;left:6px;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.car{position:absolute;left:26px;width:56px;height:38px;border-radius:7px;background:var(--acc);
+  transition:top .55s cubic-bezier(.4,0,.3,1);display:grid;place-items:center;
+  font-family:var(--mono);font-size:11px;color:#fff}
+.car.open{background:var(--l3)}
+.fbtns{display:flex;flex-direction:column-reverse;gap:5px}
+.fbtn{border:1.5px solid var(--rule);background:#FAFBFD;border-radius:8px;padding:6px 12px;cursor:pointer;
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);transition:.2s;text-align:left}
+.fbtn:hover{border-color:var(--acc)}
+.fbtn.req{border-color:var(--l5);background:color-mix(in srgb,var(--l5) 14%,#fff);color:var(--l5)}
+.fbtn.here{border-color:var(--l3);background:color-mix(in srgb,var(--l3) 13%,#fff);color:var(--l3)}
+
+/* state machine */
+.sm{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+.sn{border:2px solid var(--rule);border-radius:11px;padding:10px 16px;background:#FAFBFD;text-align:center;
+  transition:.3s;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.sn.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,#fff);color:var(--acc);
+  transform:scale(1.06);font-weight:700}
+.disp{background:#141C2B;border-radius:11px;padding:14px 18px;font-family:var(--mono);font-size:13px;
+  color:#7FD4C1;text-align:center;margin-bottom:12px}
+
+/* pattern cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
+.pcard{border:1px solid var(--rule);border-radius:11px;background:#fff;padding:12px 14px;cursor:pointer;transition:.18s}
+.pcard:hover{border-color:var(--acc);transform:translateY(-2px)}
+.pcard[aria-selected="true"]{border-color:var(--acc);background:#F3EEFD}
+.pcard b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.pcard em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.ppanel{margin-top:18px}
+.ppanel h4{margin:0 0 8px;font-family:var(--disp);font-size:20px;font-weight:700}
+.ppanel .row{display:flex;gap:12px;margin-bottom:9px;font-size:14.5px}
+.ppanel .row b{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);
+  width:92px;flex:none;padding-top:5px}
+.ppanel .row span{color:var(--ink-2)}
+
+.q{border:1px solid var(--rule);border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.q>button{width:100%;text-align:left;background:none;border:0;padding:15px 18px;font-family:var(--body);
+  font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.q>button i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--acc);margin-top:4px}
+.q .a{display:none;padding:0 18px 16px 47px;font-size:14.5px;color:var(--ink-2);border-top:1px solid #EDF0F5;padding-top:14px}
+.q.open .a{display:block}
+footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.08em;color:var(--muted)}
+@media(max-width:960px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;height:auto;padding:26px 0 0;display:flex;gap:8px;overflow-x:auto}
+  .toc-k{display:none}
+  .toc a{border-left:0;border-bottom:2px solid var(--rule);white-space:nowrap;padding:6px 4px}
+  .w{padding:18px 16px}
+  .elev{grid-template-columns:1fr}
+  .shaft{height:280px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="toc">
+  <p class="toc-k">ভলিউম ৪ · অধ্যায়</p>
+  <a href="#c1"><i>০১</i>LLD রাউন্ড কী চায়</a>
+  <a href="#c2"><i>০২</i>SOLID</a>
+  <a href="#c3"><i>০৩</i>ডিজাইন প্যাটার্ন</a>
+  <a href="#c4"><i>০৪</i>ক্লাস ডায়াগ্রাম</a>
+  <a href="#c5"><i>০৫</i>Parking Lot</a>
+  <a href="#c6"><i>০৬</i>Elevator System</a>
+  <a href="#c7"><i>০৭</i>Vending Machine</a>
+  <a href="#c8"><i>০৮</i>Splitwise ও বাকিগুলো</a>
+  <a href="#c9"><i>০৯</i>কনকারেন্সি</a>
+  <a href="#c10"><i>১০</i>নিজেকে যাচাই</a>
+</nav>
+
+<main>
+<div class="hero">
+  <div class="eyebrow">ভলিউম ৪ / ৫ · Low Level Design · ৩–৪ সপ্তাহ · সমান্তরাল</div>
+  <h1>Low Level<span>ক্লাস, ইন্টারফেস, দায়িত্ব</span></h1>
+  <p class="lede">HLD-তে প্রশ্ন — কয়টা সার্ভার? LLD-তে প্রশ্ন — কয়টা ক্লাস, আর কে কার উপর নির্ভর করবে? Amazon, Google, Microsoft-এ এটা আলাদা রাউন্ড। এই ভলিউম মূল লাইনের পাশাপাশি চালান, সপ্তাহে ২–৩ ঘণ্টা।</p>
+</div>
+
+<!-- 1 -->
+<section class="ch" id="c1">
+  <div class="ch-n">অধ্যায় ০১</div>
+  <h2>LLD রাউন্ড আসলে কী যাচাই করে</h2>
+  <p class="sub">কোড লেখা নয় — দায়িত্ব ভাগ করা</p>
+
+  <p class="lead">LLD ইন্টারভিউয়ার একটাই জিনিস দেখতে চান: <strong>নতুন একটা প্রয়োজন এলে আপনার ডিজাইন কি ভাঙবে, নাকি বাড়বে?</strong> "পার্কিং লট ডিজাইন করুন" বলার ২০ মিনিট পর তিনি বলবেন — "এখন ইলেকট্রিক গাড়ির চার্জিং স্পট যোগ করুন"। আপনার ডিজাইনে যদি তখন পুরোনো ক্লাস কাটাছেঁড়া করতে হয়, আপনি হেরে গেলেন।</p>
+
+  <h4 class="mini">৪৫ মিনিটের কাঠামো</h4>
+  <table>
+    <tr><th>সময়</th><th>কাজ</th></tr>
+    <tr><td>০–৫ মিনিট</td><td>রিকোয়ারমেন্ট ও স্কোপ। "একাধিক ফ্লোর আছে? পেমেন্ট আছে? রিজার্ভেশন?"</td></tr>
+    <tr><td>৫–১২ মিনিট</td><td>মূল entity চিহ্নিত করা — বিশেষ্যগুলো লিখে ফেলুন (Vehicle, Spot, Ticket, Floor)</td></tr>
+    <tr><td>১২–২৫ মিনিট</td><td>ক্লাস ডায়াগ্রাম — attribute, method, সম্পর্ক</td></tr>
+    <tr><td>২৫–৪০ মিনিট</td><td>মূল ফ্লো-র কোড লেখা (সব ক্লাস নয়, ২–৩টা গুরুত্বপূর্ণ)</td></tr>
+    <tr><td>৪০–৪৫ মিনিট</td><td>এক্সটেনশন প্রশ্ন, কনকারেন্সি, tradeoff</td></tr>
+  </table>
+
+  <h4 class="mini">Entity বের করার সহজ কৌশল</h4>
+  <p>রিকোয়ারমেন্ট বাক্যগুলো থেকে <strong>বিশেষ্য</strong> নিন — সেগুলো সম্ভাব্য ক্লাস। <strong>ক্রিয়া</strong> নিন — সেগুলো সম্ভাব্য মেথড। "একজন <em>ব্যবহারকারী</em> একটা <em>গাড়ি</em> নিয়ে <em>পার্কিং লটে</em> ঢুকে <em>টিকিট</em> নেয়" → User, Vehicle, ParkingLot, Ticket, আর মেথড <code>issueTicket()</code>। এটা নিখুঁত নয়, কিন্তু শূন্য থেকে শুরু করার সেরা উপায়, আর ইন্টারভিউয়ারের সামনে জোরে করলে ভালো দেখায়।</p>
+
+  <div class="note">
+    <span class="k">যে ভুলটা সবচেয়ে বেশি হয়</span>
+    <p>একটা <code>ParkingLotManager</code> ক্লাস বানিয়ে তাতে সব লজিক ঢেলে দেওয়া — গাড়ি খোঁজা, টাকা হিসাব, টিকিট ছাপা, ডেটাবেজে লেখা। একে বলে <strong>God object</strong>। ইন্টারভিউয়ার সাথে সাথে ধরে ফেলেন। প্রতিটা ক্লাসের <strong>একটাই কারণ থাকবে বদলানোর</strong> — এটাই পরের অধ্যায়ের প্রথম অক্ষর।</p>
+  </div>
+</section>
+
+<!-- 2 SOLID -->
+<section class="ch" id="c2">
+  <div class="ch-n">অধ্যায় ০২</div>
+  <h2>SOLID</h2>
+  <p class="sub">পাঁচটা নীতি — খারাপ ও ভালো কোড পাশাপাশি দেখুন</p>
+
+  <p class="lead">SOLID মুখস্থ বলতে পারা কোনো কৃতিত্ব নয়। কৃতিত্ব হলো — নিজের আঁকা ডিজাইনে কোন নীতিটা ভাঙছে সেটা <strong>নিজে ধরতে পারা</strong>। নিচে প্রতিটার জন্য আগে খারাপ কোডটা পড়ুন, তারপর টগল করুন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">নীতি</span>
+      <div class="ctrls" id="solidTabs"></div>
+    </div>
+    <div class="ctrls" style="margin-bottom:12px">
+      <button class="b bad" id="sBad" aria-selected="true">খারাপ কোড</button>
+      <button class="b good" id="sGood">ভালো কোড</button>
+    </div>
+    <div id="solidBox"></div>
+  </div>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউতে কীভাবে ব্যবহার করবেন</span>
+    <p>নীতির নাম আওড়াবেন না। বরং সিদ্ধান্তের <strong>কারণ</strong> হিসেবে বলুন: "PaymentStrategy-কে ইন্টারফেস করছি, যাতে নতুন পেমেন্ট মাধ্যম যোগ করতে হলে পুরোনো কোনো ক্লাস ছুঁতে না হয় — শুধু নতুন একটা ক্লাস লিখলেই হবে।" এটাই Open/Closed, নাম না বলেই বলা হয়ে গেল।</p>
+  </div>
+</section>
+
+<!-- 3 PATTERNS -->
+<section class="ch" id="c3">
+  <div class="ch-n">অধ্যায় ০৩</div>
+  <h2>ডিজাইন প্যাটার্ন</h2>
+  <p class="sub">যেগুলো LLD ইন্টারভিউতে সত্যিই আসে</p>
+
+  <p class="lead">২৩টা GoF প্যাটার্ন মুখস্থ করার দরকার নেই। বাস্তব LLD ইন্টারভিউতে ঘুরেফিরে <strong>এই আটটাই</strong> আসে। প্রতিটার জন্য জানুন — কোন সমস্যা, কীভাবে সমাধান, আর কোন প্রবলেমে লাগে।</p>
+
+  <div class="w">
+    <div class="cards" id="pCards"></div>
+    <div class="ppanel" id="pPanel"></div>
+  </div>
+
+  <div class="note">
+    <span class="k">অতি-প্রয়োগের ফাঁদ</span>
+    <p>প্যাটার্ন শিখে ফেললে সবখানে লাগাতে ইচ্ছে করে। কিন্তু যেখানে <code>if-else</code> যথেষ্ট সেখানে Factory + Strategy + Observer বসালে ইন্টারভিউয়ার বিরক্ত হন — এটাকে বলে over-engineering, আর এটাও একটা লাল পতাকা। নিয়ম: <strong>প্যাটার্ন তখনই আনুন যখন পরিবর্তনের একটা বাস্তব দিক আছে</strong>।</p>
+  </div>
+</section>
+
+<!-- 4 UML -->
+<section class="ch" id="c4">
+  <div class="ch-n">অধ্যায় ০৪</div>
+  <h2>ক্লাস ডায়াগ্রাম</h2>
+  <p class="sub">চারটা সম্পর্ক — এগুলো গুলিয়ে ফেললে ডিজাইনটাই ভুল হয়ে যায়</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">সম্পর্কের ধরন</span>
+      <div class="ctrls">
+        <button class="b" data-rel="inh" aria-selected="true">Inheritance</button>
+        <button class="b" data-rel="comp">Composition</button>
+        <button class="b" data-rel="agg">Aggregation</button>
+        <button class="b" data-rel="assoc">Association</button>
+      </div>
+    </div>
+    <div id="relBox"></div>
+  </div>
+
+  <div class="note">
+    <span class="k">সবচেয়ে গুরুত্বপূর্ণ নিয়ম</span>
+    <p><strong>Inheritance-এর চেয়ে Composition পছন্দ করুন।</strong> উত্তরাধিকার একটা শক্ত বাঁধন — সাবক্লাস প্যারেন্টের সব কিছু পায়, চাক না চাক, আর প্যারেন্ট বদলালে সব সাবক্লাস প্রভাবিত হয়। Composition-এ আপনি শুধু যা দরকার তা ভেতরে রাখেন, আর রানটাইমে বদলাতেও পারেন। ইন্টারভিউতে গভীর ক্লাস হায়ারার্কি (৩+ স্তর) আঁকলে প্রায় নিশ্চিতভাবে প্রশ্ন আসবে।</p>
+  </div>
+</section>
+
+<!-- 5 PARKING -->
+<section class="ch" id="c5">
+  <div class="ch-n">প্রবলেম ০১</div>
+  <h2>Parking Lot</h2>
+  <p class="sub">LLD-র "URL shortener" — সবচেয়ে জিজ্ঞাসিত</p>
+
+  <h4 class="mini">রিকোয়ারমেন্ট (যা জিজ্ঞেস করে বের করবেন)</h4>
+  <ul class="plain">
+    <li>একাধিক ফ্লোর, প্রতিটায় একাধিক স্পট</li>
+    <li>গাড়ির ধরন: মোটরসাইকেল, গাড়ি, ট্রাক — স্পটের আকারও তেমন</li>
+    <li>ঢোকার সময় টিকিট, বেরোনোর সময় সময়ভিত্তিক ফি</li>
+    <li>একাধিক এন্ট্রি/এক্সিট গেট, একাধিক পেমেন্ট পদ্ধতি</li>
+  </ul>
+
+  <div class="w uml">
+    <svg viewBox="0 0 760 330">
+      <rect class="cls hi" x="290" y="10" width="170" height="58" rx="6"/>
+      <text class="t" x="375" y="30" text-anchor="middle">ParkingLot</text>
+      <text x="302" y="46">- floors: List&lt;Floor&gt;</text>
+      <text x="302" y="60">+ parkVehicle(v): Ticket</text>
+
+      <rect class="cls" x="290" y="105" width="170" height="52" rx="6"/>
+      <text class="t" x="375" y="124" text-anchor="middle">ParkingFloor</text>
+      <text x="302" y="140">- spots: List&lt;Spot&gt;</text>
+      <text x="302" y="152">+ findSpot(type): Spot</text>
+
+      <rect class="cls" x="80" y="105" width="160" height="52" rx="6"/>
+      <text class="t" x="160" y="124" text-anchor="middle">Ticket</text>
+      <text x="92" y="140">- entryTime, spot</text>
+      <text x="92" y="152">- vehicle</text>
+
+      <rect class="cls ab" x="510" y="105" width="160" height="52" rx="6"/>
+      <text class="t" x="590" y="124" text-anchor="middle">«interface»</text>
+      <text class="t" x="590" y="138" text-anchor="middle">PricingStrategy</text>
+      <text x="522" y="152">+ calculate(ticket)</text>
+
+      <rect class="cls" x="290" y="200" width="170" height="52" rx="6"/>
+      <text class="t" x="375" y="219" text-anchor="middle">ParkingSpot</text>
+      <text x="302" y="235">- type: SpotType</text>
+      <text x="302" y="247">- isFree: boolean</text>
+
+      <rect class="cls ab" x="80" y="200" width="160" height="40" rx="6"/>
+      <text class="t" x="160" y="219" text-anchor="middle">«abstract» Vehicle</text>
+      <text x="92" y="233">- licensePlate</text>
+
+      <rect class="cls" x="45" y="272" width="76" height="34" rx="5"/><text class="t" x="83" y="293" text-anchor="middle">Car</text>
+      <rect class="cls" x="133" y="272" width="76" height="34" rx="5"/><text class="t" x="171" y="293" text-anchor="middle">Truck</text>
+      <rect class="cls" x="221" y="272" width="84" height="34" rx="5"/><text class="t" x="263" y="293" text-anchor="middle">Motorcycle</text>
+
+      <rect class="cls" x="510" y="200" width="160" height="52" rx="6"/>
+      <text class="t" x="590" y="219" text-anchor="middle">HourlyPricing</text>
+      <text x="522" y="235">+ calculate(ticket)</text>
+      <text class="i" x="522" y="247">DayPricing, FlatRate…</text>
+
+      <path class="ln" d="M375 68 V105"/>
+      <path class="ln" d="M375 157 V200"/>
+      <path class="ln" d="M290 130 H240"/>
+      <path class="ln" d="M460 130 H510"/>
+      <path class="ln" d="M590 157 V200" stroke-dasharray="5 4"/>
+      <path class="ln" d="M160 240 V272 M83 272 V258 H263 V272"/>
+      <text class="i" x="382" y="88">◆ composition</text>
+      <text class="i" x="382" y="182">◆ composition</text>
+      <text class="i" x="466" y="122">uses</text>
+      <text class="i" x="596" y="180">implements</text>
+    </svg>
+  </div>
+
+  <pre class="code"><span class="cm">// স্পট খোঁজার কৌশলও ইন্টারফেস — নিকটতম, সবচেয়ে সস্তা, ফ্লোরভিত্তিক…</span>
+<span class="kw">interface</span> <span class="cl">SpotAllocationStrategy</span> {
+    <span class="cl">Optional</span>&lt;<span class="cl">ParkingSpot</span>&gt; findSpot(<span class="cl">List</span>&lt;<span class="cl">ParkingFloor</span>&gt; floors, <span class="cl">VehicleType</span> type);
+}
+
+<span class="kw">class</span> <span class="cl">ParkingLot</span> {
+    <span class="kw">private final</span> <span class="cl">SpotAllocationStrategy</span> allocator;
+    <span class="kw">private final</span> <span class="cl">PricingStrategy</span> pricing;
+
+    <span class="kw">public</span> <span class="cl">Ticket</span> park(<span class="cl">Vehicle</span> v) {
+        <span class="cl">ParkingSpot</span> spot = allocator.findSpot(floors, v.getType())
+            .orElseThrow(() -&gt; <span class="kw">new</span> <span class="cl">LotFullException</span>());
+        spot.occupy(v);
+        <span class="kw">return</span> <span class="kw">new</span> <span class="cl">Ticket</span>(v, spot, <span class="cl">Instant</span>.now());
+    }
+
+    <span class="kw">public</span> <span class="cl">Receipt</span> unpark(<span class="cl">Ticket</span> t) {
+        <span class="kw">double</span> fee = pricing.calculate(t);   <span class="cm">// দাম কীভাবে হিসাব হয় ParkingLot জানে না</span>
+        t.getSpot().release();
+        <span class="kw">return</span> <span class="kw">new</span> <span class="cl">Receipt</span>(t, fee);
+    }
+}</pre>
+
+  <h4 class="mini">এক্সটেনশন প্রশ্নগুলো আগে থেকেই ভাবুন</h4>
+  <ul class="plain">
+    <li><strong>"ইলেকট্রিক গাড়ির চার্জিং স্পট যোগ করুন।"</strong> → <code>SpotType</code>-এ নতুন মান + <code>ElectricSpot</code> যেটা <code>ParkingSpot</code> এক্সটেন্ড করে চার্জিং লজিক যোগ করে। কোনো পুরোনো ক্লাস বদলায় না।</li>
+    <li><strong>"সপ্তাহান্তে ভিন্ন রেট।"</strong> → নতুন <code>WeekendPricing</code> ক্লাস, <code>PricingStrategy</code> ইমপ্লিমেন্ট। এজন্যই দামের হিসাব শুরু থেকেই ইন্টারফেসের পেছনে রাখা হয়েছিল।</li>
+    <li><strong>"দুটো গাড়ি একই স্পট পেয়ে গেল।"</strong> → স্পট বরাদ্দ অ্যাটমিক হতে হবে; <code>synchronized</code> বা <code>AtomicBoolean.compareAndSet()</code>। অধ্যায় ০৯-এ বিস্তারিত।</li>
+  </ul>
+</section>
+
+<!-- 6 ELEVATOR -->
+<section class="ch" id="c6">
+  <div class="ch-n">প্রবলেম ০২</div>
+  <h2>Elevator System</h2>
+  <p class="sub">ফ্লোরে ক্লিক করুন — SCAN অ্যালগরিদম চলতে দেখুন</p>
+
+  <p class="lead">লিফটের আসল প্রশ্ন ক্লাস ডিজাইন নয়, <strong>শিডিউলিং</strong>। সবচেয়ে সরল উপায় হলো FCFS — যে আগে চেপেছে তার কাছে আগে যাও। কিন্তু ৫ তলা থেকে ১ তলায় নেমে আবার ৬ তলায় ওঠা অপচয়। বাস্তবে <strong>SCAN</strong> ব্যবহার হয় — এক দিকে যেতে যেতে পথে যত অনুরোধ আছে সব সেরে নেওয়া, তারপর ঘুরে দাঁড়ানো।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">অবস্থা: <span id="elState">IDLE</span> · তলা <span id="elFloor">১</span></span>
+      <div class="ctrls">
+        <button class="b" data-el="scan" aria-selected="true">SCAN</button>
+        <button class="b" data-el="fcfs">FCFS</button>
+        <button class="b" id="elReset">রিসেট</button>
+      </div>
+    </div>
+    <div class="elev">
+      <div class="shaft" id="shaft"><div class="car" id="car">▲</div></div>
+      <div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 8px">যেকোনো তলায় ক্লিক করে অনুরোধ যোগ করুন — একসাথে কয়েকটা দিন</p>
+        <div class="fbtns" id="fbtns"></div>
+      </div>
+    </div>
+    <div class="log" id="elLog" style="height:110px"><b>▸ ফ্লোর বোতাম চাপুন</b></div>
+  </div>
+
+  <h4 class="mini">ক্লাস ডিজাইন</h4>
+  <pre class="code"><span class="kw">enum</span> <span class="cl">Direction</span> { UP, DOWN, IDLE }
+
+<span class="kw">class</span> <span class="cl">Elevator</span> {
+    <span class="kw">private int</span> currentFloor;
+    <span class="kw">private</span> <span class="cl">Direction</span> direction;
+    <span class="kw">private final</span> <span class="cl">TreeSet</span>&lt;<span class="cl">Integer</span>&gt; up   = <span class="kw">new</span> <span class="cl">TreeSet</span>&lt;&gt;();          <span class="cm">// ঊর্ধ্বমুখী অনুরোধ</span>
+    <span class="kw">private final</span> <span class="cl">TreeSet</span>&lt;<span class="cl">Integer</span>&gt; down = <span class="kw">new</span> <span class="cl">TreeSet</span>&lt;&gt;(reverseOrder()); <span class="cm">// অধোমুখী</span>
+}
+
+<span class="cm">// একাধিক লিফট থাকলে কে যাবে সেটা আলাদা দায়িত্ব — তাই আলাদা ইন্টারফেস</span>
+<span class="kw">interface</span> <span class="cl">ElevatorSelectionStrategy</span> {
+    <span class="cl">Elevator</span> select(<span class="cl">List</span>&lt;<span class="cl">Elevator</span>&gt; elevators, <span class="cl">Request</span> r);
+}</pre>
+
+  <p>দুটো <code>TreeSet</code> রাখাটাই মূল চাল — ঊর্ধ্বমুখী অনুরোধ অ্যারোহী ক্রমে, অধোমুখী অবরোহী ক্রমে। তখন "পরের গন্তব্য" মানে শুধু বর্তমান দিকের সেটের প্রথম উপাদান। সেট খালি হলে দিক উল্টে দিন। <strong>SCAN অ্যালগরিদম এভাবে কয়েক লাইনেই দাঁড়িয়ে যায়</strong> — আর এটা দেখাতে পারলে ইন্টারভিউয়ার খুশি হন।</p>
+
+  <div class="note">
+    <span class="k">যে পার্থক্যটা ধরতে হবে</span>
+    <p>দুই ধরনের অনুরোধ আছে: <strong>এক্সটার্নাল</strong> (ফ্লোরে দাঁড়িয়ে উপরে/নিচে বোতাম) আর <strong>ইন্টার্নাল</strong> (লিফটের ভেতরে তলা নম্বর)। এক্সটার্নাল অনুরোধে <em>দিক</em> জানা যায়, ইন্টার্নালে যায় না — এই পার্থক্যটা শিডিউলিং-এ কাজে লাগে। ইন্টারভিউতে এই দুটো আলাদা করতে পারলে বোঝা যায় আপনি সমস্যাটা সত্যিই ভেবেছেন।</p>
+  </div>
+</section>
+
+<!-- 7 VENDING -->
+<section class="ch" id="c7">
+  <div class="ch-n">প্রবলেম ০৩</div>
+  <h2>Vending Machine</h2>
+  <p class="sub">State প্যাটার্নের পাঠ্যপুস্তক উদাহরণ</p>
+
+  <p class="lead">ভেন্ডিং মেশিনের পুরো আচরণ নির্ভর করে সে <strong>কোন অবস্থায়</strong> আছে তার উপর। টাকা না দিয়ে আইটেম বাছা যাবে না; আইটেম না বেছে ডিসপেন্স হবে না। নিচে ভুল ক্রমে বোতাম চেপে দেখুন — মেশিন কীভাবে না বলে।</p>
+
+  <div class="w">
+    <div class="w-h"><span class="w-t">অবস্থা যন্ত্র</span></div>
+    <div class="disp" id="vmDisp">স্বাগতম — টাকা ঢোকান</div>
+    <div class="sm" id="vmStates"></div>
+    <div class="ctrls" style="justify-content:center">
+      <button class="b" data-vm="coin">৳২০ ঢোকান</button>
+      <button class="b" data-vm="select">আইটেম বাছুন</button>
+      <button class="b" data-vm="dispense">ডিসপেন্স</button>
+      <button class="b warn" data-vm="refund">ফেরত</button>
+    </div>
+    <div class="log" id="vmLog" style="height:120px"><b>▸ যেকোনো বোতাম চাপুন — ভুল ক্রমেও চেষ্টা করুন</b></div>
+  </div>
+
+  <pre class="code"><span class="cm">// খারাপ: বিশাল if-else, প্রতিটা মেথডে সব অবস্থা চেক</span>
+<span class="kw">void</span> selectItem(<span class="cl">Item</span> i) {
+    <span class="kw">if</span> (state == IDLE) <span class="kw">throw new</span> <span class="cl">Exception</span>(<span class="st">"আগে টাকা দিন"</span>);
+    <span class="kw">else if</span> (state == DISPENSING) <span class="kw">throw new</span> <span class="cl">Exception</span>(<span class="st">"অপেক্ষা করুন"</span>);
+    <span class="cm">// … নতুন অবস্থা যোগ করলে প্রতিটা মেথডে গিয়ে হাত দিতে হবে</span>
+}
+
+<span class="cm">// ভালো: প্রতিটা অবস্থা নিজের আচরণ নিজে জানে</span>
+<span class="kw">interface</span> <span class="cl">VendingState</span> {
+    <span class="kw">void</span> insertCoin(<span class="cl">VendingMachine</span> m, <span class="kw">int</span> amount);
+    <span class="kw">void</span> selectItem(<span class="cl">VendingMachine</span> m, <span class="cl">Item</span> item);
+    <span class="kw">void</span> dispense(<span class="cl">VendingMachine</span> m);
+}
+
+<span class="kw">class</span> <span class="cl">IdleState</span> <span class="kw">implements</span> <span class="cl">VendingState</span> {
+    <span class="kw">public void</span> insertCoin(<span class="cl">VendingMachine</span> m, <span class="kw">int</span> amt) {
+        m.addBalance(amt);
+        m.setState(<span class="kw">new</span> <span class="cl">HasMoneyState</span>());     <span class="cm">// অবস্থা নিজেই পরের অবস্থা ঠিক করে</span>
+    }
+    <span class="kw">public void</span> selectItem(<span class="cl">VendingMachine</span> m, <span class="cl">Item</span> i) {
+        <span class="kw">throw new</span> <span class="cl">IllegalStateException</span>(<span class="st">"আগে টাকা ঢোকান"</span>);
+    }
+    <span class="kw">public void</span> dispense(<span class="cl">VendingMachine</span> m) {
+        <span class="kw">throw new</span> <span class="cl">IllegalStateException</span>(<span class="st">"কিছু বাছা হয়নি"</span>);
+    }
+}</pre>
+
+  <p>লাভটা স্পষ্ট: নতুন একটা অবস্থা (যেমন <code>OutOfStockState</code> বা <code>MaintenanceState</code>) যোগ করতে হলে শুধু নতুন একটা ক্লাস লিখুন — পুরোনো কোনো ক্লাসে হাত দিতে হবে না। এটাই Open/Closed নীতি বাস্তবে।</p>
+</section>
+
+<!-- 8 MORE -->
+<section class="ch" id="c8">
+  <div class="ch-n">অধ্যায় ০৮</div>
+  <h2>Splitwise ও বাকি প্রবলেমগুলো</h2>
+  <p class="sub">প্রতিটার মূল অন্তর্দৃষ্টি</p>
+
+  <h3>Splitwise</h3>
+  <p>এখানে আসল চ্যালেঞ্জ ক্লাস নয়, <strong>ডেটা মডেল ও অ্যালগরিদম</strong>। প্রতিটা খরচে থাকে একজন পরিশোধকারী আর কয়েকজন অংশগ্রহণকারী, আর ভাগের নিয়ম আলাদা হতে পারে — সমান, নির্দিষ্ট অঙ্ক, শতাংশ, বা শেয়ার। এই নিয়মটাই <code>SplitStrategy</code> ইন্টারফেস।</p>
+  <pre class="code"><span class="kw">interface</span> <span class="cl">SplitStrategy</span> {
+    <span class="cl">Map</span>&lt;<span class="cl">User</span>, <span class="cl">BigDecimal</span>&gt; split(<span class="cl">BigDecimal</span> total, <span class="cl">List</span>&lt;<span class="cl">User</span>&gt; participants, <span class="cl">Object</span> cfg);
+}
+<span class="cm">// EqualSplit, ExactSplit, PercentSplit, ShareSplit</span>
+
+<span class="cm">// ব্যালান্স: প্রতি জোড়ার জন্য নয় — প্রতি ইউজারের নিট অবস্থান রাখুন</span>
+<span class="cl">Map</span>&lt;<span class="cl">User</span>, <span class="cl">BigDecimal</span>&gt; netBalance;  <span class="cm">// ধনাত্মক = পাবে, ঋণাত্মক = দেবে</span></pre>
+  <p>"সবচেয়ে কম লেনদেনে হিসাব মেটানো" — এটা একটা ক্লাসিক ফলো-আপ। প্রতিটা ইউজারের নিট ব্যালান্স বের করে, তারপর সবচেয়ে বেশি পাওনাদারের সাথে সবচেয়ে বেশি দেনাদারকে বারবার মেলানো (গ্রিডি, হিপ দিয়ে)। এটা সবসময় সর্বোত্তম নয় (সমস্যাটা NP-hard), কিন্তু বাস্তবে যথেষ্ট ভালো — <strong>এই সীমাবদ্ধতাটা স্বীকার করে নেওয়াটাই ভালো উত্তর</strong>।</p>
+  <p><strong>টাকার জন্য কখনো <code>float</code> বা <code>double</code> ব্যবহার করবেন না</strong> — <code>0.1 + 0.2 != 0.3</code>। <code>BigDecimal</code> নিন, বা পয়সাকে পূর্ণসংখ্যা হিসেবে রাখুন। এই একটা কথা বললেই ইন্টারভিউয়ার বোঝেন আপনি বাস্তবে কোড লিখেছেন।</p>
+
+  <h3>বাকিগুলো — সংক্ষেপে</h3>
+  <table>
+    <tr><th>প্রবলেম</th><th>মূল প্যাটার্ন</th><th>যেখানে পরীক্ষা হয়</th></tr>
+    <tr><td>Tic-tac-toe / দাবা</td><td>Strategy (চাল যাচাই), State</td><td>বোর্ড উপস্থাপন, জয় শনাক্তকরণ, নিয়ম আলাদা রাখা</td></tr>
+    <tr><td>Rate limiter (ক্লাস)</td><td>Strategy</td><td>একই ইন্টারফেসে টোকেন বাকেট ও স্লাইডিং উইন্ডো — ভলিউম ৩-এর LLD রূপ</td></tr>
+    <tr><td>লগার</td><td>Chain of Responsibility, Singleton</td><td>লেভেল অনুযায়ী পাস করা, একাধিক গন্তব্য (ফাইল, কনসোল)</td></tr>
+    <tr><td>ATM</td><td>State, Chain of Responsibility</td><td>নোট ডিসপেন্স (২০০০ → ৫০০ → ১০০ চেইন), কার্ড ফ্লো</td></tr>
+    <tr><td>নোটিফিকেশন</td><td>Observer, Factory, Decorator</td><td>একাধিক চ্যানেল, রানটাইমে সাবস্ক্রাইব</td></tr>
+    <tr><td>ইন-মেমোরি কী-ভ্যালু / LRU ক্যাশ</td><td>—</td><td>HashMap + দ্বি-মুখী লিঙ্কড লিস্টে O(১) get ও put</td></tr>
+    <tr><td>বুক মাই শো</td><td>State, Strategy</td><td>সিট লক করা, কনকারেন্সি — ভলিউম ৩-এর টিকিট প্রবলেমের ক্লাস রূপ</td></tr>
+  </table>
+</section>
+
+<!-- 9 CONCURRENCY -->
+<section class="ch" id="c9">
+  <div class="ch-n">অধ্যায় ০৯</div>
+  <h2>কনকারেন্সি</h2>
+  <p class="sub">যে ফলো-আপ প্রশ্নটা প্রায় সবসময় আসে</p>
+
+  <p class="lead">২৫ মিনিট ডিজাইন করার পর ইন্টারভিউয়ার বলবেন — "দুজন একই সাথে শেষ স্পটটা চাইলে?" এটা ভলিউম ৩-এর টিকিট প্রবলেমের সেই একই সমস্যা, কিন্তু এবার <strong>এক প্রসেসের ভেতরে</strong>।</p>
+
+  <pre class="code"><span class="cm">// ✕ ভাঙা: চেক ও দখলের মাঝখানে অন্য থ্রেড ঢুকে যেতে পারে</span>
+<span class="kw">if</span> (spot.isFree()) {      <span class="bad">// থ্রেড A এখানে, থ্রেড Bও এখানে</span>
+    spot.occupy(vehicle);  <span class="bad">// দুজনই দখল করে ফেলল</span>
+}
+
+<span class="cm">// ✓ সমাধান ১: অ্যাটমিক compare-and-set — লক ছাড়াই, দ্রুত</span>
+<span class="kw">class</span> <span class="cl">ParkingSpot</span> {
+    <span class="kw">private final</span> <span class="cl">AtomicBoolean</span> free = <span class="kw">new</span> <span class="cl">AtomicBoolean</span>(<span class="kw">true</span>);
+    <span class="kw">public boolean</span> tryOccupy(<span class="cl">Vehicle</span> v) {
+        <span class="kw">if</span> (!free.compareAndSet(<span class="kw">true</span>, <span class="kw">false</span>)) <span class="kw">return</span> <span class="kw">false</span>;  <span class="ok">// একজনই জেতে</span>
+        <span class="kw">this</span>.vehicle = v;
+        <span class="kw">return</span> <span class="kw">true</span>;
+    }
+}
+
+<span class="cm">// ✓ সমাধান ২: কনকারেন্ট কালেকশন — খালি স্পটের কিউ</span>
+<span class="cl">ConcurrentLinkedQueue</span>&lt;<span class="cl">ParkingSpot</span>&gt; freeSpots;
+<span class="cl">ParkingSpot</span> spot = freeSpots.poll();   <span class="ok">// অ্যাটমিক — একটাই থ্রেড এটা পাবে</span>
+<span class="kw">if</span> (spot == <span class="kw">null</span>) <span class="kw">throw new</span> <span class="cl">LotFullException</span>();</pre>
+
+  <h4 class="mini">যা বলতে পারলে আলাদা করে নজরে পড়বেন</h4>
+  <ul class="plain">
+    <li><strong>লকের পরিধি ছোট রাখুন।</strong> পুরো <code>ParkingLot</code> অবজেক্টে <code>synchronized</code> দিলে সব গেট একটা লাইনে দাঁড়াবে। বদলে প্রতি ফ্লোরে বা প্রতি স্পটে লক দিন — সমান্তরালতা টিকে থাকে।</li>
+    <li><strong>একাধিক লক নিলে সবসময় একই ক্রমে নিন</strong> — নাহলে deadlock। দুই থ্রেড যদি একজন A→B আর অন্যজন B→A ক্রমে লক নেয়, দুজনই চিরকাল অপেক্ষা করবে।</li>
+    <li><strong>Immutable অবজেক্ট থ্রেড-সেফ, বিনা খরচে।</strong> <code>Ticket</code>-এর মতো ক্লাস তৈরির পর আর বদলায় না — সব ফিল্ড <code>final</code> করে দিন, তাহলে কোনো সিঙ্ক্রোনাইজেশনই লাগবে না। ডিজাইনে যত বেশি জিনিস immutable, তত কম কনকারেন্সি বাগ।</li>
+    <li><strong>লকের চেয়ে অ্যাটমিক অপারেশন পছন্দ করুন</strong> — <code>AtomicBoolean</code>, <code>ConcurrentHashMap.putIfAbsent()</code>, <code>ConcurrentLinkedQueue.poll()</code>। এগুলো লক ছাড়াই সঠিকতা দেয় এবং দ্রুততর।</li>
+  </ul>
+
+  <div class="iq">
+    <span class="k">সংযোগটা লক্ষ করুন</span>
+    <p>এই অধ্যায়ের <code>compareAndSet</code>, ভলিউম ৩-এর <code>SET seat NX</code>, আর ভলিউম ২-এর অপ্টিমিস্টিক ভার্সন চেক — <strong>তিনটাই একই ধারণা</strong>, তিনটা ভিন্ন স্কেলে। থ্রেড, প্রসেস, বা ডেটাসেন্টার — যেখানেই দুজন একই সম্পদ চাইবে, সমাধান একটাই: <strong>চেক আর দখল যেন একটাই অবিভাজ্য পদক্ষেপ হয়</strong>। এই সংযোগটা ইন্টারভিউতে বলতে পারলে বোঝা যায় আপনি নিয়ম নয়, নীতি শিখেছেন।</p>
+  </div>
+</section>
+
+<!-- 10 QUIZ -->
+<section class="ch" id="c10">
+  <div class="ch-n">অধ্যায় ১০</div>
+  <h2>নিজেকে যাচাই করুন</h2>
+  <p class="sub">উত্তর দেখার আগে জোরে বলুন</p>
+  <div id="quiz"></div>
+  <div class="note" style="border-color:var(--l3)">
+    <span class="k" style="color:var(--l3)">ভলিউম ৪ শেষ</span>
+    <p>শেষ ভলিউম — <strong>ইন্টারভিউ এক্সিকিউশন</strong>: জ্ঞানকে পারফরম্যান্সে রূপ দেওয়া, মক ইন্টারভিউ পরিকল্পনা, হোয়াইটবোর্ড কৌশল, ইংরেজিতে tradeoff ব্যাখ্যা, আর ইন্টারভিউয়ার ঠিক কী দেখে নম্বর দেন।</p>
+  </div>
+</section>
+
+<footer>
+  <span>ভলিউম ৪ / ৫ · Low Level Design</span>
+  <span>পরবর্তী → ইন্টারভিউ এক্সিকিউশন</span>
+</footer>
+</main>
+</div>
+
+<script>
+const bn=n=>String(n).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const links=[...document.querySelectorAll(".toc a")];
+document.querySelectorAll(".ch").forEach(s=>new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))})},
+  {rootMargin:"-20% 0px -70% 0px"}).observe(s));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- SOLID ---------- */
+const SOLID=[
+ {k:"S",n:"Single Responsibility",
+  r:"একটা ক্লাস বদলানোর <b>একটাই কারণ</b> থাকবে। ক্লাসের বর্ণনা দিতে গিয়ে যদি “এবং” বলতে হয়, সেটা ভাঙার সংকেত।",
+  bad:`<span class="kw">class</span> <span class="cl">Order</span> {
+    <span class="kw">void</span> calculateTotal() { … }
+    <span class="kw">void</span> saveToDatabase() { … }   <span class="bad">// ডেটাবেজ বদলালে এই ক্লাস বদলাবে</span>
+    <span class="kw">void</span> sendEmail() { … }        <span class="bad">// ইমেইল প্রোভাইডার বদলালেও বদলাবে</span>
+    <span class="kw">void</span> printInvoice() { … }     <span class="bad">// ইনভয়েস ফরম্যাট বদলালেও বদলাবে</span>
+}`,
+  good:`<span class="kw">class</span> <span class="cl">Order</span> {                 <span class="ok">// শুধু ব্যবসায়িক লজিক</span>
+    <span class="cl">BigDecimal</span> calculateTotal() { … }
+}
+<span class="kw">class</span> <span class="cl">OrderRepository</span> { <span class="kw">void</span> save(<span class="cl">Order</span> o) { … } }
+<span class="kw">class</span> <span class="cl">EmailService</span>    { <span class="kw">void</span> sendConfirmation(<span class="cl">Order</span> o) { … } }
+<span class="kw">class</span> <span class="cl">InvoicePrinter</span>  { <span class="kw">void</span> print(<span class="cl">Order</span> o) { … } }`,
+  w:"এখন ইমেইল প্রোভাইডার বদলালে <code>Order</code> ক্লাস ছুঁতেই হয় না — টেস্ট করাও অনেক সহজ, কারণ ব্যবসায়িক লজিক টেস্ট করতে ডেটাবেজ লাগে না।"},
+ {k:"O",n:"Open/Closed",
+  r:"ক্লাস <b>সম্প্রসারণের জন্য খোলা, পরিবর্তনের জন্য বন্ধ</b>। নতুন আচরণ যোগ করতে নতুন কোড লিখুন, পুরোনো কোড কাটাছেঁড়া নয়।",
+  bad:`<span class="kw">class</span> <span class="cl">PaymentProcessor</span> {
+    <span class="kw">void</span> pay(<span class="cl">String</span> type, <span class="kw">double</span> amt) {
+        <span class="kw">if</span> (type.equals(<span class="st">"card"</span>))      { … }
+        <span class="kw">else if</span> (type.equals(<span class="st">"bkash"</span>)) { … }
+        <span class="bad">// নতুন মাধ্যম = এই মেথড আবার বদলাও, আবার টেস্ট করাও,</span>
+        <span class="bad">// আর পুরোনো কাজ করা কোড ভাঙার ঝুঁকি নাও</span>
+    }
+}`,
+  good:`<span class="kw">interface</span> <span class="cl">PaymentMethod</span> { <span class="kw">void</span> pay(<span class="cl">BigDecimal</span> amount); }
+
+<span class="kw">class</span> <span class="cl">CardPayment</span>  <span class="kw">implements</span> <span class="cl">PaymentMethod</span> { … }
+<span class="kw">class</span> <span class="cl">BkashPayment</span> <span class="kw">implements</span> <span class="cl">PaymentMethod</span> { … }
+<span class="kw">class</span> <span class="cl">NagadPayment</span> <span class="kw">implements</span> <span class="cl">PaymentMethod</span> { … }  <span class="ok">// নতুন ক্লাস, ব্যস</span>
+
+<span class="kw">class</span> <span class="cl">PaymentProcessor</span> {
+    <span class="kw">void</span> process(<span class="cl">PaymentMethod</span> m, <span class="cl">BigDecimal</span> amt) { m.pay(amt); }
+}`,
+  w:"LLD ইন্টারভিউয়ে এই নীতিটাই সবচেয়ে বেশি পরীক্ষা হয় — কারণ ফলো-আপ প্রশ্নটাই সবসময় “এখন X যোগ করুন”।"},
+ {k:"L",n:"Liskov Substitution",
+  r:"সাবক্লাসকে প্যারেন্টের জায়গায় বসালে প্রোগ্রাম <b>ভাঙবে না</b>। সাবক্লাস প্যারেন্টের প্রতিশ্রুতি রাখবে, কমাবে না।",
+  bad:`<span class="kw">class</span> <span class="cl">Bird</span> { <span class="kw">void</span> fly() { … } }
+
+<span class="kw">class</span> <span class="cl">Penguin</span> <span class="kw">extends</span> <span class="cl">Bird</span> {
+    <span class="kw">void</span> fly() {
+        <span class="kw">throw new</span> <span class="cl">UnsupportedOperationException</span>();  <span class="bad">// চুক্তি ভাঙল</span>
+    }
+}
+<span class="cm">// যে কোড List&lt;Bird&gt; নিয়ে সবাইকে fly() করায়, সেটা পেঙ্গুইন এলেই ক্র্যাশ</span>`,
+  good:`<span class="kw">class</span> <span class="cl">Bird</span> { <span class="kw">void</span> eat() { … } }
+<span class="kw">interface</span> <span class="cl">Flyable</span>   { <span class="kw">void</span> fly(); }
+<span class="kw">interface</span> <span class="cl">Swimmable</span> { <span class="kw">void</span> swim(); }
+
+<span class="kw">class</span> <span class="cl">Sparrow</span> <span class="kw">extends</span> <span class="cl">Bird</span> <span class="kw">implements</span> <span class="cl">Flyable</span>   { … }
+<span class="kw">class</span> <span class="cl">Penguin</span> <span class="kw">extends</span> <span class="cl">Bird</span> <span class="kw">implements</span> <span class="cl">Swimmable</span> { … }  <span class="ok">// কোনো মিথ্যা প্রতিশ্রুতি নেই</span>`,
+  w:"লক্ষণ চেনার উপায়: সাবক্লাসে কোনো মেথড খালি রাখতে হচ্ছে বা এক্সেপশন ছুঁড়তে হচ্ছে — মানে হায়ারার্কিটাই ভুল জায়গায় কাটা হয়েছে।"},
+ {k:"I",n:"Interface Segregation",
+  r:"কোনো ক্লাসকে এমন মেথড ইমপ্লিমেন্ট করতে বাধ্য করবেন না যা সে ব্যবহার করে না। <b>অনেক ছোট ইন্টারফেস, একটা মোটা ইন্টারফেস নয়।</b>",
+  bad:`<span class="kw">interface</span> <span class="cl">Worker</span> {
+    <span class="kw">void</span> work();
+    <span class="kw">void</span> eat();
+    <span class="kw">void</span> sleep();
+}
+<span class="kw">class</span> <span class="cl">Robot</span> <span class="kw">implements</span> <span class="cl">Worker</span> {
+    <span class="kw">public void</span> work()  { … }
+    <span class="kw">public void</span> eat()   { }   <span class="bad">// অর্থহীন, খালি</span>
+    <span class="kw">public void</span> sleep() { }   <span class="bad">// অর্থহীন, খালি</span>
+}`,
+  good:`<span class="kw">interface</span> <span class="cl">Workable</span>   { <span class="kw">void</span> work(); }
+<span class="kw">interface</span> <span class="cl">Biological</span> { <span class="kw">void</span> eat(); <span class="kw">void</span> sleep(); }
+
+<span class="kw">class</span> <span class="cl">Human</span> <span class="kw">implements</span> <span class="cl">Workable</span>, <span class="cl">Biological</span> { … }
+<span class="kw">class</span> <span class="cl">Robot</span> <span class="kw">implements</span> <span class="cl">Workable</span> { … }   <span class="ok">// শুধু যা প্রাসঙ্গিক</span>`,
+  w:"খালি বা <code>UnsupportedOperationException</code> ভরা মেথড দেখলেই বুঝবেন ইন্টারফেসটা খুব মোটা।"},
+ {k:"D",n:"Dependency Inversion",
+  r:"উঁচু স্তরের মডিউল নিচু স্তরের উপর নির্ভর করবে না — <b>দুজনই অ্যাবস্ট্রাকশনের উপর নির্ভর করবে</b>।",
+  bad:`<span class="kw">class</span> <span class="cl">OrderService</span> {
+    <span class="kw">private</span> <span class="cl">MySQLDatabase</span> db = <span class="kw">new</span> <span class="cl">MySQLDatabase</span>();  <span class="bad">// শক্ত বাঁধন</span>
+    <span class="kw">void</span> place(<span class="cl">Order</span> o) { db.insert(o); }
+}
+<span class="cm">// Postgres-এ যেতে চাইলে? টেস্টে নকল ডেটাবেজ বসাতে চাইলে? পারবেন না।</span>`,
+  good:`<span class="kw">interface</span> <span class="cl">OrderRepository</span> { <span class="kw">void</span> save(<span class="cl">Order</span> o); }
+
+<span class="kw">class</span> <span class="cl">OrderService</span> {
+    <span class="kw">private final</span> <span class="cl">OrderRepository</span> repo;
+    <span class="cl">OrderService</span>(<span class="cl">OrderRepository</span> repo) { <span class="kw">this</span>.repo = repo; }  <span class="ok">// ইনজেক্ট</span>
+    <span class="kw">void</span> place(<span class="cl">Order</span> o) { repo.save(o); }
+}
+<span class="cm">// MySQLOrderRepository, PostgresOrderRepository, InMemoryOrderRepository (টেস্টে)</span>`,
+  w:"এটাই dependency injection ফ্রেমওয়ার্কগুলোর (Spring ইত্যাদি) পুরো ভিত্তি। ইন্টারভিউতে কনস্ট্রাক্টরে নির্ভরতা নেওয়াটাই ডিফল্ট অভ্যাস হওয়া উচিত।"}
+];
+let sI=0,sBad=true;
+document.getElementById("solidTabs").innerHTML=SOLID.map((s,i)=>
+ `<button class="b" data-s="${i}" ${i===0?'aria-selected="true"':''}>${s.k} — ${s.n.split(" ")[0]}</button>`).join("");
+function sR(){
+  const s=SOLID[sI];
+  document.getElementById("solidBox").innerHTML=
+   `<h4 style="margin:0 0 6px;font-family:var(--disp);font-size:19px;font-weight:700">${s.k} · ${s.n}</h4>
+    <p style="margin:0 0 4px;font-size:14.5px">${s.r}</p>
+    <pre class="code">${sBad?s.bad:s.good}</pre>
+    ${sBad?"":`<div class="out-box"><h4>কী লাভ হলো</h4><p>${s.w}</p></div>`}`;
+  document.querySelectorAll("[data-s]").forEach((b,i)=>b.setAttribute("aria-selected",i===sI));
+  document.getElementById("sBad").setAttribute("aria-selected",sBad);
+  document.getElementById("sGood").setAttribute("aria-selected",!sBad);
+}
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{sI=+b.dataset.s;sR();});
+document.getElementById("sBad").onclick=()=>{sBad=true;sR();};
+document.getElementById("sGood").onclick=()=>{sBad=false;sR();};
+sR();
+
+/* ---------- PATTERNS ---------- */
+const PAT=[
+ {n:"Strategy",t:"Behavioral",
+  p:"একই কাজের একাধিক অ্যালগরিদম, আর কোনটা চলবে তা রানটাইমে ঠিক হয়।",
+  s:"প্রতিটা অ্যালগরিদমকে একটা ইন্টারফেসের পেছনে আলাদা ক্লাসে রাখুন; ব্যবহারকারী ক্লাস শুধু ইন্টারফেসটা জানে।",
+  u:"পার্কিং লটে দাম হিসাব, Splitwise-এ খরচ ভাগ, লিফট নির্বাচন, রেট লিমিটার অ্যালগরিদম।",
+  c:`<span class="kw">interface</span> <span class="cl">PricingStrategy</span> { <span class="cl">BigDecimal</span> calculate(<span class="cl">Ticket</span> t); }
+<span class="kw">class</span> <span class="cl">HourlyPricing</span>  <span class="kw">implements</span> <span class="cl">PricingStrategy</span> { … }
+<span class="kw">class</span> <span class="cl">WeekendPricing</span> <span class="kw">implements</span> <span class="cl">PricingStrategy</span> { … }
+
+lot.setPricing(<span class="kw">new</span> <span class="cl">WeekendPricing</span>());   <span class="ok">// রানটাইমে বদল</span>`},
+ {n:"Observer",t:"Behavioral",
+  p:"একটা অবজেক্ট বদলালে অনেকজনকে জানাতে হবে, কিন্তু কে কে শুনছে তা সে জানতে চায় না।",
+  s:"শ্রোতারা নিজেদের সাবস্ক্রাইব করে; ঘটনা ঘটলে প্রকাশক সবাইকে <code>notify()</code> করে।",
+  u:"নোটিফিকেশন সিস্টেম, স্টক প্রাইস আপডেট, লিফটে ফ্লোর ডিসপ্লে, ইভেন্ট-চালিত যেকোনো কিছু।",
+  c:`<span class="kw">interface</span> <span class="cl">Observer</span> { <span class="kw">void</span> update(<span class="cl">Event</span> e); }
+
+<span class="kw">class</span> <span class="cl">OrderService</span> {
+    <span class="kw">private final</span> <span class="cl">List</span>&lt;<span class="cl">Observer</span>&gt; observers = <span class="kw">new</span> <span class="cl">ArrayList</span>&lt;&gt;();
+    <span class="kw">void</span> subscribe(<span class="cl">Observer</span> o) { observers.add(o); }
+    <span class="kw">void</span> placeOrder(<span class="cl">Order</span> o) {
+        <span class="cm">// … অর্ডার সংরক্ষণ</span>
+        observers.forEach(ob -&gt; ob.update(<span class="kw">new</span> <span class="cl">OrderPlaced</span>(o)));
+    }
+}
+<span class="cm">// EmailNotifier, SmsNotifier, InventoryUpdater — কেউ কারও কথা জানে না</span>`},
+ {n:"Factory",t:"Creational",
+  p:"অবজেক্ট তৈরির লজিক জটিল বা শর্তসাপেক্ষ, আর সেটা সব জায়গায় ছড়িয়ে পড়ছে।",
+  s:"তৈরির দায়িত্ব একটা জায়গায় কেন্দ্রীভূত করুন; ব্যবহারকারী <code>new</code> নয়, ফ্যাক্টরিকে ডাকে।",
+  u:"ভেহিকল টাইপ থেকে অবজেক্ট, নোটিফিকেশন চ্যানেল, ডেটাবেজ কানেকশন, পার্সার নির্বাচন।",
+  c:`<span class="kw">class</span> <span class="cl">NotificationFactory</span> {
+    <span class="kw">static</span> <span class="cl">Notification</span> create(<span class="cl">Channel</span> c) {
+        <span class="kw">return switch</span> (c) {
+            <span class="kw">case</span> EMAIL -&gt; <span class="kw">new</span> <span class="cl">EmailNotification</span>();
+            <span class="kw">case</span> SMS   -&gt; <span class="kw">new</span> <span class="cl">SmsNotification</span>();
+            <span class="kw">case</span> PUSH  -&gt; <span class="kw">new</span> <span class="cl">PushNotification</span>();
+        };
+    }
+}`},
+ {n:"Singleton",t:"Creational",
+  p:"একটা ক্লাসের ঠিক একটাই ইনস্ট্যান্স থাকা উচিত, আর সবার সেটাতেই অ্যাক্সেস লাগবে।",
+  s:"কনস্ট্রাক্টর প্রাইভেট, একটা স্ট্যাটিক ইনস্ট্যান্স। Java-তে <b>enum ব্যবহার করাই সবচেয়ে নিরাপদ</b> — থ্রেড-সেফ ও সিরিয়ালাইজেশন-নিরাপদ।",
+  u:"কনফিগারেশন, লগার, কানেকশন পুল। <b>সাবধান:</b> এটা কার্যত গ্লোবাল স্টেট — টেস্ট করা কঠিন, আর অতিরিক্ত ব্যবহার করলে ইন্টারভিউয়ার প্রশ্ন তুলবেন।",
+  c:`<span class="kw">enum</span> <span class="cl">ConfigManager</span> {
+    INSTANCE;
+    <span class="kw">private final</span> <span class="cl">Map</span>&lt;<span class="cl">String</span>,<span class="cl">String</span>&gt; config = loadConfig();
+    <span class="kw">public</span> <span class="cl">String</span> get(<span class="cl">String</span> key) { <span class="kw">return</span> config.get(key); }
+}
+<span class="cm">// ব্যবহার: ConfigManager.INSTANCE.get("db.url")</span>
+
+<span class="cm">// double-checked locking লিখতে গেলে volatile ভুলবেন না —</span>
+<span class="cm">// সেটাই এই প্যাটার্নের সবচেয়ে জিজ্ঞাসিত ফলো-আপ</span>`},
+ {n:"Decorator",t:"Structural",
+  p:"একটা অবজেক্টে রানটাইমে ফিচার যোগ করতে হবে, কিন্তু সাবক্লাসের বিস্ফোরণ চাই না।",
+  s:"একই ইন্টারফেসের মোড়ক তৈরি করুন, যা ভেতরের অবজেক্টকে ধরে রেখে আচরণ বাড়ায়। মোড়ক একটার উপর আরেকটা চাপানো যায়।",
+  u:"কফি + দুধ + চিনি, পিৎজা টপিং, স্ট্রিমে কমপ্রেশন ও এনক্রিপশন, HTTP মিডলওয়্যার।",
+  c:`<span class="kw">interface</span> <span class="cl">Coffee</span> { <span class="cl">BigDecimal</span> cost(); }
+
+<span class="kw">class</span> <span class="cl">MilkDecorator</span> <span class="kw">implements</span> <span class="cl">Coffee</span> {
+    <span class="kw">private final</span> <span class="cl">Coffee</span> inner;
+    <span class="kw">public</span> <span class="cl">BigDecimal</span> cost() { <span class="kw">return</span> inner.cost().add(TEN); }
+}
+
+<span class="cl">Coffee</span> c = <span class="kw">new</span> <span class="cl">SugarDecorator</span>(<span class="kw">new</span> <span class="cl">MilkDecorator</span>(<span class="kw">new</span> <span class="cl">Espresso</span>()));
+<span class="cm">// সাবক্লাস দিয়ে করলে: MilkCoffee, SugarCoffee, MilkSugarCoffee… বিস্ফোরণ</span>`},
+ {n:"State",t:"Behavioral",
+  p:"অবজেক্টের আচরণ তার অবস্থার উপর নির্ভরশীল, আর সব মেথডে বিশাল if-else জমছে।",
+  s:"প্রতিটা অবস্থাকে আলাদা ক্লাস করুন, যে নিজের আচরণ ও পরের অবস্থা নিজে জানে।",
+  u:"ভেন্ডিং মেশিন, ATM, অর্ডার লাইফসাইকেল, লিফট, ট্র্যাফিক লাইট।",
+  c:`<span class="kw">interface</span> <span class="cl">OrderState</span> {
+    <span class="kw">void</span> next(<span class="cl">Order</span> o);
+    <span class="kw">void</span> cancel(<span class="cl">Order</span> o);
+}
+<span class="kw">class</span> <span class="cl">ShippedState</span> <span class="kw">implements</span> <span class="cl">OrderState</span> {
+    <span class="kw">public void</span> next(<span class="cl">Order</span> o)   { o.setState(<span class="kw">new</span> <span class="cl">DeliveredState</span>()); }
+    <span class="kw">public void</span> cancel(<span class="cl">Order</span> o) {
+        <span class="kw">throw new</span> <span class="cl">IllegalStateException</span>(<span class="st">"শিপ হয়ে গেছে, বাতিল করা যাবে না"</span>);
+    }
+}`},
+ {n:"Builder",t:"Creational",
+  p:"অনেক ঐচ্ছিক প্যারামিটারওয়ালা অবজেক্ট — কনস্ট্রাক্টর অপাঠ্য হয়ে যাচ্ছে।",
+  s:"ধাপে ধাপে অবজেক্ট বানানোর একটা বিল্ডার ক্লাস, শেষে <code>build()</code>।",
+  u:"HTTP রিকোয়েস্ট, ডেটাবেজ কোয়েরি, জটিল কনফিগারেশন, টেস্ট ডেটা।",
+  c:`<span class="cm">// ✕ new Pizza(true, false, true, false, 12, "thin") — কোনটা কী?</span>
+
+<span class="cl">Pizza</span> p = <span class="kw">new</span> <span class="cl">Pizza</span>.<span class="cl">Builder</span>()
+    .size(<span class="cl">Size</span>.LARGE)
+    .crust(<span class="cl">Crust</span>.THIN)
+    .addTopping(<span class="st">"cheese"</span>)
+    .addTopping(<span class="st">"olives"</span>)
+    .build();     <span class="ok">// পাঠযোগ্য, আর অবজেক্টটা immutable হতে পারে</span>`},
+ {n:"Chain of Responsibility",t:"Behavioral",
+  p:"একটা রিকোয়েস্ট কয়েকজন হ্যান্ডলারের মধ্যে যাবে, কিন্তু কে সামলাবে তা আগে জানা নেই।",
+  s:"হ্যান্ডলারদের চেইনে সাজান; প্রত্যেকে হয় সামলাবে, নয় পরেরজনের কাছে পাঠাবে।",
+  u:"ATM নোট ডিসপেন্স (২০০০ → ৫০০ → ১০০), লগ লেভেল, HTTP মিডলওয়্যার, অনুমোদনের স্তর।",
+  c:`<span class="kw">abstract class</span> <span class="cl">DispenseHandler</span> {
+    <span class="kw">protected</span> <span class="cl">DispenseHandler</span> next;
+    <span class="kw">void</span> dispense(<span class="kw">int</span> amount) {
+        <span class="kw">int</span> count = amount / denomination();
+        <span class="kw">if</span> (count &gt; 0) release(count);
+        <span class="kw">int</span> remaining = amount % denomination();
+        <span class="kw">if</span> (remaining &gt; 0 &amp;&amp; next != <span class="kw">null</span>) next.dispense(remaining);
+    }
+    <span class="kw">abstract int</span> denomination();
+}`}
+];
+document.getElementById("pCards").innerHTML=PAT.map((p,i)=>
+ `<div class="pcard" data-p="${i}" ${i===0?'aria-selected="true"':''}><b>${p.n}</b><em>${p.t}</em></div>`).join("");
+function pR(i){
+  const p=PAT[i];
+  document.getElementById("pPanel").innerHTML=
+   `<h4>${p.n}</h4>
+    <div class="row"><b>সমস্যা</b><span>${p.p}</span></div>
+    <div class="row"><b>সমাধান</b><span>${p.s}</span></div>
+    <div class="row"><b>কোথায়</b><span>${p.u}</span></div>
+    <pre class="code">${p.c}</pre>`;
+  document.querySelectorAll("[data-p]").forEach((c,j)=>c.setAttribute("aria-selected",i===j));
+}
+document.querySelectorAll("[data-p]").forEach(c=>c.onclick=()=>pR(+c.dataset.p));
+pR(0);
+
+/* ---------- UML RELATIONS ---------- */
+const REL={
+ inh:{t:"Inheritance — “is-a”",
+  d:"সাবক্লাস প্যারেন্টের <b>একটা ধরন</b>। সবচেয়ে শক্ত বাঁধন — প্যারেন্ট বদলালে সব সাবক্লাস প্রভাবিত হয়। শুধু তখনই ব্যবহার করুন যখন সম্পর্কটা সত্যিই “is-a”, আর সাবক্লাস প্যারেন্টের সব প্রতিশ্রুতি রাখতে পারে (Liskov)।",
+  c:`<span class="kw">abstract class</span> <span class="cl">Vehicle</span> { <span class="kw">abstract int</span> spotsNeeded(); }
+<span class="kw">class</span> <span class="cl">Car</span> <span class="kw">extends</span> <span class="cl">Vehicle</span> { <span class="kw">int</span> spotsNeeded() { <span class="kw">return</span> 1; } }
+<span class="kw">class</span> <span class="cl">Truck</span> <span class="kw">extends</span> <span class="cl">Vehicle</span> { <span class="kw">int</span> spotsNeeded() { <span class="kw">return</span> 2; } }`,
+  n:"একটা Car একটা Vehicle — সবসময়, প্রতিটা প্রসঙ্গে। এটাই যাচাই।"},
+ comp:{t:"Composition — “part-of”, মালিকানা সহ",
+  d:"ধারক অংশটির <b>মালিক</b>। ধারক ধ্বংস হলে অংশও ধ্বংস হয়। অংশটি ধারকের বাইরে স্বাধীনভাবে থাকতে পারে না। UML-এ ভরাট হীরা ◆।",
+  c:`<span class="kw">class</span> <span class="cl">ParkingLot</span> {
+    <span class="kw">private final</span> <span class="cl">List</span>&lt;<span class="cl">ParkingFloor</span>&gt; floors;
+    <span class="cl">ParkingLot</span>(<span class="kw">int</span> n) {
+        floors = IntStream.range(0, n)
+            .mapToObj(<span class="cl">ParkingFloor</span>::<span class="kw">new</span>)   <span class="ok">// লট নিজেই ফ্লোর তৈরি করে</span>
+            .toList();
+    }
+}`,
+  n:"পার্কিং লট ভেঙে ফেললে তার ফ্লোরগুলোর আলাদা কোনো অস্তিত্ব থাকে না।"},
+ agg:{t:"Aggregation — “has-a”, মালিকানা ছাড়া",
+  d:"ধারক অংশটিকে <b>ব্যবহার করে, কিন্তু মালিক নয়</b>। ধারক ধ্বংস হলেও অংশ টিকে থাকে। UML-এ ফাঁপা হীরা ◇।",
+  c:`<span class="kw">class</span> <span class="cl">ParkingSpot</span> {
+    <span class="kw">private</span> <span class="cl">Vehicle</span> vehicle;      <span class="ok">// স্পট গাড়ির মালিক নয়</span>
+    <span class="kw">void</span> occupy(<span class="cl">Vehicle</span> v) { <span class="kw">this</span>.vehicle = v; }
+    <span class="kw">void</span> release()          { <span class="kw">this</span>.vehicle = <span class="kw">null</span>; }
+}`,
+  n:"স্পট মুছে ফেললে গাড়িটা তো আর অদৃশ্য হয়ে যায় না — গাড়ির নিজস্ব জীবনচক্র আছে।"},
+ assoc:{t:"Association — শুধু “জানে”",
+  d:"দুটো ক্লাস একে অপরের সম্পর্কে জানে, কিন্তু কেউ কারও অংশ নয়। সবচেয়ে দুর্বল ও সবচেয়ে নমনীয় বাঁধন।",
+  c:`<span class="kw">class</span> <span class="cl">Ticket</span> {
+    <span class="kw">private final</span> <span class="cl">Vehicle</span> vehicle;      <span class="ok">// শুধু রেফারেন্স</span>
+    <span class="kw">private final</span> <span class="cl">ParkingSpot</span> spot;
+    <span class="kw">private final</span> <span class="cl">Instant</span> entryTime;
+}`,
+  n:"টিকিট গাড়ি ও স্পট দুটোকেই চেনে, কিন্তু কোনোটার মালিক নয়, কোনোটার অংশও নয়।"}
+};
+function relR(k){
+  const r=REL[k];
+  document.getElementById("relBox").innerHTML=
+   `<h4 style="margin:0 0 6px;font-family:var(--disp);font-size:19px;font-weight:700">${r.t}</h4>
+    <p style="margin:0;font-size:14.5px">${r.d}</p>
+    <pre class="code">${r.c}</pre>
+    <div class="out-box"><h4>যেভাবে যাচাই করবেন</h4><p>${r.n}</p></div>`;
+}
+document.querySelectorAll("[data-rel]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-rel]").forEach(x=>x.setAttribute("aria-selected",x===b));relR(b.dataset.rel);});
+relR("inh");
+
+/* ---------- ELEVATOR ---------- */
+const FL=8;let cur=1,dir=0,reqs=new Set(),moving=false,algo="scan",fifo=[];
+const shaft=document.getElementById("shaft"),car=document.getElementById("car");
+document.getElementById("fbtns").innerHTML=Array.from({length:FL},(_,i)=>
+ `<button class="fbtn" data-f="${i+1}">তলা ${bn(i+1)}</button>`).join("");
+function elDraw(){
+  const h=340/FL;
+  shaft.querySelectorAll(".floorline,.floornum").forEach(e=>e.remove());
+  for(let i=0;i<FL;i++){
+    const l=document.createElement("div");l.className="floorline";l.style.top=(i*h)+"px";shaft.appendChild(l);
+    const n=document.createElement("div");n.className="floornum";n.style.top=(i*h+3)+"px";
+    n.textContent=bn(FL-i);shaft.appendChild(n);
+  }
+  car.style.top=((FL-cur)*h+3)+"px";
+  car.textContent=dir>0?"▲":dir<0?"▼":"■";
+  document.getElementById("elFloor").textContent=bn(cur);
+  document.getElementById("elState").textContent=
+    moving?(dir>0?"MOVING_UP":"MOVING_DOWN"):reqs.size?"DOORS_OPEN":"IDLE";
+  document.querySelectorAll("[data-f]").forEach(b=>{
+    const f=+b.dataset.f;b.className="fbtn"+(f===cur?" here":reqs.has(f)?" req":"");});
+}
+function ellog(t,c){const l=document.getElementById("elLog");
+  l.innerHTML+=`<div>${c?`<${c}>${t}</${c}>`:t}</div>`;l.scrollTop=l.scrollHeight;}
+function nextTarget(){
+  if(!reqs.size)return null;
+  if(algo==="fcfs")return fifo.length?fifo[0]:null;
+  const up=[...reqs].filter(f=>f>cur).sort((a,b)=>a-b);
+  const dn=[...reqs].filter(f=>f<cur).sort((a,b)=>b-a);
+  if(dir>=0)return up.length?up[0]:(dn.length?dn[0]:null);
+  return dn.length?dn[0]:(up.length?up[0]:null);
+}
+async function step(){
+  if(moving)return;moving=true;
+  while(reqs.size){
+    const t=nextTarget();if(t===null)break;
+    dir=t>cur?1:t<cur?-1:dir;
+    if(t===cur){reqs.delete(t);fifo=fifo.filter(x=>x!==t);
+      ellog(`তলা ${bn(cur)} — দরজা খুলল ✓`,"b");elDraw();await wait(700);continue;}
+    ellog(`তলা ${bn(cur)} → ${bn(t)} (${dir>0?"উপরে":"নিচে"})`);
+    while(cur!==t){
+      cur+=dir;elDraw();await wait(420);
+      if(algo==="scan"&&reqs.has(cur)){reqs.delete(cur);fifo=fifo.filter(x=>x!==cur);
+        ellog(`পথে তলা ${bn(cur)} — এখানেও থামল ✓`,"em");elDraw();await wait(600);}
+    }
+    if(reqs.has(cur)){reqs.delete(cur);fifo=fifo.filter(x=>x!==cur);
+      ellog(`তলা ${bn(cur)} — দরজা খুলল ✓`,"b");elDraw();await wait(700);}
+  }
+  dir=0;moving=false;elDraw();ellog("সব অনুরোধ শেষ — IDLE","b");
+}
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{
+  const f=+b.dataset.f;if(f===cur&&!moving)return;
+  if(!reqs.has(f)){reqs.add(f);fifo.push(f);ellog(`অনুরোধ যোগ: তলা ${bn(f)}`,"em");}
+  elDraw();step();});
+document.querySelectorAll("[data-el]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-el]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  algo=b.dataset.el;
+  document.getElementById("elLog").innerHTML=`<div><b>▸ ${algo==="scan"
+    ?"SCAN — এক দিকে যেতে যেতে পথের সব অনুরোধ সারবে"
+    :"FCFS — যে আগে চেপেছে তার কাছে আগে যাবে, পথে থাকলেও থামবে না"}</b></div>`;});
+document.getElementById("elReset").onclick=()=>{if(moving)return;
+  cur=1;dir=0;reqs.clear();fifo=[];elDraw();
+  document.getElementById("elLog").innerHTML="<div><b>▸ রিসেট</b></div>";};
+elDraw();
+
+/* ---------- VENDING ---------- */
+const VS=["IDLE","HAS_MONEY","ITEM_SELECTED","DISPENSING"];
+let vs=0,bal=0;
+function vmDraw(){
+  document.getElementById("vmStates").innerHTML=VS.map((s,i)=>
+   `<div class="sn ${i===vs?"on":""}">${s}</div>`).join("");
+  document.getElementById("vmDisp").textContent=
+    vs===0?"স্বাগতম — টাকা ঢোকান":vs===1?`ব্যালান্স ৳${bn(bal)} — আইটেম বাছুন`
+    :vs===2?"আইটেম নির্বাচিত — ডিসপেন্স চাপুন":"ডিসপেন্স হচ্ছে…";
+}
+function vlog(t,c){const l=document.getElementById("vmLog");
+  l.innerHTML+=`<div>${c?`<${c}>${t}</${c}>`:t}</div>`;l.scrollTop=l.scrollHeight;}
+document.querySelectorAll("[data-vm]").forEach(b=>b.onclick=()=>{
+  const a=b.dataset.vm;
+  if(a==="coin"){
+    if(vs===3){vlog("IdleState নয় — ডিসপেন্স চলাকালীন টাকা নেওয়া হয় না","u");return;}
+    bal+=20;vs=1;vlog(`insertCoin(২০) → ব্যালান্স ৳${bn(bal)} · অবস্থা HAS_MONEY`,"b");}
+  else if(a==="select"){
+    if(vs===0){vlog("IllegalStateException: আগে টাকা ঢোকান","u");
+      vlog("IdleState.selectItem() নিজেই এই সিদ্ধান্ত নিয়েছে — কোনো if-else লাগেনি","em");return;}
+    if(vs>=2){vlog("ইতিমধ্যে একটা আইটেম নির্বাচিত","u");return;}
+    if(bal<20){vlog("পর্যাপ্ত ব্যালান্স নেই","u");return;}
+    vs=2;vlog("selectItem(কোক) → অবস্থা ITEM_SELECTED","b");}
+  else if(a==="dispense"){
+    if(vs!==2){vlog("IllegalStateException: কোনো আইটেম বাছা হয়নি","u");return;}
+    vs=3;vmDraw();vlog("ডিসপেন্স হচ্ছে…","em");
+    setTimeout(()=>{bal=0;vs=0;vmDraw();vlog("আইটেম বেরিয়ে এলো ✓ · অবস্থা IDLE-এ ফিরল","b");},900);}
+  else{
+    if(vs===0){vlog("ফেরত দেওয়ার মতো টাকা নেই","u");return;}
+    if(vs===3){vlog("ডিসপেন্স চলাকালীন ফেরত সম্ভব নয়","u");return;}
+    vlog(`৳${bn(bal)} ফেরত দেওয়া হলো · অবস্থা IDLE`,"b");bal=0;vs=0;}
+  vmDraw();});
+vmDraw();
+
+/* ---------- QUIZ ---------- */
+const QZ=[
+ ["একটা ক্লাস Single Responsibility ভাঙছে কি না বুঝবেন কীভাবে?",
+  "ক্লাসটা কী করে তা এক বাক্যে বলার চেষ্টা করুন। যদি “এবং” বলতে হয় — “অর্ডারের দাম হিসাব করে এবং ডেটাবেজে সংরক্ষণ করে এবং ইমেইল পাঠায়” — তাহলে ভাঙছে। আরেকটা পরীক্ষা: এই ক্লাসটা বদলানোর কতগুলো ভিন্ন কারণ থাকতে পারে? একাধিক হলেই সমস্যা।"],
+ ["Open/Closed নীতি LLD ইন্টারভিউতে এত গুরুত্বপূর্ণ কেন?",
+  "কারণ ফলো-আপ প্রশ্নটাই সবসময় “এখন X ফিচার যোগ করুন”। ডিজাইন যদি Open/Closed মানে, তাহলে উত্তর হয় “একটা নতুন ক্লাস লিখব, পুরোনো কিছুতে হাত দিতে হবে না” — যেটা প্রায় নিখুঁত উত্তর। না মানলে পুরোনো কোড কাটাছেঁড়া করতে হয়, আর দুর্বলতা ধরা পড়ে যায়।"],
+ ["Liskov Substitution ভাঙার লক্ষণ কী?",
+  "সাবক্লাসে কোনো ইনহেরিটেড মেথড খালি রাখতে হচ্ছে, বা UnsupportedOperationException ছুঁড়তে হচ্ছে, বা প্যারেন্টের চেয়ে কড়া precondition বসাতে হচ্ছে। মানে হায়ারার্কি ভুল জায়গায় কাটা হয়েছে — সাধারণত সমাধান হলো সক্ষমতাগুলো আলাদা ইন্টারফেসে সরানো (Flyable, Swimmable)।"],
+ ["Composition কেন Inheritance-এর চেয়ে পছন্দনীয়?",
+  "Inheritance কম্পাইল-টাইমে স্থির ও শক্ত — সাবক্লাস প্যারেন্টের সবকিছু পায় (চাক বা না চাক), আর প্যারেন্ট বদলালে সব সাবক্লাস ভাঙতে পারে। Composition-এ শুধু যা দরকার তা রাখা হয়, রানটাইমে বদলানো যায় (Strategy প্যাটার্নের ভিত্তি), আর টেস্টে নকল বসানো সহজ।"],
+ ["Composition আর Aggregation-এর পার্থক্য একটা উদাহরণে বলুন।",
+  "মালিকানা ও জীবনচক্র। ParkingLot ও ParkingFloor = composition — লট ধ্বংস হলে ফ্লোরের আলাদা অস্তিত্ব নেই, লট নিজেই ফ্লোর তৈরি করে। ParkingSpot ও Vehicle = aggregation — স্পট গাড়িকে ধরে রাখে কিন্তু মালিক নয়; স্পট মুছে ফেললেও গাড়ির নিজস্ব জীবনচক্র চলতে থাকে।"],
+ ["Strategy আর State প্যাটার্ন গঠনে প্রায় একই — পার্থক্য কী?",
+  "উদ্দেশ্যে। Strategy-তে বাইরের কেউ (ক্লায়েন্ট) ঠিক করে কোন অ্যালগরিদম চলবে, আর অ্যালগরিদমগুলো একে অপরের সম্পর্কে জানে না। State-এ অবজেক্ট নিজেই নিজের অবস্থা বদলায়, আর প্রতিটা অবস্থা জানে পরের অবস্থা কী হবে। কোড দেখতে এক, অভিপ্রায় আলাদা।"],
+ ["ভেন্ডিং মেশিনে State প্যাটার্ন ব্যবহার করলে কী লাভ হয়?",
+  "if-else-এর জঙ্গল দূর হয় — প্রতিটা অবস্থা নিজের বৈধ কাজ নিজে জানে, তাই প্রতিটা মেথডে সব অবস্থা চেক করতে হয় না। আর নতুন অবস্থা (OutOfStock, Maintenance) যোগ করতে শুধু একটা নতুন ক্লাস লিখলেই হয়, পুরোনো কোনো ক্লাসে হাত দিতে হয় না — অর্থাৎ Open/Closed রক্ষা পায়।"],
+ ["Singleton-কে অনেকে অ্যান্টি-প্যাটার্ন বলে কেন?",
+  "এটা কার্যত গ্লোবাল স্টেট — কে কোথায় ব্যবহার করছে তা কোডে দৃশ্যমান নয়, তাই নির্ভরতা লুকিয়ে থাকে। টেস্টে নকল বসানো কঠিন, টেস্টগুলো একে অপরের স্টেট দূষিত করে, আর থ্রেড-সেফটি নিয়ে ভুল করা সহজ। বিকল্প: একটা সাধারণ ক্লাস বানিয়ে DI দিয়ে একটাই ইনস্ট্যান্স ইনজেক্ট করা।"],
+ ["পার্কিং লটে দুজন একই স্পট পাওয়া আটকাবেন কীভাবে?",
+  "isFree() চেক ও occupy() — এই দুটোকে একটাই অবিভাজ্য পদক্ষেপ বানাতে হবে। AtomicBoolean.compareAndSet(true,false) দিয়ে, বা খালি স্পটগুলো একটা ConcurrentLinkedQueue-তে রেখে poll() করে (poll অ্যাটমিক, একটাই থ্রেড পাবে)। synchronized-ও কাজ করে, তবে লকের পরিধি ছোট রাখতে হবে।"],
+ ["একাধিক লক নেওয়ার সময় deadlock এড়াবেন কীভাবে?",
+  "সবসময় একই বৈশ্বিক ক্রমে লক নিন (যেমন ID অনুসারে সাজিয়ে)। দুই থ্রেড যদি একজন A→B আর অন্যজন B→A ক্রমে নেয়, দুজনই চিরকাল অপেক্ষা করবে। এছাড়া লকে টাইমআউট দেওয়া (tryLock), আর সবচেয়ে ভালো — যতটা সম্ভব লক এড়িয়ে অ্যাটমিক অপারেশন ও immutable অবজেক্ট ব্যবহার করা।"],
+ ["টাকার হিসাবে double ব্যবহার করবেন না কেন?",
+  "বাইনারি ফ্লোটিং পয়েন্টে দশমিক ভগ্নাংশ নিখুঁতভাবে ধরে না — 0.1 + 0.2 ফলাফল দেয় 0.30000000000000004। লক্ষ লেনদেনে এই ত্রুটি জমে হিসাব মেলে না। বদলে BigDecimal ব্যবহার করুন, অথবা সবকিছু পয়সা/সেন্টে পূর্ণসংখ্যা হিসেবে রাখুন।"],
+ ["লিফটে FCFS-এর চেয়ে SCAN ভালো কেন?",
+  "FCFS-এ লিফট অনুরোধের ক্রম মেনে চলে, তাই ৫ তলা থেকে ১ তলায় নেমে আবার ৬ তলায় উঠতে পারে — পথের যাত্রীদের পাশ কাটিয়ে। SCAN এক দিকে যেতে যেতে পথের সব অনুরোধ সেরে নেয়, তারপর ঘোরে — মোট দূরত্ব ও গড় অপেক্ষা দুটোই কমে। উপরে দুটো মোডে একই অনুরোধ দিয়ে পার্থক্যটা দেখা যায়।"]
+];
+document.getElementById("quiz").innerHTML=QZ.map(([q,a],i)=>
+ `<div class="q"><button onclick="this.parentNode.classList.toggle('open')">
+  <i>${bn(String(i+1).padStart(2,"0"))}</i><span>${q}</span></button>
+  <div class="a">${a}</div></div>`).join("");
+</script>
+</body>
+</html>
