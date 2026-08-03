@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ভলিউম ৫ — ইন্টারভিউ এক্সিকিউশন | সিস্টেম ডিজাইন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBF1; --card:#FFF; --ink:#141C2B; --ink-2:#3E4A5E; --muted:#77839A; --rule:#CBD3DF;
+  --acc:#B07D00; --l1:#E24E1B; --l2:#1F63D6; --l3:#0E8474; --l4:#7B4FE0; --red:#C42B1C;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --disp:"Anek Bangla","Hind Siliguri",system-ui,sans-serif;
+  --body:"Hind Siliguri","Anek Bangla",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;
+  line-height:1.8;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px,rgba(20,28,43,.07) 1px,transparent 0);background-size:26px 26px}
+.shell{max-width:1240px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:44px}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:34px 0;align-self:start}
+.toc-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
+.toc a{display:block;text-decoration:none;color:var(--ink-2);font-size:13.5px;padding:6px 0 6px 14px;
+  border-left:2px solid var(--rule);line-height:1.4;transition:.16s}
+.toc a:hover{color:var(--ink);border-color:var(--muted)}
+.toc a.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+.toc a i{font-family:var(--mono);font-style:normal;font-size:10.5px;color:var(--muted);margin-right:7px}
+main{padding:34px 0 80px;min-width:0}
+.hero{padding:26px 0 44px;border-bottom:1px solid var(--rule);margin-bottom:44px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--acc);margin-bottom:18px}
+h1{font-family:var(--disp);font-weight:800;font-stretch:88%;font-size:clamp(32px,5.2vw,56px);
+  line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+h1 span{display:block;font-weight:400;color:var(--ink-2)}
+.lede{font-size:17.5px;color:var(--ink-2);max-width:640px;margin:0}
+.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:20px}
+.ch:last-of-type{border-bottom:0}
+.ch-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc);margin-bottom:10px}
+h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(25px,3.6vw,36px);
+  margin:0 0 8px;letter-spacing:-.015em;line-height:1.2}
+.sub{color:var(--muted);font-size:15px;margin:0 0 26px}
+h3{font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:20px;margin:32px 0 10px}
+h4.mini{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);
+  text-transform:uppercase;margin:26px 0 10px}
+p{margin:0 0 15px;color:var(--ink-2)}
+p.lead{color:var(--ink)}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.86em;background:#DDE3EC;padding:2px 6px;border-radius:5px;color:var(--ink)}
+ul.plain{margin:0 0 16px;padding-left:20px;color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+.w{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;margin:22px 0 24px;
+  box-shadow:0 14px 34px -28px rgba(20,28,43,.55)}
+.w-h{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.w-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.ctrls{display:flex;gap:7px;flex-wrap:wrap}
+button.b{font-family:var(--body);font-size:13.5px;font-weight:600;border:1px solid var(--rule);background:#fff;
+  color:var(--ink-2);border-radius:9px;padding:7px 14px;cursor:pointer;transition:.16s}
+button.b:hover{border-color:var(--ink);color:var(--ink)}
+button.b[aria-selected="true"],button.b.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+button.b.warn{border-color:var(--red);color:var(--red)}
+button.b:disabled{opacity:.35;cursor:default}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);
+  font-weight:500;padding:0 10px 9px 0;border-bottom:1px solid var(--rule)}
+td{padding:10px 10px 10px 0;border-bottom:1px solid #EDF0F5;vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td.y{color:var(--l3);font-weight:600}td.n{color:var(--red);font-weight:600}
+.note{border-left:3px solid var(--l2);padding:4px 0 4px 16px;margin:20px 0;font-size:14.5px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--l2);display:block;margin-bottom:3px}
+.note p{margin:0;font-size:14.5px}
+.iq{background:#141C2B;color:#C3CEDD;border-radius:14px;padding:20px 24px;margin:24px 0;font-size:14.5px}
+.iq .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#FFD166;display:block;margin-bottom:8px}
+.iq p{color:#C3CEDD;margin:0 0 10px}.iq p:last-child{margin:0}
+.iq strong{color:#fff}
+
+/* timer */
+.timer{display:grid;grid-template-columns:190px 1fr;gap:26px;align-items:center}
+.tring{position:relative;width:190px;height:190px}
+.tring svg{transform:rotate(-90deg)}
+.tring .bg{fill:none;stroke:#DCE3EC;stroke-width:13}
+.tring .fg{fill:none;stroke:var(--acc);stroke-width:13;stroke-linecap:round;transition:stroke-dashoffset .5s linear}
+.tclock{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.tclock b{font-family:var(--mono);font-size:34px;font-weight:700;display:block;line-height:1.1}
+.tclock em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em}
+.phases{display:flex;flex-direction:column;gap:6px}
+.ph{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:8px 12px;
+  border-radius:9px;border:1px solid transparent;transition:.3s;font-size:13.5px}
+.ph em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.ph.on{background:color-mix(in srgb,var(--acc) 11%,#fff);border-color:var(--acc)}
+.ph.on em{color:var(--acc)}
+.ph.done{opacity:.45}
+.tnow{background:#141C2B;border-radius:11px;padding:14px 18px;margin-top:16px;font-size:14px;color:#C3CEDD}
+.tnow em{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:#FFD166;
+  font-style:normal;margin-bottom:6px}
+
+/* phrase bank */
+.pb{background:#141C2B;border-radius:12px;padding:16px 19px;margin-bottom:10px}
+.pb .en{font-size:14.5px;color:#fff;margin:0 0 7px;line-height:1.65}
+.pb .bnx{font-size:13px;color:#98A6BC;margin:0;border-top:1px dashed #2B3950;padding-top:8px}
+
+/* rubric */
+.rub{display:grid;grid-template-columns:130px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid #EDF0F5;font-size:14px}
+.rub:last-child{border-bottom:0}
+.rub b{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--muted);padding-top:4px}
+.rub span{color:var(--ink-2)}
+
+/* flags */
+.flags{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fl{border-radius:12px;padding:15px 17px;font-size:14px;line-height:1.7}
+.fl.red{background:color-mix(in srgb,var(--red) 7%,#fff);border:1px solid color-mix(in srgb,var(--red) 30%,#fff)}
+.fl.grn{background:color-mix(in srgb,var(--l3) 7%,#fff);border:1px solid color-mix(in srgb,var(--l3) 30%,#fff)}
+.fl h5{margin:0 0 6px;font-family:var(--mono);font-size:10px;letter-spacing:.12em}
+.fl.red h5{color:var(--red)}.fl.grn h5{color:var(--l3)}
+.fl p{margin:0;color:var(--ink-2)}
+
+/* generator */
+.gen{background:#141C2B;border-radius:14px;padding:24px 26px;text-align:center}
+.gen .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:#FFD166;margin-bottom:8px}
+.gen .prob{font-family:var(--disp);font-size:26px;font-weight:700;color:#fff;margin-bottom:16px;line-height:1.25}
+.gen .cb{background:#1E2A40;border-radius:10px;padding:13px 17px;font-size:14.5px;color:#C3CEDD;text-align:left}
+.gen .cb em{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:#FF9E7A;
+  font-style:normal;margin-bottom:6px}
+
+/* checklist */
+ul.check{list-style:none;margin:0;padding:0}
+ul.check label{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:8px 10px;
+  border-radius:10px;transition:background .18s;font-size:14.5px;line-height:1.65}
+ul.check label:hover{background:color-mix(in srgb,var(--acc) 7%,transparent)}
+ul.check input{appearance:none;width:19px;height:19px;flex:none;margin-top:4px;border-radius:6px;
+  border:2px solid var(--rule);background:#fff;cursor:pointer;transition:.16s;position:relative}
+ul.check input:checked{background:var(--acc);border-color:var(--acc)}
+ul.check input:checked::after{content:"";position:absolute;left:5px;top:1.5px;width:5px;height:10px;
+  border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+ul.check input:checked+span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--rule)}
+.prog{height:7px;background:#DCE3EC;border-radius:99px;overflow:hidden;margin:14px 0 4px}
+.prog i{display:block;height:100%;background:var(--acc);width:0;border-radius:99px;transition:width .4s}
+
+/* recap map */
+.recap{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:16px}
+.rc{border-radius:12px;padding:15px 17px;border-top:4px solid var(--c);background:#fff;
+  border-left:1px solid var(--rule);border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.rc b{display:block;font-size:15px;font-weight:700;margin-bottom:4px}
+.rc em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted);display:block;margin-bottom:8px}
+.rc p{margin:0;font-size:13px;line-height:1.65}
+
+footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.08em;color:var(--muted)}
+@media(max-width:960px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;height:auto;padding:26px 0 0;display:flex;gap:8px;overflow-x:auto}
+  .toc-k{display:none}
+  .toc a{border-left:0;border-bottom:2px solid var(--rule);white-space:nowrap;padding:6px 4px}
+  .timer{grid-template-columns:1fr;justify-items:center}
+  .flags{grid-template-columns:1fr}
+  .w{padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="toc">
+  <p class="toc-k">ভলিউম ৫ · অধ্যায়</p>
+  <a href="#c1"><i>০১</i>ইন্টারভিউয়ার কী দেখেন</a>
+  <a href="#c2"><i>০২</i>লাইভ প্র্যাকটিস টাইমার</a>
+  <a href="#c3"><i>০৩</i>বাক্য ভাণ্ডার</a>
+  <a href="#c4"><i>০৪</i>হোয়াইটবোর্ড কৌশল</a>
+  <a href="#c5"><i>০৫</i>প্রবলেম জেনারেটর</a>
+  <a href="#c6"><i>০৬</i>লাল ও সবুজ পতাকা</a>
+  <a href="#c7"><i>০৭</i>মক ইন্টারভিউ প্ল্যান</a>
+  <a href="#c8"><i>০৮</i>শেষ দুই সপ্তাহ</a>
+  <a href="#c9"><i>০৯</i>পুরো সিরিজের মানচিত্র</a>
+</nav>
+
+<main>
+<div class="hero">
+  <div class="eyebrow">ভলিউম ৫ / ৫ · ইন্টারভিউ এক্সিকিউশন · ৪–৬ সপ্তাহ</div>
+  <h1>এক্সিকিউশন<span>জ্ঞান থেকে পারফরম্যান্স</span></h1>
+  <p class="lede">এই ভলিউমে নতুন কোনো প্রযুক্তি নেই। আগের চার ভলিউমে যা শিখেছেন, সেটা ৪৫ মিনিটে একজন অপরিচিত মানুষের সামনে <strong>দেখাতে পারা</strong> — বিষয় শুধু এটুকুই। আর এখানেই সবচেয়ে বেশি ভালো প্রার্থী বাদ পড়ে।</p>
+</div>
+
+<!-- 1 RUBRIC -->
+<section class="ch" id="c1">
+  <div class="ch-n">অধ্যায় ০১</div>
+  <h2>ইন্টারভিউয়ার আসলে কী দেখেন</h2>
+  <p class="sub">লেভেল বদলালে প্রত্যাশাও বদলায়</p>
+
+  <p class="lead">ইন্টারভিউয়ারের সামনে একটা রুব্রিক থাকে, আর তিনি কয়েকটা নির্দিষ্ট মাত্রায় নম্বর দেন। "ভালো ডিজাইন" বলে কোনো একক জিনিস নেই — <strong>একই উত্তর L4-এ পাস, L6-এ ফেল হতে পারে</strong>। নিচে লেভেল বদলে দেখুন প্রত্যাশা কীভাবে সরে যায়।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">লেভেল</span>
+      <div class="ctrls">
+        <button class="b" data-lv="4" aria-selected="true">L4 · SDE II</button>
+        <button class="b" data-lv="5">L5 · Senior</button>
+        <button class="b" data-lv="6">L6 · Staff</button>
+      </div>
+    </div>
+    <div id="rubBox"></div>
+  </div>
+
+  <div class="note">
+    <span class="k">যেটা কেউ বলে না</span>
+    <p>ইন্টারভিউয়ার আসলে একটা প্রশ্নের উত্তর খোঁজেন: <strong>"এই মানুষটার সাথে কি আমি একটা কঠিন সমস্যায় কাজ করতে চাইব?"</strong> তাই টেকনিক্যাল উত্তরের পাশাপাশি তিনি দেখেন — আপনি কি শোনেন? ইঙ্গিত পেলে মানিয়ে নেন, নাকি নিজের অবস্থান আঁকড়ে থাকেন? না জানলে স্বীকার করেন, নাকি বানিয়ে বলেন? এই তিনটাই দ্রুত শেখা যায়, কিন্তু প্র্যাকটিস ছাড়া হয় না।</p>
+  </div>
+</section>
+
+<!-- 2 TIMER -->
+<section class="ch" id="c2">
+  <div class="ch-n">অধ্যায় ০২</div>
+  <h2>লাইভ প্র্যাকটিস টাইমার</h2>
+  <p class="sub">একটা প্রবলেম নিন, স্টার্ট চাপুন, জোরে বলে ডিজাইন করুন</p>
+
+  <p class="lead">সময় ব্যবস্থাপনাই সবচেয়ে বেশি অবহেলিত দক্ষতা। বেশিরভাগ প্রার্থী প্রথম ২০ মিনিটে হাই-লেভেল ডিজাইনে আটকে যান, তারপর ডিপ ডাইভের জন্য সময় থাকে না — অথচ ডিপ ডাইভেই সবচেয়ে বেশি নম্বর। <strong>এই টাইমার নিয়ে অন্তত ১০ বার প্র্যাকটিস করুন</strong>, তাহলে গতিটা শরীরে ঢুকে যাবে।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">৪৫ মিনিট</span>
+      <div class="ctrls">
+        <button class="b pri" id="tStart">শুরু</button>
+        <button class="b" id="tPause">বিরতি</button>
+        <button class="b" id="tReset">রিসেট</button>
+        <button class="b" id="tFast">দ্রুত ডেমো: বন্ধ</button>
+      </div>
+    </div>
+    <div class="timer">
+      <div class="tring">
+        <svg viewBox="0 0 190 190" width="190" height="190">
+          <circle class="bg" cx="95" cy="95" r="82"/>
+          <circle class="fg" cx="95" cy="95" r="82" id="tArc"
+            stroke-dasharray="515" stroke-dashoffset="515"/>
+        </svg>
+        <div class="tclock"><div><b id="tTime">৪৫:০০</b><em id="tLeft">বাকি সময়</em></div></div>
+      </div>
+      <div>
+        <div class="phases" id="tPhases"></div>
+        <div class="tnow"><em>এই মুহূর্তে যা করবেন</em><span id="tNow">শুরু চাপুন। একটা প্রবলেম বেছে নিন (নিচের জেনারেটর থেকে), তারপর জোরে বলে ডিজাইন শুরু করুন।</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h4 class="mini">প্র্যাকটিসের নিয়ম</h4>
+  <ul class="plain">
+    <li><strong>জোরে বলুন, মনে মনে নয়।</strong> মনে মনে করলে সব সহজ লাগে, মুখে বললেই ফাঁকগুলো বেরিয়ে আসে। ফোনে রেকর্ড করুন।</li>
+    <li><strong>রেকর্ডিং নিজে শুনুন।</strong> প্রথমবার অস্বস্তিকর লাগবে, কিন্তু "উম", দীর্ঘ নীরবতা আর ঘুরিয়ে-ফিরিয়ে একই কথা বলা ধরা পড়বে — যেগুলো নিজে টের পান না।</li>
+    <li><strong>টাইমার শেষ মানেই শেষ।</strong> বাড়তি সময় নেবেন না। বাস্তবে ইন্টারভিউয়ার থামিয়ে দেবেন।</li>
+    <li><strong>প্রতিবার আলাদা প্রবলেম।</strong> একই প্রবলেম দুবার করলে দ্বিতীয়বার আপনি স্মৃতি থেকে বলছেন, ডিজাইন করছেন না।</li>
+  </ul>
+</section>
+
+<!-- 3 PHRASES -->
+<section class="ch" id="c3">
+  <div class="ch-n">অধ্যায় ০৩</div>
+  <h2>বাক্য ভাণ্ডার</h2>
+  <p class="sub">ইংরেজিতে ঠিক কোন বাক্যগুলো কাজে লাগে</p>
+
+  <p class="lead">বাংলাদেশ থেকে আবেদন করলে এটা সবচেয়ে বড় লুকানো ছাঁকনি — জ্ঞান আছে, কিন্তু চাপের মধ্যে ইংরেজিতে <strong>tradeoff ব্যাখ্যা করা</strong> আটকে যায়। সমাধান সহজ: কয়েকটা বাক্যকাঠামো মুখস্থ করে ফেলুন, তাহলে ভাবনার জন্য মাথা খালি থাকবে।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">পরিস্থিতি</span>
+      <div class="ctrls" id="phTabs"></div>
+    </div>
+    <div id="phBox"></div>
+  </div>
+
+  <div class="note">
+    <span class="k">উচ্চারণের চেয়ে গঠন গুরুত্বপূর্ণ</span>
+    <p>ইন্টারভিউয়াররা রোজ পৃথিবীর সব প্রান্তের উচ্চারণ শোনেন — আপনার অ্যাকসেন্ট নিয়ে কেউ মাথা ঘামায় না। যা গুরুত্বপূর্ণ তা হলো <strong>গঠন</strong>: ছোট বাক্য, একটা করে ধারণা, আর সিদ্ধান্তের পর কারণ। "I'll use Kafka because we need replay" — এইটুকুই যথেষ্ট, এর চেয়ে জটিল বাক্য বানাতে গিয়ে আটকে যাওয়ার চেয়ে ঢের ভালো।</p>
+  </div>
+</section>
+
+<!-- 4 WHITEBOARD -->
+<section class="ch" id="c4">
+  <div class="ch-n">অধ্যায় ০৪</div>
+  <h2>হোয়াইটবোর্ড কৌশল</h2>
+  <p class="sub">কী আঁকবেন, কোন ক্রমে, আর কী আঁকবেন না</p>
+
+  <p class="lead">রিমোট ইন্টারভিউতে সাধারণত Excalidraw বা তাদের নিজস্ব টুল দেওয়া হয়। <strong>টুলটার সাথে আগে থেকে পরিচিত হয়ে যান</strong> — ইন্টারভিউর দিন বক্স আঁকতে গিয়ে হাতড়ানোটা মূল্যবান সেকেন্ড খায় আর আত্মবিশ্বাস নষ্ট করে।</p>
+
+  <h4 class="mini">ক্যানভাসের বিন্যাস — শুরুতেই ঠিক করে নিন</h4>
+  <table>
+    <tr><th>এলাকা</th><th>কী থাকবে</th></tr>
+    <tr><td>উপরে বাঁয়ে</td><td>রিকোয়ারমেন্ট (ফাংশনাল ও নন-ফাংশনাল) — সারা সময় দৃশ্যমান থাকবে</td></tr>
+    <tr><td>উপরে ডানে</td><td>এস্টিমেশনের সংখ্যা — QPS, স্টোরেজ, পিক</td></tr>
+    <tr><td>মাঝখানে</td><td>মূল আর্কিটেকচার ডায়াগ্রাম — সবচেয়ে বেশি জায়গা</td></tr>
+    <tr><td>নিচে</td><td>API সিগনেচার ও ডেটা মডেল</td></tr>
+    <tr><td>পাশে ফাঁকা</td><td>ডিপ ডাইভের জন্য — এখানেই বিস্তারিত আঁকবেন</td></tr>
+  </table>
+
+  <h4 class="mini">আঁকার নিয়ম</h4>
+  <ul class="plain">
+    <li><strong>বাঁ থেকে ডানে ডেটা প্রবাহিত হবে।</strong> ক্লায়েন্ট বাঁয়ে, স্টোরেজ ডানে। এলোমেলো তীরের জাল ইন্টারভিউয়ারকে ক্লান্ত করে।</li>
+    <li><strong>তীরে লেবেল দিন</strong> — শুধু তীর নয়, তীরের উপর লিখুন কী যাচ্ছে ("write path", "async event")।</li>
+    <li><strong>সব আঁকবেন না।</strong> লগিং, মনিটরিং, CI/CD — এগুলো মুখে উল্লেখ করুন, বক্স আঁকবেন না। ক্যানভাসের জায়গা মূল্যবান।</li>
+    <li><strong>নাম দিন, সংখ্যা দিন।</strong> "DB" নয়, "PostgreSQL — user metadata, ~২ TB"। বিশদই পরিপক্বতার সংকেত।</li>
+    <li><strong>মুছবেন না, পাশে যোগ করুন।</strong> ডিজাইন বিবর্তিত হওয়ার ইতিহাসটা দৃশ্যমান থাকলে ইন্টারভিউয়ার আপনার চিন্তার পথ দেখতে পান।</li>
+    <li><strong>আঁকতে আঁকতে কথা বলুন।</strong> নীরবে আঁকা = মৃত সময়। "এখন এই লোড ব্যালান্সারটা বসাচ্ছি, কারণ…" — এভাবে বলতে থাকুন।</li>
+  </ul>
+
+  <div class="iq">
+    <span class="k">সময় বাঁচানোর কৌশল</span>
+    <p>একটা <strong>প্রস্তুত টেমপ্লেট</strong> বানিয়ে রাখুন — খালি ক্যানভাসে চারটা শিরোনাম (Requirements, Estimation, Architecture, Deep dive) আর কয়েকটা প্রি-স্টাইল করা বক্স। বেশিরভাগ ইন্টারভিউতে নিজের টুল ব্যবহার করতে দেওয়া হয়। এতে প্রথম মিনিটেই আপনি গোছানো দেখাবেন, আর ফরম্যাটিং নিয়ে ভাবতে হবে না।</p>
+  </div>
+</section>
+
+<!-- 5 GENERATOR -->
+<section class="ch" id="c5">
+  <div class="ch-n">অধ্যায় ০৫</div>
+  <h2>প্রবলেম ও কার্ভবল জেনারেটর</h2>
+  <p class="sub">এলোমেলো প্রবলেম + এলোমেলো ফলো-আপ — মুখস্থ করার সুযোগ নেই</p>
+
+  <p class="lead">আসল ইন্টারভিউতে ২৫ মিনিটের মাথায় একটা <strong>কার্ভবল</strong> আসে — এমন একটা মোচড় যা আপনার ডিজাইনকে পরীক্ষা করে। প্রস্তুতির সেরা উপায় হলো এলোমেলোভাবে সেগুলোর মুখোমুখি হওয়া। জেনারেট করুন, টাইমার চালু করুন, ২৫ মিনিটে কার্ভবলটা পড়ুন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">প্র্যাকটিস সেট</span>
+      <div class="ctrls"><button class="b pri" id="genBtn">নতুন প্রবলেম</button></div>
+    </div>
+    <div class="gen">
+      <div class="lbl">প্রবলেম</div>
+      <div class="prob" id="genProb">বোতাম চাপুন</div>
+      <div class="cb"><em>২৫ মিনিটের মাথায় কার্ভবল</em><span id="genCb">—</span></div>
+    </div>
+    <p style="margin:14px 0 0;font-size:13.5px;color:var(--muted)" id="genHint"></p>
+  </div>
+
+  <h4 class="mini">কার্ভবল আসলে যা পরীক্ষা করে</h4>
+  <p>প্রতিটা কার্ভবল একটাই জিনিস দেখে — <strong>আপনার ডিজাইন কি নমনীয়, নাকি ভঙ্গুর?</strong> ভালো উত্তরের গঠন সবসময় একই:</p>
+  <ul class="plain">
+    <li>প্রথমে <strong>স্বীকার করুন</strong> এটা কী ভাঙে: "That breaks my current fan-out approach, because…"</li>
+    <li>তারপর <strong>বিকল্প দিন</strong>, একটার বেশি: "Two options here — either A, or B."</li>
+    <li>শেষে <strong>বেছে নিন ও কারণ বলুন</strong>: "I'd go with B, because we said read latency matters more than write cost."</li>
+  </ul>
+  <p>যা করবেন না — সাথে সাথে "হ্যাঁ ওটাও করা যাবে" বলে হালকা করে দেওয়া, বা নিজের প্রথম ডিজাইনকে রক্ষা করতে গিয়ে জেদ ধরা। <strong>ডিজাইন বদলাতে রাজি হওয়া দুর্বলতা নয়, এটাই ইন্টারভিউয়ার দেখতে চান।</strong></p>
+</section>
+
+<!-- 6 FLAGS -->
+<section class="ch" id="c6">
+  <div class="ch-n">অধ্যায় ০৬</div>
+  <h2>লাল ও সবুজ পতাকা</h2>
+  <p class="sub">একই পরিস্থিতি, দুই রকম আচরণ</p>
+
+  <div id="flagBox"></div>
+
+  <div class="note">
+    <span class="k">সবচেয়ে বড় পার্থক্য</span>
+    <p>লাল পতাকাগুলো লক্ষ করুন — প্রায় কোনোটাই টেকনিক্যাল জ্ঞানের অভাব নয়। সবই <strong>আচরণ</strong>: না শোনা, ধরে নেওয়া, বানিয়ে বলা, জেদ ধরা। এগুলো এক সপ্তাহেই শোধরানো যায়, কিন্তু কেউ ধরিয়ে না দিলে টেরই পাওয়া যায় না। এজন্যই মক ইন্টারভিউ এত জরুরি।</p>
+  </div>
+</section>
+
+<!-- 7 MOCKS -->
+<section class="ch" id="c7">
+  <div class="ch-n">অধ্যায় ০৭</div>
+  <h2>মক ইন্টারভিউ প্ল্যান</h2>
+  <p class="sub">১০টা মক, ৬ সপ্তাহে — টিক দিয়ে এগোন</p>
+
+  <p class="lead">১০টা সংখ্যাটা এলোমেলো নয়। প্রথম ৩টায় আপনি ভয় কাটাবেন, পরের ৪টায় গতি ঠিক করবেন, শেষ ৩টায় পালিশ করবেন। <strong>৩টা মক করে থেমে যাওয়া মানে প্রথম ধাপেই থেমে যাওয়া।</strong></p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">অগ্রগতি</span>
+      <div class="ctrls"><button class="b" id="mkReset">রিসেট</button></div>
+    </div>
+    <div class="prog"><i id="mkFill"></i></div>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 14px"><span id="mkPct">০</span>% সম্পন্ন</p>
+    <ul class="check" id="mkList"></ul>
+  </div>
+
+  <h4 class="mini">মক কোথায় পাবেন</h4>
+  <table>
+    <tr><th>উৎস</th><th>ধরন</th><th>নোট</th></tr>
+    <tr><td>interviewing.io</td><td>পেইড, রিয়েল ইন্টারভিউয়ার</td><td>বেনামে, FAANG ইন্টারভিউয়ারদের সাথে — সবচেয়ে কাছাকাছি অভিজ্ঞতা</td></tr>
+    <tr><td>Pramp / Exponent</td><td>পিয়ার, ফ্রি অপশন আছে</td><td>আপনিও ইন্টারভিউয়ার হবেন — এটা নিজেই দারুণ শেখার উপায়</td></tr>
+    <tr><td>সহকর্মী / বন্ধু</td><td>ফ্রি</td><td>সিনিয়র কেউ হলে সবচেয়ে ভালো; তাকে আগে থেকে কার্ভবল দিয়ে রাখুন</td></tr>
+    <tr><td>নিজেকে রেকর্ড করা</td><td>ফ্রি</td><td>ইন্টারভিউয়ার নেই, কিন্তু গতি ও ভাষার জন্য অত্যন্ত কার্যকর</td></tr>
+    <tr><td>Discord / স্থানীয় গ্রুপ</td><td>ফ্রি</td><td>বাংলাদেশি ডেভ কমিউনিটিতে মক পার্টনার খোঁজা যায়</td></tr>
+  </table>
+
+  <h4 class="mini">প্রতিটা মকের পর — ১০ মিনিটের রিভিউ</h4>
+  <p>মক করেই ফেলে রাখলে অর্ধেক মূল্য নষ্ট। প্রতিবার এই চারটা প্রশ্নের উত্তর লিখে রাখুন: <strong>কোন প্রশ্নে আটকে গিয়েছিলাম? কোন ধারণাটা ব্যাখ্যা করতে পারিনি? সময় কোথায় নষ্ট হলো? পরের বার একটা জিনিস কী আলাদা করব?</strong> চতুর্থ প্রশ্নের উত্তরটাই পরের মকের একমাত্র লক্ষ্য — একবারে একটা জিনিসই ঠিক করা যায়।</p>
+</section>
+
+<!-- 8 FINAL -->
+<section class="ch" id="c8">
+  <div class="ch-n">অধ্যায় ০৮</div>
+  <h2>শেষ দুই সপ্তাহ ও ইন্টারভিউর দিন</h2>
+  <p class="sub">নতুন কিছু শেখার সময় শেষ — এখন ধার দেওয়ার সময়</p>
+
+  <h3>শেষ দুই সপ্তাহ</h3>
+  <ul class="plain">
+    <li><strong>নতুন বিষয় ধরবেন না।</strong> এই পর্যায়ে নতুন কিছু শুরু করলে শুধু উদ্বেগ বাড়ে। যা জানেন তাই ঝালাই করুন।</li>
+    <li><strong>নিজের নোট থেকে রিভিশন করুন</strong>, বই থেকে নয়। নিজের ভাষায় লেখা নোট দ্রুত মনে পড়ে।</li>
+    <li><strong>প্রতিদিন একটা করে ডিজাইন</strong> — পুরো ৪৫ মিনিট নয়, শুধু ১৫ মিনিটে হাই-লেভেল স্কেচ। গতি ধরে রাখাই লক্ষ্য।</li>
+    <li><strong>নিজের প্রজেক্টের গল্প তৈরি করুন।</strong> "আপনার সবচেয়ে জটিল সিস্টেম কোনটা?" — এই প্রশ্নের একটা গোছানো ৩ মিনিটের উত্তর মুখস্থের মতো তৈরি রাখুন, সংখ্যা ও ট্রেডঅফ সহ।</li>
+    <li><strong>এস্টিমেশনের সংখ্যাগুলো ঝালিয়ে নিন</strong> — লেটেন্সি নম্বর, ৮৬,৪০০ ≈ ১ লাখ, সার্ভারপ্রতি ~১,০০০ QPS। এগুলো ভুলে গেলে চাপের মুখে হিসাব আটকে যায়।</li>
+  </ul>
+
+  <h3>ইন্টারভিউর দিন</h3>
+  <ul class="plain">
+    <li><strong>৩০ মিনিট আগে</strong> টুল, ক্যামেরা, মাইক, ইন্টারনেট পরীক্ষা করুন। ব্যাকআপ ইন্টারনেট (মোবাইল হটস্পট) হাতের কাছে রাখুন — ঢাকায় এটা কাল্পনিক দুশ্চিন্তা নয়।</li>
+    <li><strong>কাগজ-কলম রাখুন।</strong> এস্টিমেশনের সময় স্ক্রিনে টাইপ করার চেয়ে কাগজে দ্রুত হিসাব করা সহজ।</li>
+    <li><strong>পানি রাখুন।</strong> ৪৫ মিনিট টানা কথা বলতে হবে — গলা শুকিয়ে যাবে।</li>
+    <li><strong>প্রথম ৩০ সেকেন্ডে তাড়াহুড়ো করবেন না।</strong> প্রশ্ন শুনে একটু থামুন, "Let me make sure I understand the scope" বলে শুরু করুন। এই বিরতিটা আত্মবিশ্বাসী দেখায়।</li>
+    <li><strong>শেষে প্রশ্ন করুন।</strong> "আপনার টিমের সবচেয়ে কঠিন স্কেলিং সমস্যা কী ছিল?" — আগ্রহ দেখায়, আর উত্তরটা আপনাকেও সাহায্য করে যদি পরের রাউন্ড থাকে।</li>
+    <li><strong>খারাপ হলে পরের রাউন্ড ছাড়বেন না।</strong> ইন্টারভিউয়াররা আলাদাভাবে নম্বর দেন; একটা রাউন্ড খারাপ হলেও অন্যগুলো ভালো হলে অফার আসে।</li>
+  </ul>
+
+  <div class="iq">
+    <span class="k">প্রত্যাখ্যান নিয়ে</span>
+    <p>প্রথমবারে না হওয়াটাই স্বাভাবিক — বেশিরভাগ মানুষ কয়েকবার চেষ্টার পর ঢোকেন। বেশিরভাগ কোম্পানির কুলডাউন ৬–১২ মাস, আর সেই সময়টা কাজে লাগালে দ্বিতীয়বার সাফল্যের হার অনেক বেশি। ইন্টারভিউর ফলাফল আপনার দক্ষতার পরিমাপ নয় — এটা <strong>একটা নির্দিষ্ট দিনে, একটা নির্দিষ্ট প্রশ্নে, একজন নির্দিষ্ট মানুষের সামনে</strong> আপনার পারফরম্যান্সের পরিমাপ। পার্থক্যটা মনে রাখলে আবার চেষ্টা করা অনেক সহজ হয়।</p>
+  </div>
+</section>
+
+<!-- 9 RECAP -->
+<section class="ch" id="c9">
+  <div class="ch-n">অধ্যায় ০৯</div>
+  <h2>পুরো সিরিজের মানচিত্র</h2>
+  <p class="sub">পাঁচ ভলিউম, একটাই সুতো</p>
+
+  <div class="recap">
+    <div class="rc" style="--c:#E24E1B"><b>ভলিউম ১ — ভিত্তি</b><em>৬–৮ সপ্তাহ</em>
+      <p>নেটওয়ার্ক, ডেটাবেজ ইনডেক্স, ক্যাশ, লেটেন্সি সংখ্যা, এস্টিমেশন। বাকি সব এর উপর দাঁড়ায়।</p></div>
+    <div class="rc" style="--c:#1F63D6"><b>ভলিউম ২ — ডিস্ট্রিবিউটেড</b><em>৮–১০ সপ্তাহ</em>
+      <p>রেপ্লিকেশন, কনসিস্টেন্ট হ্যাশিং, CAP/PACELC, Raft, Kafka, রেজিলিয়েন্স। ডিপ ডাইভের জ্বালানি।</p></div>
+    <div class="rc" style="--c:#0E8474"><b>ভলিউম ৩ — কেস স্টাডি</b><em>৮–১০ সপ্তাহ</em>
+      <p>১৭টা ডিজাইন। উপাদানগুলো বারবার ফিরে আসে — তাই অচেনা প্রবলেমও চেনা লাগতে শুরু করে।</p></div>
+    <div class="rc" style="--c:#7B4FE0"><b>ভলিউম ৪ — LLD</b><em>৩–৪ সপ্তাহ</em>
+      <p>SOLID, প্যাটার্ন, ক্লাস ডিজাইন, কনকারেন্সি। Amazon-এর আলাদা রাউন্ড।</p></div>
+    <div class="rc" style="--c:#B07D00"><b>ভলিউম ৫ — এক্সিকিউশন</b><em>৪–৬ সপ্তাহ</em>
+      <p>গতি, ভাষা, হোয়াইটবোর্ড, মক। জ্ঞানকে পারফরম্যান্সে রূপ দেওয়া।</p></div>
+  </div>
+
+  <h3>যে তিনটা ধারণা পাঁচ ভলিউম জুড়ে ফিরে ফিরে এসেছে</h3>
+  <ul class="plain">
+    <li><strong>চেক আর দখল একটাই অবিভাজ্য পদক্ষেপ হতে হবে।</strong> থ্রেডে <code>compareAndSet</code>, ডেটাবেজে অপ্টিমিস্টিক ভার্সন চেক, Redis-এ <code>SET NX</code>, টিকিট বুকিংয়ে সিট হোল্ড — একই নীতি, চারটা স্কেলে।</li>
+    <li><strong>প্রতিটা গ্যারান্টির একটা দাম আছে।</strong> সিঙ্ক্রোনাস রেপ্লিকেশনে নিরাপত্তা কিনে গতি বিক্রি; ইনডেক্সে read কিনে write বিক্রি; strong consistency-তে সঠিকতা কিনে প্রাপ্যতা বিক্রি। ইন্টারভিউয়ার এই বিনিময়টা নাম ধরে বলা শুনতে চান।</li>
+    <li><strong>কাজটা কখন করবেন — লেখার সময় না পড়ার সময়?</strong> ফিডের ফ্যান-আউট, autocomplete-এ প্রি-কম্পিউট করা শীর্ষ-৫, ভিডিওর প্রি-এনকোডেড রেন্ডিশন, ডেটাবেজ ইনডেক্স — সবই একই প্রশ্নের ভিন্ন উত্তর।</li>
+  </ul>
+
+  <div class="note" style="border-color:#B07D00">
+    <span class="k" style="color:#B07D00">শেষ কথা</span>
+    <p>এই সিরিজে যা আছে তা পড়ে শেষ করা যায় কয়েক দিনে, কিন্তু আয়ত্ত করতে ৬–৯ মাস লাগে — কারণ পার্থক্যটা পড়া আর <strong>জোরে বলে ব্যাখ্যা করতে পারার</strong> মধ্যে। প্রতিটা অধ্যায়ের কুইজগুলো নোট ছাড়া উত্তর দিন, প্রতিটা ডিজাইন আগে নিজে করুন, আর অন্তত ১০টা মক করুন। বাকিটা সময় আর ধৈর্যের কাজ।</p>
+  </div>
+</section>
+
+<footer>
+  <span>ভলিউম ৫ / ৫ · ইন্টারভিউ এক্সিকিউশন</span>
+  <span>সিরিজ সম্পূর্ণ</span>
+</footer>
+</main>
+</div>
+
+<script>
+const bn=n=>String(n).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const links=[...document.querySelectorAll(".toc a")];
+document.querySelectorAll(".ch").forEach(s=>new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))})},
+  {rootMargin:"-20% 0px -70% 0px"}).observe(s));
+
+/* ---------- 1 RUBRIC ---------- */
+const RUB={
+ 4:{t:"L4 · SDE II / Software Engineer",
+  s:"প্রত্যাশা: আপনি একটা যুক্তিসঙ্গত ডিজাইন দাঁড় করাতে পারবেন এবং পরিচিত উপাদানগুলো সঠিকভাবে ব্যবহার করবেন। গভীরতা সব জায়গায় লাগবে না।",
+  r:[["রিকোয়ারমেন্ট","স্পষ্ট প্রশ্ন করেন, স্কোপ ছোট করেন। নিখুঁত না হলেও চলবে।"],
+     ["আর্কিটেকচার","LB, সার্ভিস, ডেটাবেজ, ক্যাশ — সঠিক জায়গায় বসাতে পারেন।"],
+     ["ডিপ ডাইভ","অন্তত একটা কম্পোনেন্টে যুক্তিসঙ্গত গভীরতা। ডেটা মডেল লিখতে পারেন।"],
+     ["ট্রেডঅফ","অন্তত কয়েকটা সিদ্ধান্তের কারণ বলতে পারেন।"],
+     ["যোগাযোগ","কাঠামোবদ্ধভাবে বলেন, ইঙ্গিত পেলে বোঝেন।"]]},
+ 5:{t:"L5 · Senior Engineer",
+  s:"প্রত্যাশা: আপনি নিজে থেকেই ট্রেডঅফ নিয়ে কথা বলবেন এবং স্কেলে কী ভাঙবে তা আগেই দেখতে পাবেন। এই লেভেলেই সিস্টেম ডিজাইন রাউন্ডের ওজন সবচেয়ে বেশি।",
+  r:[["রিকোয়ারমেন্ট","নন-ফাংশনাল রিকোয়ারমেন্ট নিজে থেকে তোলেন — লেটেন্সি, কনসিস্টেন্সি, প্রাপ্যতা।"],
+     ["আর্কিটেকচার","সহজ থেকে শুরু করে বাধা দেখিয়ে জটিল করেন। প্রতিটা যোগের কারণ থাকে।"],
+     ["ডিপ ডাইভ","পার্টিশন কী, হট কী, রেপ্লিকেশন, ফেইলিউর মোড — প্রম্পট ছাড়াই আলোচনা করেন।"],
+     ["ট্রেডঅফ","একাধিক বিকল্প দেন, একটা বেছে নেন, আর কী ছেড়ে দিলেন তা নাম ধরে বলেন।"],
+     ["যোগাযোগ","ইন্টারভিউয়ারকে সাথে নিয়ে চলেন, নিজের দুর্বলতা নিজেই ধরিয়ে দেন।"]]},
+ 6:{t:"L6 · Staff / Principal",
+  s:"প্রত্যাশা: আপনি শুধু সিস্টেম নয়, <b>সমস্যাটাই</b> সংজ্ঞায়িত করবেন — কোন সমাধান কোন ব্যবসায়িক প্রেক্ষাপটে ঠিক, সেটা নিয়ে কথা বলবেন।",
+  r:[["রিকোয়ারমেন্ট","কোন ফিচারটা আসলে দরকার, কোনটা নয় — প্রশ্ন তোলেন। ব্যবসায়িক প্রভাব বোঝেন।"],
+     ["আর্কিটেকচার","একাধিক সম্ভাব্য আর্কিটেকচার তুলনা করেন, তারপর প্রেক্ষাপট অনুযায়ী বাছেন।"],
+     ["ডিপ ডাইভ","মাইগ্রেশন পথ, রোলআউট কৌশল, খরচ, অপারেশনাল বোঝা — এগুলোও ধরেন।"],
+     ["ট্রেডঅফ","সাংগঠনিক ট্রেডঅফও বলেন — টিম কি এটা মেইনটেইন করতে পারবে? বিল্ড না বাই?"],
+     ["যোগাযোগ","ইন্টারভিউয়ারের সাথে সহকর্মীর মতো তর্ক করেন, প্রার্থীর মতো নয়।"]]}
+};
+function rubR(l){
+  const r=RUB[l];
+  document.getElementById("rubBox").innerHTML=
+   `<h4 style="margin:0 0 6px;font-family:var(--disp);font-size:19px;font-weight:700">${r.t}</h4>
+    <p style="margin:0 0 14px;font-size:14.5px">${r.s}</p>
+    ${r.r.map(([k,v])=>`<div class="rub"><b>${k}</b><span>${v}</span></div>`).join("")}`;
+}
+document.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-lv]").forEach(x=>x.setAttribute("aria-selected",x===b));rubR(b.dataset.lv);});
+rubR(4);
+
+/* ---------- 2 TIMER ---------- */
+const PH=[
+ {n:"রিকোয়ারমেন্ট",a:0,b:5,d:"কিছুই আঁকবেন না। ফাংশনাল ও নন-ফাংশনাল রিকোয়ারমেন্ট জিজ্ঞেস করে লিখে ফেলুন। স্কোপ ছোট করে ৩–৪টা মূল ফিচারে রাজি হন।"},
+ {n:"এস্টিমেশন ও API",a:5,b:10,d:"DAU → QPS → স্টোরেজ। গোল সংখ্যা নিন। প্রতিটা সংখ্যার পর “অতএব” বলে একটা সিদ্ধান্তে পৌঁছান। তারপর ৩–৪টা API লিখুন।"},
+ {n:"হাই-লেভেল ডিজাইন",a:10,b:20,d:"সরল ছবি আগে — ক্লায়েন্ট, LB, সার্ভিস, DB। তারপর এক এক করে ক্যাশ, কিউ, CDN যোগ করুন, প্রতিটার কারণ বলতে বলতে।"},
+ {n:"ডিপ ডাইভ",a:20,b:40,d:"সবচেয়ে বড় অংশ — এখানেই পাস-ফেল। ডেটা মডেল, পার্টিশন কী, হট কী, রেপ্লিকেশন, ফেইলিউর মোড। ইন্টারভিউয়ার যেখানে আগ্রহ দেখান সেখানে যান।"},
+ {n:"বটলনেক ও tradeoff",a:40,b:45,d:"নিজের ডিজাইনের দুর্বলতা নিজেই ধরিয়ে দিন। SPOF কোথায়? ১০ গুণ ট্রাফিকে কী ভাঙবে? কী ছেড়ে দিয়েছেন? মনিটরিং-এ কী দেখবেন?"}
+];
+let tSec=45*60,tRun=false,tFast=false,tInt=null;
+document.getElementById("tPhases").innerHTML=PH.map((p,i)=>
+ `<div class="ph" id="ph${i}"><em>${bn(p.a)}–${bn(p.b)}</em><span>${p.n}</span></div>`).join("");
+function tDraw(){
+  const el=45*60-tSec,m=Math.floor(tSec/60),s=tSec%60;
+  document.getElementById("tTime").textContent=bn(String(m).padStart(2,"0"))+":"+bn(String(s).padStart(2,"0"));
+  document.getElementById("tArc").style.strokeDashoffset=515*(1-el/(45*60));
+  const mins=el/60;
+  const cur=PH.findIndex(p=>mins>=p.a&&mins<p.b);
+  PH.forEach((p,i)=>{const e=document.getElementById("ph"+i);
+    e.className="ph"+(i===cur?" on":mins>=p.b?" done":"")});
+  if(tSec<=0){document.getElementById("tNow").textContent="সময় শেষ। এখন থামুন — বাস্তবে ইন্টারভিউয়ার থামিয়ে দিতেন। রেকর্ডিংটা শুনে চারটা রিভিউ প্রশ্নের উত্তর লিখুন।";
+    document.getElementById("tLeft").textContent="সময় শেষ";return;}
+  if(cur>=0)document.getElementById("tNow").textContent=PH[cur].d;
+}
+function tick(){if(tSec>0){tSec--;tDraw();}else{clearInterval(tInt);tRun=false;}}
+document.getElementById("tStart").onclick=()=>{
+  if(tRun)return;tRun=true;clearInterval(tInt);tInt=setInterval(tick,tFast?40:1000);};
+document.getElementById("tPause").onclick=()=>{tRun=false;clearInterval(tInt);};
+document.getElementById("tReset").onclick=()=>{tRun=false;clearInterval(tInt);tSec=45*60;tDraw();
+  document.getElementById("tLeft").textContent="বাকি সময়";
+  document.getElementById("tNow").textContent="শুরু চাপুন। একটা প্রবলেম বেছে নিন (নিচের জেনারেটর থেকে), তারপর জোরে বলে ডিজাইন শুরু করুন।";};
+document.getElementById("tFast").onclick=e=>{tFast=!tFast;
+  e.target.textContent="দ্রুত ডেমো: "+(tFast?"চালু":"বন্ধ");e.target.setAttribute("aria-selected",tFast);
+  if(tRun){clearInterval(tInt);tInt=setInterval(tick,tFast?40:1000);}};
+tDraw();
+
+/* ---------- 3 PHRASES ---------- */
+const PHR=[
+ {k:"স্পষ্ট করা",p:[
+  ["Before I start designing, let me clarify a few things about the scope.",
+   "শুরুর বাক্য। এটা বললেই ইন্টারভিউয়ার বোঝেন আপনি ঝাঁপিয়ে পড়ছেন না।"],
+  ["Is this read-heavy or write-heavy? That will change my storage choice.",
+   "প্রশ্নের সাথে <b>কেন</b> জিজ্ঞেস করছেন তাও বলুন — এটাই প্রশ্নটাকে ওজন দেয়।"],
+  ["I'm going to assume eventual consistency is acceptable here. Does that work?",
+   "ধরে নিন, কিন্তু জোরে বলে নিন। নীরবে ধরে নেওয়াই সবচেয়ে বড় ভুল।"],
+  ["To keep this in scope, I'll focus on these three features. Anything you'd rather I prioritize?",
+   "স্কোপ ছোট করা দুর্বলতা নয় — ৪৫ মিনিটে সব সম্ভব নয়, এটা বোঝাটাই পরিপক্বতা।"]]},
+ {k:"এস্টিমেশন",p:[
+  ["Let me do some rough math to see what scale we're dealing with.",
+   "“rough” শব্দটা গুরুত্বপূর্ণ — নিখুঁত হিসাব কেউ চায় না।"],
+  ["I'll round a day to 100,000 seconds to keep the math simple.",
+   "৮৬,৪০০-কে ১ লাখ ধরা। কেউ আপত্তি করবে না, বরং দ্রুত এগোনো যাবে।"],
+  ["That gives us roughly 7,000 QPS at peak. So a single database won't handle this — we'll need sharding.",
+   "সবচেয়ে গুরুত্বপূর্ণ বাক্যকাঠামো: <b>সংখ্যা → “so” → সিদ্ধান্ত</b>। এটা ছাড়া হিসাবটা অর্থহীন।"]]},
+ {k:"প্রস্তাব করা",p:[
+  ["Let me start with the simplest thing that works, then we'll find where it breaks.",
+   "সেরা সূচনা বাক্য। এতে বোঝা যায় আপনি মুখস্থ বলছেন না, ভাবছেন।"],
+  ["I'm adding a cache here because the read-to-write ratio is about 100 to 1.",
+   "প্রতিটা কম্পোনেন্টের সাথে “because” — এটাই অভ্যাস করতে হবে।"],
+  ["There are two approaches here. Option A is… Option B is… I'd lean towards A because…",
+   "বিকল্প দেওয়া, তারপর বাছা — এটাই সিনিয়র লেভেলের সংকেত।"]]},
+ {k:"ট্রেডঅফ বলা",p:[
+  ["The tradeoff is that we get faster reads at the cost of slower writes.",
+   "সবচেয়ে দরকারি কাঠামো: <b>X at the cost of Y</b>। মুখস্থ করে ফেলুন।"],
+  ["This gives us stronger consistency, but we're sacrificing availability during a partition.",
+   "“but we're sacrificing…” — কী হারাচ্ছেন তা নিজে বলাটাই আসল কথা।"],
+  ["I'm choosing eventual consistency here because a two-second delay on a like count is acceptable, but I'd use strong consistency for the payment flow.",
+   "একই সিস্টেমে দুই রকম পছন্দ — এই বাক্যটা বললে আপনি ভিড় থেকে আলাদা হয়ে যান।"]]},
+ {k:"না জানা স্বীকার",p:[
+  ["I haven't worked with that specific technology, but based on the properties you'd need here, I'd expect…",
+   "সৎ, কিন্তু থেমে যাওয়া নয় — নীতি থেকে যুক্তি চালিয়ে যান।"],
+  ["I'm not certain about the exact number, but the order of magnitude is around…",
+   "মাত্রার ধারণা দেওয়াই যথেষ্ট। বানিয়ে নির্দিষ্ট সংখ্যা বলার চেয়ে বহু গুণ ভালো।"],
+  ["That's a good point, I hadn't considered it. Let me think about how it changes the design.",
+   "ইন্টারভিউয়ার ভুল ধরিয়ে দিলে এটাই সঠিক প্রতিক্রিয়া। রক্ষণাত্মক হবেন না।"]]},
+ {k:"সময় সামলানো",p:[
+  ["I could go deeper on this, but I want to make sure we cover the data model too. Which would you prefer?",
+   "ইন্টারভিউয়ারকে দিক বেছে নিতে দেওয়া — সময় ব্যবস্থাপনার সবচেয়ে ভদ্র উপায়।"],
+  ["I'll note that we'd need monitoring and rate limiting here, but let me focus on the core flow first.",
+   "উল্লেখ করে এগিয়ে যাওয়া। সব আঁকার দরকার নেই, কিন্তু জানেন তা বোঝানো দরকার।"],
+  ["Before we run out of time, let me walk through the main bottlenecks I see in this design.",
+   "শেষ ৫ মিনিটে এটা বলে নিজেই সমাপ্তি টানুন — ইন্টারভিউয়ার মনে রাখবেন।"]]}
+];
+document.getElementById("phTabs").innerHTML=PHR.map((c,i)=>
+ `<button class="b" data-ph="${i}" ${i===0?'aria-selected="true"':''}>${c.k}</button>`).join("");
+function phR(i){
+  document.getElementById("phBox").innerHTML=PHR[i].p.map(([e,b])=>
+   `<div class="pb"><p class="en">“${e}”</p><p class="bnx">${b}</p></div>`).join("");
+  document.querySelectorAll("[data-ph]").forEach((b,j)=>b.setAttribute("aria-selected",i===j));
+}
+document.querySelectorAll("[data-ph]").forEach(b=>b.onclick=()=>phR(+b.dataset.ph));
+phR(0);
+
+/* ---------- 5 GENERATOR ---------- */
+const PROBS=["URL Shortener","Rate Limiter","News Feed (Twitter)","চ্যাট সিস্টেম (WhatsApp)",
+ "ভিডিও স্ট্রিমিং (YouTube)","Uber / রাইড ম্যাচিং","টিকিট বুকিং (Ticketmaster)","Google Drive",
+ "Web Crawler","Search Autocomplete","নোটিফিকেশন সিস্টেম","Ad Click Aggregation",
+ "ডিস্ট্রিবিউটেড ক্যাশ","Pastebin","পেমেন্ট সিস্টেম","মেট্রিক্স ও মনিটরিং","S3 / অবজেক্ট স্টোর"];
+const CURVE=[
+ ["হঠাৎ ১০০ গুণ ট্রাফিক","একটা পোস্ট ভাইরাল হলো — ট্রাফিক ১০০ গুণ বেড়ে গেল। প্রথমে কী ভাঙবে, আর আপনি কী করবেন?"],
+ ["পুরো রিজিয়ন ডাউন","আপনার প্রাইমারি রিজিয়ন সম্পূর্ণ অচল হয়ে গেছে। রিকভারি প্ল্যান কী? RPO আর RTO কত?"],
+ ["হট কী","একটা কী-তে সব ট্রাফিক জমছে (সেলিব্রিটি, ভাইরাল আইটেম)। শার্ডিং তো কাজে আসছে না — এখন?"],
+ ["খরচ অর্ধেক করুন","CFO বললেন ইনফ্রা খরচ ৫০% কমাতে হবে। কোথায় কাটবেন, আর কী হারাবেন?"],
+ ["মাল্টি-রিজিয়ন","এখন ইউরোপেও চালু করতে হবে, আর GDPR মানতে হবে। ডেটা কোথায় থাকবে?"],
+ ["জিরো-ডাউনটাইম মাইগ্রেশন","একটা লাইভ সিস্টেমকে নতুন ডেটাবেজে সরাতে হবে, ডাউনটাইম ছাড়া। ধাপগুলো বলুন।"],
+ ["ডুপ্লিকেট প্রসেসিং","প্রোডাকশনে দেখা গেল কিছু ইভেন্ট দুবার প্রসেস হচ্ছে। কীভাবে ধরবেন ও ঠেকাবেন?"],
+ ["রিয়েলটাইম চাই","প্রোডাক্ট টিম বলছে ৫ মিনিট দেরি চলবে না, রিয়েলটাইম লাগবে। আর্কিটেকচারে কী বদলাবে?"],
+ ["অ্যানালিটিক্স যোগ করুন","এখন প্রতিটা ইভেন্টের উপর ড্যাশবোর্ড ও রিপোর্ট চাই — মূল সিস্টেম ধীর না করে।"],
+ ["অপব্যবহার ও স্প্যাম","স্প্যামাররা সিস্টেমটা অপব্যবহার করছে। কীভাবে সীমা ও শনাক্তকরণ যোগ করবেন?"],
+ ["ডেটা হারিয়েছে","গত ২৪ ঘণ্টার কিছু ডেটা হারিয়ে গেছে। কীভাবে টের পেতেন, আর কীভাবে পুনরুদ্ধার করবেন?"],
+ ["মোবাইল অফলাইন","ইউজাররা অফলাইনে কাজ করে পরে সিঙ্ক করবে। কনফ্লিক্ট কীভাবে সামলাবেন?"],
+ ["p99 লেটেন্সি খারাপ","গড় লেটেন্সি ভালো কিন্তু p99 ভয়ংকর। কারণ কী হতে পারে, কীভাবে খুঁজবেন?"],
+ ["ছোট টিম","এই সিস্টেম মেইনটেইন করবে মাত্র ৩ জন ইঞ্জিনিয়ার। ডিজাইনে কী বদলাবেন?"]];
+document.getElementById("genBtn").onclick=()=>{
+  const p=PROBS[Math.floor(Math.random()*PROBS.length)];
+  const c=CURVE[Math.floor(Math.random()*CURVE.length)];
+  document.getElementById("genProb").textContent=p;
+  document.getElementById("genCb").innerHTML=`<b style="color:#FFD166">${c[0]}</b> — ${c[1]}`;
+  document.getElementById("genHint").innerHTML=
+   "এখন উপরের টাইমারে গিয়ে <b>শুরু</b> চাপুন। ২৫ মিনিটের ঘরে পৌঁছালে কার্ভবলটা পড়ুন এবং সেখান থেকেই ডিজাইন চালিয়ে যান।";
+};
+
+/* ---------- 6 FLAGS ---------- */
+const FLAGS=[
+ ["প্রশ্ন শোনার পর","সাথে সাথে বক্স আঁকা শুরু করেন, কোনো প্রশ্ন ছাড়াই।",
+  "প্রথমে থামেন, স্কোপ নিয়ে ৪–৫টা প্রশ্ন করেন, তারপর রিকোয়ারমেন্ট লিখে ফেলেন।"],
+ ["ইন্টারভিউয়ার ইঙ্গিত দিলে","ইঙ্গিত উপেক্ষা করে নিজের পরিকল্পনায় এগিয়ে যান।",
+  "থামেন, ইঙ্গিতটা ধরেন, আর দিক বদলান — “Good point, let me revisit that.”"],
+ ["না জানা প্রশ্নে","আত্মবিশ্বাসের সাথে ভুল উত্তর বানিয়ে বলেন।",
+  "স্বীকার করেন, তারপর মূল নীতি থেকে যুক্তি দাঁড় করান।"],
+ ["প্রযুক্তি বাছাইয়ে","“Cassandra ব্যবহার করব” — কারণ ছাড়া, নাম ধরে।",
+  "“আমাদের লেখা অনেক, জয়েন লাগে না, তাই ওয়াইড-কলাম স্টোর — যেমন Cassandra।”"],
+ ["এস্টিমেশনের পর","সংখ্যা বের করে সেটা আর ব্যবহারই করেন না।",
+  "প্রতিটা সংখ্যার পর “অতএব” বলে একটা আর্কিটেকচারাল সিদ্ধান্তে পৌঁছান।"],
+ ["ট্রেডঅফ নিয়ে","শুধু সুবিধা বলেন, যেন সিদ্ধান্তটা বিনা মূল্যে এসেছে।",
+  "কী হারাচ্ছেন তা নিজে থেকে বলেন — “at the cost of…”"],
+ ["ডিজাইনের শুরুতে","প্রথমেই ১২টা মাইক্রোসার্ভিস আর ৫টা কিউ আঁকেন।",
+  "সরল দিয়ে শুরু করে বাধা দেখিয়ে দেখিয়ে জটিল করেন।"],
+ ["শেষ ৫ মিনিটে","ইন্টারভিউয়ারের প্রশ্নের অপেক্ষায় চুপ করে থাকেন।",
+  "নিজেই বটলনেক, SPOF ও দুর্বলতা তুলে ধরে সমাপ্তি টানেন।"],
+ ["সমালোচিত হলে","রক্ষণাত্মক হন, নিজের ডিজাইন আঁকড়ে ধরেন।",
+  "যুক্তিটা বিবেচনা করেন, একমত হলে বদলান, দ্বিমত হলে শান্তভাবে কারণ বলেন।"],
+ ["নীরবতা এলে","চুপচাপ ভাবেন — ইন্টারভিউয়ার কিছু বুঝতে পারেন না।",
+  "ভাবনাটা জোরে বলেন — “I'm weighing two options here…”"]];
+document.getElementById("flagBox").innerHTML=FLAGS.map(([s,r,g])=>
+ `<h4 class="mini" style="margin:22px 0 8px">${s}</h4>
+  <div class="flags">
+    <div class="fl red"><h5>✕ লাল পতাকা</h5><p>${r}</p></div>
+    <div class="fl grn"><h5>✓ সবুজ পতাকা</h5><p>${g}</p></div>
+  </div>`).join("");
+
+/* ---------- 7 MOCKS ---------- */
+const MOCKS=[
+ "মক ১ — সহজ প্রবলেম (URL shortener)। লক্ষ্য শুধু ৪৫ মিনিট টিকে থাকা। খারাপ হবে, স্বাভাবিক।",
+ "মক ২ — Rate limiter। লক্ষ্য: প্রথম ৫ মিনিট শুধু প্রশ্ন করা, একটাও বক্স না আঁকা।",
+ "মক ৩ — Pastebin বা নোটিফিকেশন। লক্ষ্য: এস্টিমেশন করে প্রতিটা সংখ্যার পর “অতএব” বলা।",
+ "মক ৪ — News feed। লক্ষ্য: ২০ মিনিটের মধ্যে ডিপ ডাইভে পৌঁছানো।",
+ "মক ৫ — চ্যাট সিস্টেম। লক্ষ্য: অন্তত তিনটা ট্রেডঅফ “at the cost of” কাঠামোয় বলা।",
+ "মক ৬ — Uber বা টিকিট বুকিং। লক্ষ্য: কার্ভবল এলে রক্ষণাত্মক না হয়ে ডিজাইন বদলানো।",
+ "মক ৭ — ভিডিও স্ট্রিমিং বা Google Drive। লক্ষ্য: পুরো ৪৫ মিনিটে গতি নিখুঁত রাখা।",
+ "মক ৮ — এলোমেলো প্রবলেম (জেনারেটর থেকে)। লক্ষ্য: অচেনা প্রবলেমেও কাঠামো ধরে রাখা।",
+ "মক ৯ — এলোমেলো প্রবলেম। লক্ষ্য: শেষ ৫ মিনিটে নিজেই বটলনেক তুলে ধরে সমাপ্তি টানা।",
+ "মক ১০ — এলোমেলো প্রবলেম, সবচেয়ে কড়া ইন্টারভিউয়ারের সাথে। লক্ষ্য: শুধু স্বাভাবিক থাকা।",
+ "প্রতিটা মকের পর ৪টা রিভিউ প্রশ্নের উত্তর লিখে রেখেছি",
+ "অন্তত ৩টা মক রেকর্ড করে নিজে শুনেছি"];
+let mkDone=new Array(MOCKS.length).fill(false);
+function mkDraw(){
+  document.getElementById("mkList").innerHTML=MOCKS.map((m,i)=>
+   `<li><label><input type="checkbox" data-mk="${i}" ${mkDone[i]?"checked":""}><span>${m}</span></label></li>`).join("");
+  document.querySelectorAll("[data-mk]").forEach(cb=>cb.onchange=e=>{
+    mkDone[+e.target.dataset.mk]=e.target.checked;mkUpd();});
+  mkUpd();
+}
+function mkUpd(){
+  const p=Math.round(mkDone.filter(Boolean).length/MOCKS.length*100);
+  document.getElementById("mkFill").style.width=p+"%";
+  document.getElementById("mkPct").textContent=bn(p);
+}
+document.getElementById("mkReset").onclick=()=>{mkDone.fill(false);mkDraw();};
+mkDraw();
+</script>
+</body>
+</html>
