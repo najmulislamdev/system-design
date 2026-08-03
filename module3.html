@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ভলিউম ৩ — কেস স্টাডি | সিস্টেম ডিজাইন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@85..100,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7EBF1; --card:#FFF; --ink:#141C2B; --ink-2:#3E4A5E; --muted:#77839A; --rule:#CBD3DF;
+  --acc:#0E8474; --l1:#E24E1B; --l2:#1F63D6; --l4:#7B4FE0; --l5:#C08A00; --red:#C42B1C;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --disp:"Anek Bangla","Hind Siliguri",system-ui,sans-serif;
+  --body:"Hind Siliguri","Anek Bangla",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;
+  line-height:1.8;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 1px 1px,rgba(20,28,43,.07) 1px,transparent 0);background-size:26px 26px}
+.shell{max-width:1240px;margin:0 auto;padding:0 22px;display:grid;grid-template-columns:236px 1fr;gap:44px}
+nav.toc{position:sticky;top:0;height:100vh;overflow-y:auto;padding:34px 0;align-self:start}
+.toc-k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);margin:0 0 14px}
+.toc a{display:block;text-decoration:none;color:var(--ink-2);font-size:13.5px;padding:6px 0 6px 14px;
+  border-left:2px solid var(--rule);line-height:1.4;transition:.16s}
+.toc a:hover{color:var(--ink);border-color:var(--muted)}
+.toc a.on{color:var(--acc);border-color:var(--acc);font-weight:600}
+.toc a i{font-family:var(--mono);font-style:normal;font-size:10.5px;color:var(--muted);margin-right:7px}
+main{padding:34px 0 80px;min-width:0}
+.hero{padding:26px 0 44px;border-bottom:1px solid var(--rule);margin-bottom:44px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--acc);margin-bottom:18px}
+h1{font-family:var(--disp);font-weight:800;font-stretch:88%;font-size:clamp(32px,5.2vw,56px);
+  line-height:1.08;letter-spacing:-.02em;margin:0 0 16px}
+h1 span{display:block;font-weight:400;color:var(--ink-2)}
+.lede{font-size:17.5px;color:var(--ink-2);max-width:640px;margin:0}
+.ch{padding:52px 0;border-bottom:1px solid var(--rule);scroll-margin-top:20px}
+.ch:last-of-type{border-bottom:0}
+.ch-n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acc);margin-bottom:10px}
+h2{font-family:var(--disp);font-weight:700;font-stretch:90%;font-size:clamp(25px,3.6vw,36px);
+  margin:0 0 8px;letter-spacing:-.015em;line-height:1.2}
+.sub{color:var(--muted);font-size:15px;margin:0 0 26px}
+h3{font-family:var(--disp);font-weight:700;font-stretch:92%;font-size:20px;margin:32px 0 10px}
+h4.mini{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);
+  text-transform:uppercase;margin:26px 0 10px}
+p{margin:0 0 15px;color:var(--ink-2)}
+p.lead{color:var(--ink)}
+strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.86em;background:#DDE3EC;padding:2px 6px;border-radius:5px;color:var(--ink)}
+ul.plain{margin:0 0 16px;padding-left:20px;color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+.w{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:22px 24px;margin:22px 0 24px;
+  box-shadow:0 14px 34px -28px rgba(20,28,43,.55)}
+.w-h{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.w-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.ctrls{display:flex;gap:7px;flex-wrap:wrap}
+button.b{font-family:var(--body);font-size:13.5px;font-weight:600;border:1px solid var(--rule);background:#fff;
+  color:var(--ink-2);border-radius:9px;padding:7px 14px;cursor:pointer;transition:.16s}
+button.b:hover{border-color:var(--ink);color:var(--ink)}
+button.b[aria-selected="true"],button.b.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+button.b.warn{border-color:var(--red);color:var(--red)}
+button.b.warn:hover{background:var(--red);color:#fff}
+button.b:disabled{opacity:.4;cursor:default}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:6px 0}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);
+  font-weight:500;padding:0 10px 9px 0;border-bottom:1px solid var(--rule)}
+td{padding:10px 10px 10px 0;border-bottom:1px solid #EDF0F5;vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td.y{color:var(--acc);font-weight:600}td.n{color:var(--red);font-weight:600}
+.note{border-left:3px solid var(--l2);padding:4px 0 4px 16px;margin:20px 0;font-size:14.5px}
+.note .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--l2);display:block;margin-bottom:3px}
+.note p{margin:0;font-size:14.5px}
+.iq{background:#141C2B;color:#C3CEDD;border-radius:14px;padding:20px 24px;margin:24px 0;font-size:14.5px}
+.iq .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:#FFD166;display:block;margin-bottom:8px}
+.iq p{color:#C3CEDD;margin:0 0 10px}.iq p:last-child{margin:0}
+.iq strong{color:#fff}
+.log{font-family:var(--mono);font-size:11.5px;line-height:1.85;background:#141C2B;color:#9FB0C6;
+  border-radius:10px;padding:14px 16px;height:160px;overflow-y:auto;margin-top:12px}
+.log b{color:#7FD4C1;font-weight:400}.log u{color:#FF8B7A;text-decoration:none}
+.log em{color:#FFD166;font-style:normal}
+.out-box{border-left:3px solid var(--acc);padding-left:15px;margin-top:14px}
+.out-box h4{margin:0 0 5px;font-size:16.5px;font-family:var(--disp);font-weight:700}
+.out-box p{margin:0;font-size:14.5px}
+.stat{display:flex;gap:24px;flex-wrap:wrap;margin-top:14px}
+.stat div em{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.stat div b{font-family:var(--mono);font-size:22px;font-weight:700}
+
+/* requirement chips */
+.reqs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}
+.reqbox{background:#FAFBFD;border:1px solid var(--rule);border-radius:13px;padding:16px 18px}
+.reqbox h5{margin:0 0 10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--muted)}
+.reqbox ul{margin:0;padding-left:18px;font-size:14px;color:var(--ink-2)}
+.reqbox li{margin-bottom:5px}
+.api{font-family:var(--mono);font-size:12.5px;background:#141C2B;color:#C3CEDD;border-radius:11px;
+  padding:14px 17px;margin:14px 0;line-height:2}
+.api i{color:#7FD4C1;font-style:normal}
+.api u{color:#FFD166;text-decoration:none}
+
+/* arch diagram */
+.arch svg{width:100%;height:auto;display:block}
+.arch .bx{fill:#FAFBFD;stroke:#CBD3DF;stroke-width:1.5}
+.arch .bx.hi{fill:#E4F2EF;stroke:#0E8474;stroke-width:2}
+.arch .bx.wr{fill:#FBEDE8;stroke:#E24E1B;stroke-width:2}
+.arch text{font-family:"Hind Siliguri",sans-serif;font-size:12px;fill:#3E4A5E}
+.arch text.m{font-family:"JetBrains Mono";font-size:9.5px;fill:#77839A}
+.arch .ar{stroke:#9AA7BA;stroke-width:1.4;fill:none;marker-end:url(#ah)}
+
+/* rate limiter */
+.rl-track{position:relative;height:64px;background:#F4F7FA;border:1px solid var(--rule);
+  border-radius:10px;overflow:hidden;margin-top:8px}
+.rl-req{position:absolute;top:10px;width:12px;height:12px;border-radius:3px;transition:.2s}
+.rl-req.ok{background:var(--acc)}.rl-req.no{background:var(--red)}
+.rl-win{position:absolute;top:0;bottom:0;background:rgba(31,99,214,.09);border-left:1px dashed #1F63D6}
+.rl-mark{position:absolute;bottom:5px;font-family:var(--mono);font-size:9px;color:var(--muted)}
+.bucket{width:100%;height:16px;background:#E4E9F0;border-radius:5px;overflow:hidden;margin-top:6px}
+.bucket i{display:block;height:100%;background:var(--acc);transition:width .25s;border-radius:5px}
+
+/* fanout */
+.fo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fo-card{border:1.5px solid var(--rule);border-radius:12px;padding:14px 16px;background:#FAFBFD;transition:.3s}
+.fo-card.on{border-color:var(--acc);background:#E9F4F2}
+.fo-card h5{margin:0 0 8px;font-size:14.5px;font-family:var(--disp);font-weight:700}
+.fo-card .big{font-family:var(--mono);font-size:21px;font-weight:700;color:var(--acc)}
+.fo-card p{margin:6px 0 0;font-size:12.5px;line-height:1.6}
+
+/* geo */
+.geo{position:relative;width:100%;aspect-ratio:1/1;max-width:400px;margin:0 auto;
+  border:1px solid var(--rule);border-radius:12px;background:#F4F7FA;overflow:hidden;cursor:crosshair}
+.gcell{position:absolute;border:1px solid rgba(14,132,116,.25)}
+.gcell.on{background:rgba(14,132,116,.22);border-color:var(--acc)}
+.gcell.nb{background:rgba(31,99,214,.13)}
+.gdrv{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--l1);transform:translate(-50%,-50%)}
+.gme{position:absolute;width:13px;height:13px;border-radius:50%;background:var(--l2);
+  border:2.5px solid #fff;transform:translate(-50%,-50%);box-shadow:0 0 0 3px rgba(31,99,214,.3)}
+
+/* seat */
+.seats{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.seat{width:52px;height:52px;border-radius:10px;border:2px solid var(--rule);background:#FAFBFD;
+  display:grid;place-items:center;font-family:var(--mono);font-size:12px;color:var(--muted);transition:.3s}
+.seat.taken{border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,#fff);color:var(--red)}
+.seat.held{border-color:var(--l5);background:color-mix(in srgb,var(--l5) 14%,#fff);color:var(--l5)}
+.seat.sold{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 13%,#fff);color:var(--acc)}
+
+/* abr */
+.abr{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.abrow{display:grid;grid-template-columns:74px 1fr 84px;gap:10px;align-items:center;font-size:13px}
+.abbar{height:15px;border-radius:4px;background:#DCE3EC;transition:.3s}
+.abbar.on{background:var(--acc)}
+.abrow em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:8px}
+.dcard{border:1px solid var(--rule);border-radius:12px;background:#fff;padding:14px 16px;cursor:pointer;transition:.18s}
+.dcard:hover{border-color:var(--acc);transform:translateY(-2px)}
+.dcard[aria-selected="true"]{border-color:var(--acc);background:#E9F4F2}
+.dcard b{display:block;font-size:14.5px;font-weight:700;color:var(--ink)}
+.dcard em{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.dpanel{margin-top:18px;border-left:3px solid var(--acc);padding-left:17px}
+.dpanel h4{margin:0 0 8px;font-family:var(--disp);font-size:19px;font-weight:700}
+.dpanel .row{display:flex;gap:12px;margin-bottom:9px;font-size:14px}
+.dpanel .row b{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);
+  width:104px;flex:none;padding-top:5px}
+.dpanel .row span{color:var(--ink-2)}
+
+/* framework */
+.fw{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap}
+.fw button{flex:1;min-width:100px;border:1px solid var(--rule);background:#fff;border-radius:10px;
+  padding:11px 8px;cursor:pointer;font-family:var(--body);font-size:12.5px;font-weight:600;
+  color:var(--ink-2);transition:.16s;text-align:center}
+.fw button i{display:block;font-family:var(--mono);font-style:normal;font-size:10px;color:var(--muted);margin-bottom:2px}
+.fw button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.fw button[aria-selected="true"] i{color:rgba(255,255,255,.72)}
+.say{background:#141C2B;border-radius:11px;padding:15px 18px;margin-top:14px;font-size:14px;color:#C3CEDD}
+.say em{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:#FFD166;
+  font-style:normal;margin-bottom:7px}
+
+.q{border:1px solid var(--rule);border-radius:12px;background:#fff;margin-bottom:10px;overflow:hidden}
+.q>button{width:100%;text-align:left;background:none;border:0;padding:15px 18px;font-family:var(--body);
+  font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+.q>button i{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--acc);margin-top:4px}
+.q .a{display:none;padding:0 18px 16px 47px;font-size:14.5px;color:var(--ink-2);border-top:1px solid #EDF0F5;padding-top:14px}
+.q.open .a{display:block}
+footer{border-top:1px solid var(--rule);margin-top:30px;padding:26px 0 60px;display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.08em;color:var(--muted)}
+@media(max-width:960px){
+  .shell{grid-template-columns:1fr;gap:0}
+  nav.toc{position:static;height:auto;padding:26px 0 0;display:flex;gap:8px;overflow-x:auto}
+  .toc-k{display:none}
+  .toc a{border-left:0;border-bottom:2px solid var(--rule);white-space:nowrap;padding:6px 4px}
+  .reqs,.fo-grid{grid-template-columns:1fr}
+  .w{padding:18px 16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="toc">
+  <p class="toc-k">ভলিউম ৩ · অধ্যায়</p>
+  <a href="#c0"><i>০০</i>আক্রমণের কাঠামো</a>
+  <a href="#c1"><i>০১</i>URL Shortener</a>
+  <a href="#c2"><i>০২</i>Rate Limiter</a>
+  <a href="#c3"><i>০৩</i>News Feed</a>
+  <a href="#c4"><i>০৪</i>চ্যাট সিস্টেম</a>
+  <a href="#c5"><i>০৫</i>ভিডিও স্ট্রিমিং</a>
+  <a href="#c6"><i>০৬</i>Uber ও জিওস্প্যাশিয়াল</a>
+  <a href="#c7"><i>০৭</i>টিকিট বুকিং</a>
+  <a href="#c8"><i>০৮</i>আরও ১০টা ডিজাইন</a>
+  <a href="#c9"><i>০৯</i>নিজেকে যাচাই</a>
+</nav>
+
+<main>
+<div class="hero">
+  <div class="eyebrow">ভলিউম ৩ / ৫ · কেস স্টাডি · ৮–১০ সপ্তাহ</div>
+  <h1>কেস স্টাডি<span>১৭টা প্রবলেম, একটাই পদ্ধতি</span></h1>
+  <p class="lede">একটা নিয়ম কঠোরভাবে মানুন — প্রতিটা প্রবলেম <strong>আগে নিজে হাতে সমাধান করুন</strong>, তারপর নিচে পড়ুন। আগে পড়ে ফেললে আপনি সমাধান মুখস্থ করবেন, আর ইন্টারভিউয়ার একটা টুইস্ট দিলেই সব ভেঙে পড়বে।</p>
+</div>
+
+<!-- 0 FRAMEWORK -->
+<section class="ch" id="c0">
+  <div class="ch-n">অধ্যায় ০০</div>
+  <h2>যেকোনো প্রবলেম আক্রমণের কাঠামো</h2>
+  <p class="sub">এই পাঁচ ধাপ মুখস্থ করুন — বাকি সব এর ভেতরে বসে যাবে</p>
+
+  <p class="lead">সিস্টেম ডিজাইন ইন্টারভিউতে আসলে দুটো জিনিস যাচাই হয়: আপনি কতটা জানেন, আর <strong>অনিশ্চয়তার মধ্যে আপনি কতটা গোছানো</strong>। দ্বিতীয়টা প্রথমটার চেয়ে বেশি গুরুত্বপূর্ণ। নিচের কাঠামোটা সেই গোছানো ভাবটা দেয় — অচেনা প্রবলেমেও।</p>
+
+  <div class="w">
+    <div class="fw" id="fwTabs"></div>
+    <div id="fwBox"></div>
+  </div>
+
+  <div class="note">
+    <span class="k">সবচেয়ে বড় ভুল</span>
+    <p>প্রশ্ন শোনামাত্র বক্স আঁকা শুরু করা। ইন্টারভিউয়ার তখনই বুঝে যান আপনি সমাধান মুখস্থ করে এসেছেন। প্রথম পাঁচ মিনিট <strong>শুধু প্রশ্ন করুন</strong> — এটাই সবচেয়ে বেশি নম্বর দেওয়া পাঁচ মিনিট।</p>
+  </div>
+</section>
+
+<!-- 1 URL SHORTENER -->
+<section class="ch" id="c1">
+  <div class="ch-n">কেস স্টাডি ০১ · সহজ</div>
+  <h2>URL Shortener</h2>
+  <p class="sub">bit.ly — দেখতে ছোট, ভেতরে সব মৌলিক প্রশ্ন</p>
+
+  <div class="reqs">
+    <div class="reqbox"><h5>ফাংশনাল</h5><ul>
+      <li>লম্বা URL দিলে ছোট URL ফেরত</li>
+      <li>ছোট URL-এ গেলে মূল URL-এ রিডাইরেক্ট</li>
+      <li>ঐচ্ছিক: কাস্টম alias, মেয়াদ, ক্লিক অ্যানালিটিক্স</li>
+    </ul></div>
+    <div class="reqbox"><h5>নন-ফাংশনাল</h5><ul>
+      <li>রিডাইরেক্ট লেটেন্সি খুব কম (&lt;১০০ ms)</li>
+      <li>উচ্চ প্রাপ্যতা — লিঙ্ক কখনো ভাঙবে না</li>
+      <li>ছোট কোড অনুমান করা কঠিন হবে</li>
+      <li>read : write ≈ ১০০ : ১</li>
+    </ul></div>
+  </div>
+
+  <h4 class="mini">এস্টিমেশন</h4>
+  <p>দিনে ১০ কোটি নতুন URL ধরুন → লেখা ≈ <code>১০<sup>৮</sup> / ১০<sup>৫</sup> = ১,০০০ QPS</code>, পড়া ≈ <code>১,০০,০০০ QPS</code>। প্রতি রেকর্ড ~৫০০ বাইট → বছরে ~১৮ TB, ১০ বছরে ~১৮০ TB। <strong>অতএব</strong> এক ডেটাবেজে হবে না, শার্ড করতে হবে; আর পড়া এত বেশি যে ক্যাশ বাধ্যতামূলক।</p>
+
+  <div class="api">
+    <i>POST</i> /api/v1/urls &nbsp; <u>{ long_url, custom_alias?, expires_at? }</u> → <u>{ short_url }</u><br>
+    <i>GET</i> &nbsp;/{short_code} → <u>302 Redirect</u>
+  </div>
+
+  <h4 class="mini">মূল সমস্যা — কোড কীভাবে বানাবেন</h4>
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">তিনটা কৌশল · একটা বেছে চাপুন</span>
+      <div class="ctrls">
+        <button class="b" data-ks="hash" aria-selected="true">হ্যাশ + ছাঁটাই</button>
+        <button class="b" data-ks="counter">কাউন্টার + base62</button>
+        <button class="b" data-ks="kgs">প্রি-জেনারেটেড (KGS)</button>
+      </div>
+    </div>
+    <div id="ksBox"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:13.5px;color:var(--muted)">সংখ্যা → base62:</span>
+      <input class="b" id="b62in" type="number" value="1000000007" style="width:170px;font-family:var(--mono)">
+      <span style="font-family:var(--mono);font-size:16px;color:var(--acc);font-weight:700" id="b62out"></span>
+    </div>
+  </div>
+
+  <p><code>62<sup>৭</sup> ≈ ৩.৫ লক্ষ কোটি</code> — সাত অক্ষরেই কয়েকশ বছরের জন্য যথেষ্ট। ছয় অক্ষরে ৫,৬০০ কোটি, যা অনেক ক্ষেত্রেই যথেষ্ট। এই হিসাবটা ইন্টারভিউতে জোরে করে দেখান, কারণ এটাই "কত অক্ষর?" প্রশ্নের একমাত্র সৎ উত্তর।</p>
+
+  <h4 class="mini">আর্কিটেকচার</h4>
+  <div class="w arch">
+    <svg viewBox="0 0 760 250">
+      <defs><marker id="ah" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L8,3 z" fill="#9AA7BA"/></marker></defs>
+      <rect class="bx" x="10" y="100" width="88" height="46" rx="9"/><text x="54" y="122" text-anchor="middle">ক্লায়েন্ট</text>
+      <rect class="bx" x="130" y="100" width="88" height="46" rx="9"/><text x="174" y="118" text-anchor="middle">LB</text><text class="m" x="174" y="133" text-anchor="middle">+ CDN</text>
+      <rect class="bx hi" x="250" y="40" width="108" height="46" rx="9"/><text x="304" y="62" text-anchor="middle">Read সার্ভিস</text><text class="m" x="304" y="76" text-anchor="middle">১,০০,০০০ QPS</text>
+      <rect class="bx wr" x="250" y="160" width="108" height="46" rx="9"/><text x="304" y="182" text-anchor="middle">Write সার্ভিস</text><text class="m" x="304" y="196" text-anchor="middle">১,০০০ QPS</text>
+      <rect class="bx hi" x="400" y="40" width="98" height="46" rx="9"/><text x="449" y="62" text-anchor="middle">Redis ক্যাশ</text><text class="m" x="449" y="76" text-anchor="middle">LRU · হট লিঙ্ক</text>
+      <rect class="bx" x="400" y="160" width="98" height="46" rx="9"/><text x="449" y="182" text-anchor="middle">কী জেনারেটর</text><text class="m" x="449" y="196" text-anchor="middle">রেঞ্জ বরাদ্দ</text>
+      <rect class="bx" x="545" y="100" width="112" height="46" rx="9"/><text x="601" y="118" text-anchor="middle">শার্ডেড DB</text><text class="m" x="601" y="133" text-anchor="middle">code → long_url</text>
+      <rect class="bx" x="545" y="20" width="112" height="40" rx="9"/><text x="601" y="45" text-anchor="middle">অ্যানালিটিক্স</text>
+      <path class="ar" d="M98 123 H128"/><path class="ar" d="M218 118 L248 70"/><path class="ar" d="M218 130 L248 178"/>
+      <path class="ar" d="M358 63 H398"/><path class="ar" d="M358 183 H398"/>
+      <path class="ar" d="M498 68 L543 108"/><path class="ar" d="M498 178 L543 143"/>
+      <path class="ar" d="M449 38 V 30 H543" stroke-dasharray="4 3"/>
+    </svg>
+  </div>
+
+  <h4 class="mini">যে জায়গাগুলোতে ইন্টারভিউয়ার খোঁচাবেন</h4>
+  <ul class="plain">
+    <li><strong>৩০১ না ৩০২?</strong> ৩০১ (permanent) ব্রাউজার ক্যাশ করে ফেলে, তাই সার্ভারে দ্বিতীয়বার আর আসে না — লোড কমে কিন্তু <strong>ক্লিক অ্যানালিটিক্স হারিয়ে যায়</strong>। ৩০২ (temporary) প্রতিবার সার্ভারে আসে। bit.ly ৩০২ ব্যবহার করে, কারণ অ্যানালিটিক্সই তাদের ব্যবসা।</li>
+    <li><strong>ডেটাবেজ কোনটা?</strong> কোয়েরি শুধু <code>code → url</code>, কোনো জয়েন নেই, কোনো জটিল ট্রানজেকশন নেই। তাই কী-ভ্যালু স্টোর (DynamoDB, Cassandra) SQL-এর চেয়ে ভালো ফিট। এই যুক্তিটা দিতে পারাই মূল কথা, ব্র্যান্ডের নাম নয়।</li>
+    <li><strong>ক্যাশ হিট রেট?</strong> লিঙ্কের জনপ্রিয়তা তীব্রভাবে অসম (পাওয়ার ল)। ২০% লিঙ্ক ৮০% ট্রাফিক আনে, তাই LRU ক্যাশে হিট রেট সহজেই ৯০%+ হয়।</li>
+    <li><strong>কাস্টম alias?</strong> এটা কাউন্টার-ভিত্তিক পদ্ধতিকে জটিল করে — আলাদা টেবিলে ইউনিক কনস্ট্রেইন্ট দিয়ে সংরক্ষণ করতে হবে ও সংরক্ষিত শব্দ (admin, login) ব্লক করতে হবে।</li>
+  </ul>
+</section>
+
+<!-- 2 RATE LIMITER -->
+<section class="ch" id="c2">
+  <div class="ch-n">কেস স্টাডি ০২ · সহজ</div>
+  <h2>Rate Limiter</h2>
+  <p class="sub">চারটা অ্যালগরিদম — নিজে বার্স্ট পাঠিয়ে পার্থক্য দেখুন</p>
+
+  <p class="lead">সীমা: <strong>প্রতি ১০ সেকেন্ডে ১০টা রিকোয়েস্ট</strong>। নিচে বার্স্ট পাঠান আর দেখুন কোন অ্যালগরিদম কীভাবে আচরণ করে। বিশেষ করে <em>Fixed window</em>-তে "সীমানায় বার্স্ট" সমস্যাটা লক্ষ করুন — এটাই এই প্রবলেমের সবচেয়ে জিজ্ঞাসিত প্রশ্ন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">সীমা: ১০ req / ১০ সেকেন্ড</span>
+      <div class="ctrls">
+        <button class="b" data-rl="token" aria-selected="true">Token bucket</button>
+        <button class="b" data-rl="leaky">Leaky bucket</button>
+        <button class="b" data-rl="fixed">Fixed window</button>
+        <button class="b" data-rl="sliding">Sliding window</button>
+      </div>
+    </div>
+    <div class="ctrls" style="margin-bottom:10px">
+      <button class="b pri" id="rlBurst">১৫টা রিকোয়েস্টের বার্স্ট</button>
+      <button class="b" id="rlSteady">ধীরে ধীরে ২০টা</button>
+      <button class="b" id="rlEdge">সীমানায় বার্স্ট (৮+৮)</button>
+      <button class="b" id="rlClear">মুছুন</button>
+    </div>
+    <div class="rl-track" id="rlTrack"></div>
+    <div class="bucket" id="rlBucketWrap" style="display:none"><i id="rlBucket" style="width:100%"></i></div>
+    <div class="stat">
+      <div><em>অনুমোদিত</em><b id="rlOk" style="color:var(--acc)">০</b></div>
+      <div><em>প্রত্যাখ্যাত</em><b id="rlNo" style="color:var(--red)">০</b></div>
+    </div>
+    <div class="out-box" id="rlOut" style="margin-top:14px"></div>
+  </div>
+
+  <table>
+    <tr><th>অ্যালগরিদম</th><th>বার্স্ট সহ্য</th><th>মেমোরি</th><th>নির্ভুলতা</th><th>ব্যবহার</th></tr>
+    <tr><td>Token bucket</td><td class="y">হ্যাঁ, নিয়ন্ত্রিত</td><td class="y">২টা সংখ্যা</td><td>ভালো</td><td>API গেটওয়ে (সবচেয়ে প্রচলিত)</td></tr>
+    <tr><td>Leaky bucket</td><td class="n">না, সমান হারে</td><td>কিউ</td><td>ভালো</td><td>স্থির আউটপুট রেট দরকার হলে</td></tr>
+    <tr><td>Fixed window</td><td class="n">সীমানায় ২× ফাঁক</td><td class="y">১টা কাউন্টার</td><td class="n">দুর্বল</td><td>সরল, কম গুরুত্বপূর্ণ সীমা</td></tr>
+    <tr><td>Sliding window log</td><td class="y">না</td><td class="n">প্রতিটা টাইমস্ট্যাম্প</td><td class="y">নিখুঁত</td><td>কড়া সীমা, কম ট্রাফিক</td></tr>
+    <tr><td>Sliding window counter</td><td class="y">না</td><td class="y">২টা কাউন্টার</td><td class="y">প্রায় নিখুঁত</td><td>বাস্তবের সেরা আপস</td></tr>
+  </table>
+
+  <h4 class="mini">বিতরণ করা পরিবেশে</h4>
+  <p>একাধিক সার্ভার থাকলে প্রতিটা যদি নিজের কাউন্টার রাখে, তাহলে ১০টা সার্ভারে সীমা কার্যত ১০ গুণ হয়ে যাবে। তাই কাউন্টার কেন্দ্রীয় জায়গায় — সাধারণত Redis-এ — রাখতে হয়। কিন্তু <code>GET</code> তারপর <code>SET</code> করলে দুটো রিকোয়েস্টের মাঝে রেস কন্ডিশন হয়। সমাধান দুটো: <strong>Lua স্ক্রিপ্ট</strong> (Redis-এ পুরোটা অ্যাটমিকভাবে চলে), বা <code>INCR</code> + <code>EXPIRE</code> ব্যবহার করা যা নিজেই অ্যাটমিক।</p>
+  <p>রেসপন্সে হেডার দিন — <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>Retry-After</code> — আর প্রত্যাখ্যানে <code>429 Too Many Requests</code>। ক্লায়েন্ট কী দিয়ে চিনবেন সেটাও ঠিক করতে হবে: API key (সবচেয়ে ভালো), ইউজার ID, নাকি IP (NAT-এর পেছনে পুরো অফিস এক IP — সাবধান)।</p>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"Fixed window কেন খারাপ?"</strong></p>
+    <p>উপরের তৃতীয় বোতামটা চেপে দেখুন। সীমা ১০/১০s হলে কেউ ৯ম সেকেন্ডে ৮টা আর ১১তম সেকেন্ডে আরও ৮টা পাঠাতে পারে — <strong>২ সেকেন্ডে ১৬টা</strong>, অথচ কোনো উইন্ডোতেই সীমা ভাঙেনি। কারণ উইন্ডোর সীমানা স্থির। Sliding window সবসময় "গত ১০ সেকেন্ড" দেখে, তাই এই ফাঁকটা থাকে না।</p>
+  </div>
+</section>
+
+<!-- 3 NEWS FEED -->
+<section class="ch" id="c3">
+  <div class="ch-n">কেস স্টাডি ০৩ · মাঝারি</div>
+  <h2>News Feed</h2>
+  <p class="sub">Twitter/Facebook — একটাই সিদ্ধান্তে পুরো ডিজাইন নির্ভর করে</p>
+
+  <div class="reqs">
+    <div class="reqbox"><h5>ফাংশনাল</h5><ul>
+      <li>পোস্ট করা</li><li>যাদের ফলো করি তাদের পোস্ট সময়ক্রমে দেখা</li>
+      <li>ফলো / আনফলো</li><li>ফিড পেজিনেশন</li>
+    </ul></div>
+    <div class="reqbox"><h5>নন-ফাংশনাল</h5><ul>
+      <li>ফিড লোড &lt;২০০ ms</li><li>পোস্ট কয়েক সেকেন্ডে দেখা গেলেই চলবে (eventual)</li>
+      <li>প্রচণ্ড read-heavy</li><li>ফলোয়ার সংখ্যায় চরম বৈষম্য</li>
+    </ul></div>
+  </div>
+
+  <p class="lead">এই প্রবলেমের পুরোটা একটা প্রশ্নে দাঁড়িয়ে: <strong>ফিডটা কখন বানাবেন — পোস্ট করার সময়, নাকি পড়ার সময়?</strong> স্লাইডার নাড়িয়ে দেখুন উত্তরটা ফলোয়ার সংখ্যার সাথে কীভাবে বদলে যায়।</p>
+
+  <div class="w">
+    <div class="w-h"><span class="w-t">খরচের তুলনা</span></div>
+    <div style="margin-bottom:14px">
+      <label style="display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-2);margin-bottom:6px">
+        ফলোয়ার সংখ্যা <b style="font-family:var(--mono);color:var(--acc)" id="foV">১,০০০</b></label>
+      <input type="range" id="foR" min="1" max="8" step="0.1" value="3" style="width:100%;accent-color:var(--acc)">
+    </div>
+    <div class="fo-grid">
+      <div class="fo-card" id="foPush"><h5>Fan-out on write (পুশ)</h5>
+        <div class="big" id="foPushV">—</div>
+        <p>পোস্ট করার সময় প্রতিটা ফলোয়ারের ফিড-লিস্টে পোস্ট ID ঢুকিয়ে দেওয়া হয়। পড়া হয় একটা মাত্র Redis লিস্ট থেকে — বিদ্যুৎগতি।</p></div>
+      <div class="fo-card" id="foPull"><h5>Fan-out on read (পুল)</h5>
+        <div class="big" id="foPullV">—</div>
+        <p>পোস্ট শুধু একবার লেখা হয়। পড়ার সময় সব ফলোয়িং-এর সাম্প্রতিক পোস্ট এনে মার্জ করতে হয় — লেখা সস্তা, পড়া দামি।</p></div>
+    </div>
+    <div class="out-box" id="foOut" style="margin-top:16px"></div>
+  </div>
+
+  <h4 class="mini">হাইব্রিড — বাস্তবে যা করা হয়</h4>
+  <p>সাধারণ ইউজারদের জন্য <strong>পুশ</strong> (ফলোয়ার কম, লেখার খরচ সামান্য, পড়া বিদ্যুৎগতি)। সেলিব্রিটিদের জন্য <strong>পুল</strong> (২ কোটি ফিডে লেখা অসম্ভব)। ফিড তৈরির সময় ইউজারের প্রি-কম্পিউটেড লিস্টের সাথে সে যে কয়জন সেলিব্রিটিকে ফলো করে তাদের সাম্প্রতিক পোস্ট মার্জ করে দেওয়া হয়। সীমা সাধারণত ১০ হাজার ফলোয়ারের আশেপাশে।</p>
+
+  <h4 class="mini">বাকি গুরুত্বপূর্ণ সিদ্ধান্ত</h4>
+  <ul class="plain">
+    <li><strong>ফিডে পোস্টের পুরো বস্তু নয়, শুধু ID রাখুন।</strong> মেমোরি বহুগুণ কমে, আর পোস্ট এডিট হলে সব কপি আপডেট করতে হয় না। রেন্ডারের সময় ID দিয়ে হাইড্রেট করুন।</li>
+    <li><strong>ফিড লিস্ট ছেঁটে রাখুন</strong> — সাম্প্রতিক ৫০০–১০০০টা যথেষ্ট। কেউ ফিডের ২ হাজারতম পোস্টে যায় না; গেলে ডেটাবেজ থেকে আনুন।</li>
+    <li><strong>পেজিনেশনে offset নয়, cursor</strong> ব্যবহার করুন। <code>OFFSET 10000</code> ডেটাবেজকে ১০ হাজার সারি গুনতে বাধ্য করে, আর নতুন পোস্ট এলে আইটেম বারবার দেখা যায়। কার্সর (শেষ দেখা পোস্টের ID বা টাইমস্ট্যাম্প) দুটো সমস্যাই মেটায়।</li>
+    <li><strong>ফ্যান-আউট অ্যাসিঙ্ক্রোনাস</strong> — পোস্ট করার API সাথে সাথে ফিরে আসবে, ফ্যান-আউটের কাজ যাবে মেসেজ কিউতে (Kafka), ওয়ার্কাররা ব্যাকগ্রাউন্ডে করবে।</li>
+    <li>এখানে <strong>eventual consistency যথেষ্ট</strong> — বন্ধুর পোস্ট ৩ সেকেন্ড পরে দেখলে কারও কিছু যায় আসে না। এটা জোরে বলুন, কারণ এটাই এই ডিজাইনকে সম্ভব করে তোলে।</li>
+  </ul>
+</section>
+
+<!-- 4 CHAT -->
+<section class="ch" id="c4">
+  <div class="ch-n">কেস স্টাডি ০৪ · মাঝারি</div>
+  <h2>চ্যাট সিস্টেম</h2>
+  <p class="sub">WhatsApp — যেখানে স্টেটফুল কানেকশনই মূল চ্যালেঞ্জ</p>
+
+  <p class="lead">চ্যাটের কঠিন অংশ মেসেজ সংরক্ষণ নয়, বরং <strong>১০ লাখ খোলা WebSocket কানেকশন</strong>। এগুলো নির্দিষ্ট সার্ভারে বাঁধা — তাই "A থেকে B-তে মেসেজ" মানে আসলে "কোন সার্ভারে B বসে আছে সেটা খুঁজে বের করা"।</p>
+
+  <div class="w arch">
+    <svg viewBox="0 0 760 260">
+      <rect class="bx" x="10" y="105" width="80" height="46" rx="9"/><text x="50" y="127" text-anchor="middle">ইউজার A</text>
+      <rect class="bx hi" x="125" y="105" width="96" height="46" rx="9"/><text x="173" y="123" text-anchor="middle">চ্যাট সার্ভার ১</text><text class="m" x="173" y="138" text-anchor="middle">WebSocket</text>
+      <rect class="bx" x="270" y="20" width="110" height="44" rx="9"/><text x="325" y="38" text-anchor="middle">কানেকশন রেজিস্ট্রি</text><text class="m" x="325" y="53" text-anchor="middle">Redis: user→server</text>
+      <rect class="bx hi" x="270" y="105" width="110" height="46" rx="9"/><text x="325" y="123" text-anchor="middle">Pub/Sub</text><text class="m" x="325" y="138" text-anchor="middle">Redis / Kafka</text>
+      <rect class="bx" x="270" y="192" width="110" height="46" rx="9"/><text x="325" y="210" text-anchor="middle">মেসেজ স্টোর</text><text class="m" x="325" y="225" text-anchor="middle">Cassandra</text>
+      <rect class="bx hi" x="430" y="105" width="96" height="46" rx="9"/><text x="478" y="123" text-anchor="middle">চ্যাট সার্ভার ৭</text><text class="m" x="478" y="138" text-anchor="middle">WebSocket</text>
+      <rect class="bx" x="565" y="105" width="80" height="46" rx="9"/><text x="605" y="127" text-anchor="middle">ইউজার B</text>
+      <rect class="bx" x="565" y="20" width="110" height="44" rx="9"/><text x="620" y="38" text-anchor="middle">পুশ নোটিফিকেশন</text><text class="m" x="620" y="53" text-anchor="middle">B অফলাইন হলে</text>
+      <path class="ar" d="M90 128 H123"/><path class="ar" d="M221 128 H268"/>
+      <path class="ar" d="M380 128 H428"/><path class="ar" d="M526 128 H563"/>
+      <path class="ar" d="M200 105 L285 66"/><path class="ar" d="M200 151 L285 195"/>
+      <path class="ar" d="M526 112 L563 66" stroke-dasharray="4 3"/>
+    </svg>
+  </div>
+
+  <h4 class="mini">মেসেজ পাঠানোর পথ</h4>
+  <ul class="plain">
+    <li>A তার সার্ভারে মেসেজ পাঠায় (খোলা WebSocket দিয়ে)।</li>
+    <li>সার্ভার মেসেজটা <strong>আগে সংরক্ষণ করে</strong> (এটাই আসল "sent" ✓)। সংরক্ষণের আগে ডেলিভারি নিশ্চিত করলে ক্র্যাশে মেসেজ হারাবে।</li>
+    <li>রেজিস্ট্রিতে দেখে B কোন সার্ভারে আছে। থাকলে সেই সার্ভারে pub/sub দিয়ে পাঠায় → B পায় (✓✓ delivered)।</li>
+    <li>B অফলাইন হলে মেসেজ ইনবক্সে জমা থাকে + পুশ নোটিফিকেশন (APNs/FCM) যায়। B ফিরলে জমা মেসেজ সিঙ্ক হয়।</li>
+    <li>B পড়লে read receipt উল্টো পথে A-র কাছে যায় (✓✓ নীল)।</li>
+  </ul>
+
+  <h4 class="mini">যে বিষয়গুলো আলাদা করে ভাবতে হয়</h4>
+  <ul class="plain">
+    <li><strong>মেসেজের ক্রম।</strong> সার্ভারের ঘড়ি মেলে না, তাই টাইমস্ট্যাম্পে ভরসা নেই। কথোপকথন-ভিত্তিক সিকোয়েন্স নম্বর বা Snowflake ID (টাইমস্ট্যাম্প + মেশিন ID + কাউন্টার) ব্যবহার করুন — এতে ক্রম <em>ও</em> ইউনিকনেস দুটোই আসে।</li>
+    <li><strong>ডেটা মডেল।</strong> কোয়েরি সবসময় "এই কথোপকথনের সাম্প্রতিক মেসেজ" — তাই পার্টিশন কী <code>conversation_id</code>, ক্লাস্টারিং কী <code>message_id</code> (অবরোহী)। Cassandra এই প্যাটার্নের জন্য আদর্শ; লেখাও প্রচুর, আর জয়েন লাগে না।</li>
+    <li><strong>গ্রুপ চ্যাট।</strong> ছোট গ্রুপে প্রতি সদস্যের ইনবক্সে ফ্যান-আউট। বড় গ্রুপে (WhatsApp সীমা ১০২৪) এটা ব্যয়বহুল — তখন কথোপকথন-কেন্দ্রিক মডেল ও পুল। ফিডের সেই একই পুশ-বনাম-পুল প্রশ্ন, নতুন পোশাকে।</li>
+    <li><strong>লোড ব্যালান্সিং।</strong> WebSocket স্টেটফুল, তাই সাধারণ round robin চলবে না — কানেকশন যতক্ষণ খোলা ততক্ষণ একই সার্ভারে থাকতে হবে। একটা সার্ভার ডেপ্লয়ের জন্য বন্ধ হলে হাজার হাজার ক্লায়েন্ট একসাথে রিকানেক্ট করবে; তাই <strong>graceful drain</strong> ও ক্লায়েন্টে jitter সহ রিকানেক্ট বাধ্যতামূলক।</li>
+  </ul>
+
+  <div class="note">
+    <span class="k">এন্ড-টু-এন্ড এনক্রিপশন</span>
+    <p>E2E মানে সার্ভার মেসেজ পড়তে পারে না — সে শুধু এনক্রিপ্টেড বাইট আদান-প্রদান করে। এর ফলে সার্ভার-সাইড সার্চ, ক্লাউড ব্যাকআপ, স্প্যাম ডিটেকশন সবই কঠিন হয়ে পড়ে। ইন্টারভিউতে এই <strong>ট্রেডঅফটা</strong> উল্লেখ করলেই যথেষ্ট; কী এক্সচেঞ্জের গণিতে ঢোকার দরকার নেই।</p>
+  </div>
+</section>
+
+<!-- 5 VIDEO -->
+<section class="ch" id="c5">
+  <div class="ch-n">কেস স্টাডি ০৫ · কঠিন</div>
+  <h2>ভিডিও স্ট্রিমিং</h2>
+  <p class="sub">YouTube / Netflix — আপলোড পাইপলাইন আর ব্যান্ডউইথের যুদ্ধ</p>
+
+  <p class="lead">এখানে দুটো সম্পূর্ণ আলাদা সিস্টেম আছে, আর ইন্টারভিউয়ার সাধারণত একটাতে গভীরে যেতে বলেন: <strong>আপলোড ও ট্রান্সকোডিং পাইপলাইন</strong> (write path), আর <strong>ডেলিভারি</strong> (read path)।</p>
+
+  <h4 class="mini">আপলোড পাইপলাইন</h4>
+  <ul class="plain">
+    <li>ক্লায়েন্ট সার্ভারের মধ্য দিয়ে ফাইল পাঠায় না — সার্ভার একটা <strong>pre-signed URL</strong> দেয়, ক্লায়েন্ট সরাসরি অবজেক্ট স্টোরে (S3) আপলোড করে। অ্যাপ সার্ভার টেরাবাইট ট্রাফিক থেকে বেঁচে যায়।</li>
+    <li>বড় ফাইলের জন্য <strong>chunked / resumable upload</strong> — নেটওয়ার্ক কাটলে শুরু থেকে নয়, যেখান থেকে থেমেছিল সেখান থেকে চলবে।</li>
+    <li>আপলোড শেষ হলে একটা ইভেন্ট যায় কিউতে। ট্রান্সকোডিং ওয়ার্কাররা ভিডিওকে ছোট সেগমেন্টে ভেঙে <strong>সমান্তরালে</strong> একাধিক রেজলিউশনে রূপান্তর করে। এটা একটা DAG — থাম্বনেইল, অডিও ট্র্যাক, সাবটাইটেল, প্রতিটা রেন্ডিশন আলাদা নোড।</li>
+    <li>ফলাফল CDN-এ যায়, মেটাডেটা ডেটাবেজে, আর ভিডিও "প্রকাশিত" হয়। জনপ্রিয় ভিডিও আগেই এজ লোকেশনে পুশ করা হয়।</li>
+  </ul>
+
+  <h4 class="mini">Adaptive Bitrate — প্লেয়ার নিজেই সিদ্ধান্ত নেয়</h4>
+  <div class="w">
+    <div class="w-h"><span class="w-t">ব্যান্ডউইথ বদলান</span></div>
+    <div style="margin-bottom:12px">
+      <label style="display:flex;justify-content:space-between;font-size:13.5px;color:var(--ink-2);margin-bottom:6px">
+        উপলব্ধ ব্যান্ডউইথ <b style="font-family:var(--mono);color:var(--acc)" id="bwV">৫.০ Mbps</b></label>
+      <input type="range" id="bwR" min="0.3" max="30" step="0.1" value="5" style="width:100%;accent-color:var(--acc)">
+    </div>
+    <div class="abr" id="abrBox"></div>
+    <div class="out-box" id="abrOut" style="margin-top:14px"></div>
+  </div>
+
+  <p>ভিডিও ছোট সেগমেন্টে (২–১০ সেকেন্ড) ভাঙা থাকে, প্রতিটা কয়েকটা মানে। প্লেয়ার একটা <strong>manifest</strong> (HLS-এ <code>.m3u8</code>, DASH-এ <code>.mpd</code>) পড়ে জানে কোন মান পাওয়া যায়, তারপর মাপা থ্রুপুট ও বাফারের অবস্থা দেখে <em>প্রতিটা সেগমেন্টের জন্য আলাদাভাবে</em> মান বেছে নেয়। এজন্যই ট্রেনে ভিডিও ঝাপসা হয়ে যায় কিন্তু থামে না — <strong>সিদ্ধান্তটা সার্ভারের নয়, প্লেয়ারের</strong>।</p>
+
+  <div class="iq">
+    <span class="k">ইন্টারভিউ প্রশ্ন</span>
+    <p><strong>"একটা ভিডিও ৫ কোটি বার দেখা হলে কী হবে?"</strong></p>
+    <p>মূল সার্ভার এই ট্রাফিকের ধারেকাছেও যায় না — <strong>৯৫%+ CDN থেকেই সার্ভ হয়</strong>। আসল প্রশ্ন হয়ে দাঁড়ায় CDN খরচ, এজ ক্যাশে কী রাখা হবে (জনপ্রিয় ভিডিও প্রি-পুশ, বাকিগুলো চাহিদামতো), আর ভিউ কাউন্ট কীভাবে গোনা হবে — প্রতিটা ভিউ ডেটাবেজে লেখা অসম্ভব, তাই স্ট্রিমে জমা করে ব্যাচে অ্যাগ্রিগেট করা হয় (approximate counting)।</p>
+  </div>
+</section>
+
+<!-- 6 GEO -->
+<section class="ch" id="c6">
+  <div class="ch-n">কেস স্টাডি ০৬ · কঠিন</div>
+  <h2>Uber ও জিওস্প্যাশিয়াল ইনডেক্স</h2>
+  <p class="sub">"আমার ২ কিমির মধ্যে ড্রাইভার" — এই কোয়েরিটা কীভাবে দ্রুত হয়</p>
+
+  <p class="lead">সাধারণ ডেটাবেজে <code>WHERE lat BETWEEN … AND lng BETWEEN …</code> চললেও ধীর — কারণ B-tree একমাত্রিক, দুটো কলামে একসাথে রেঞ্জ কোয়েরি ভালো হয় না। সমাধান: <strong>দ্বিমাত্রিক অবস্থানকে একমাত্রিক স্ট্রিং-এ রূপান্তর করা</strong>, যাতে কাছাকাছি জায়গার প্রিফিক্স মিলে যায়। নিচে ম্যাপে ক্লিক করুন।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">ম্যাপে ক্লিক করুন · <span id="geoCell">—</span></span>
+      <div class="ctrls">
+        <button class="b" data-gp="1">নিম্ন নির্ভুলতা</button>
+        <button class="b" data-gp="2" aria-selected="true">মাঝারি</button>
+        <button class="b" data-gp="3">উচ্চ নির্ভুলতা</button>
+        <button class="b" id="geoNb">প্রতিবেশী সেল দেখান</button>
+      </div>
+    </div>
+    <div class="geo" id="geoMap"></div>
+    <div class="out-box" id="geoOut" style="margin-top:14px"><h4>ম্যাপে ক্লিক করুন</h4><p>আপনার অবস্থান বসবে, আর সেই সেলের ভেতরের ড্রাইভাররা গোনা হবে।</p></div>
+  </div>
+
+  <h4 class="mini">তিনটা পদ্ধতি</h4>
+  <table>
+    <tr><th>পদ্ধতি</th><th>ধারণা</th><th>সুবিধা</th><th>সমস্যা</th></tr>
+    <tr><td>Geohash</td><td>গ্রিডকে বারবার অর্ধেক করে base32 স্ট্রিং</td><td class="y">সরল, প্রিফিক্স সার্চ, যেকোনো KV স্টোরে চলে</td><td class="n">সীমানার ওপারে কাছের প্রতিবেশী মিস</td></tr>
+    <tr><td>Quadtree</td><td>ঘনত্ব বেশি হলে সেল ভাগ হয়</td><td class="y">শহর-গ্রামে মানিয়ে নেয়</td><td class="n">মেমোরিতে গাছ, আপডেট জটিল</td></tr>
+    <tr><td>S2 (Google)</td><td>গোলককে ঘনক ধরে Hilbert বক্ররেখা</td><td class="y">গোলাকার পৃথিবীতে নির্ভুল</td><td class="n">শেখা কঠিন</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="k">সীমানা সমস্যা</span>
+    <p>দুটো জায়গা পাশাপাশি হলেও ভিন্ন সেলে পড়লে তাদের geohash সম্পূর্ণ আলাদা হতে পারে। তাই কখনোই শুধু নিজের সেল খুঁজবেন না — <strong>নিজের সেল + ৮টা প্রতিবেশী</strong>, মোট ৯টা সেলে সার্চ করতে হয়। উপরের "প্রতিবেশী সেল" বোতামটা চেপে দেখুন। এই কথাটা ইন্টারভিউতে না বললে ডিজাইনটা ভুল থেকে যায়।</p>
+  </div>
+
+  <h4 class="mini">যে জিনিসটা সবাই ভুলে যায় — লেখার চাপ</h4>
+  <p>১০ লাখ ড্রাইভার প্রতি ৪ সেকেন্ডে অবস্থান পাঠালে <code>২,৫০,০০০ লেখা/সেকেন্ড</code>। কোনো সাধারণ ডেটাবেজ এটা নেবে না, আর নেওয়ার দরকারও নেই — <strong>৪ সেকেন্ড পুরোনো অবস্থান এমনিতেই মূল্যহীন</strong>। তাই লাইভ অবস্থান থাকে ইন-মেমোরিতে (Redis-এর geo কমান্ড বা কাস্টম শার্ডেড সার্ভিস), শুধু ট্রিপের ঐতিহাসিক পথ স্থায়ী স্টোরে যায়। <strong>"এই ডেটার স্থায়িত্ব দরকার নেই" — এটা চিনতে পারাই এই প্রবলেমের আসল অন্তর্দৃষ্টি।</strong></p>
+  <p>ম্যাচিং নিজেও একটা আলাদা সমস্যা: কাছের ড্রাইভার খুঁজে পাওয়ার পর কাকে দেবেন? একই ড্রাইভারকে দুটো রাইড দেওয়া যাবে না, তাই ম্যাচিং-এ একটা লক বা অ্যাটমিক অপারেশন লাগে — এবং ড্রাইভার প্রত্যাখ্যান করলে বা টাইমআউট হলে পরেরজনের কাছে যেতে হবে। এটা মূলত টিকিট বুকিং-এর সেই একই কনকারেন্সি সমস্যা।</p>
+</section>
+
+<!-- 7 TICKET -->
+<section class="ch" id="c7">
+  <div class="ch-n">কেস স্টাডি ০৭ · কঠিন</div>
+  <h2>টিকিট বুকিং</h2>
+  <p class="sub">Ticketmaster — যেখানে দুজন একই সিটে ক্লিক করে</p>
+
+  <p class="lead">এই প্রবলেমের ৯৫% read (মানুষ ইভেন্ট ব্রাউজ করছে) কিন্তু ৫% write-এ <strong>ভয়াবহ কনকারেন্সি</strong> — একটা কনসার্টের টিকিট ছাড়ার মুহূর্তে হাজারো মানুষ একই সিটের জন্য ঝাঁপায়। নিচে শেষ সিটের জন্য দুজনকে একসাথে চেষ্টা করান।</p>
+
+  <div class="w">
+    <div class="w-h">
+      <span class="w-t">শেষ ১টা সিট · দুজন ইউজার একসাথে</span>
+      <div class="ctrls">
+        <button class="b" data-lk="none" aria-selected="true">কোনো লক নেই</button>
+        <button class="b" data-lk="pess">পেসিমিস্টিক লক</button>
+        <button class="b" data-lk="opt">অপ্টিমিস্টিক লক</button>
+        <button class="b" data-lk="hold">হোল্ড + TTL</button>
+      </div>
+    </div>
+    <div class="seats" id="seatBox"></div>
+    <div class="ctrls" style="justify-content:center">
+      <button class="b pri" id="seatRun">দুজনই একসাথে বুক করুক</button>
+      <button class="b" id="seatReset">রিসেট</button>
+    </div>
+    <div class="log" id="seatLog"><b>▸ একটা কৌশল বেছে চালান</b></div>
+  </div>
+
+  <table>
+    <tr><th>কৌশল</th><th>কীভাবে</th><th>ভালো</th><th>খারাপ</th></tr>
+    <tr><td>পেসিমিস্টিক</td><td><code>SELECT … FOR UPDATE</code></td><td class="y">নিশ্চিত সঠিক</td><td class="n">লক ধরে রাখে, থ্রুপুট কমে, deadlock</td></tr>
+    <tr><td>অপ্টিমিস্টিক</td><td>ভার্সন কলাম মিলিয়ে আপডেট</td><td class="y">লক নেই, দ্রুত</td><td class="n">সংঘর্ষ বেশি হলে অনেক রিট্রাই</td></tr>
+    <tr><td>হোল্ড + TTL</td><td>Redis-এ ৫–১০ মিনিটের অস্থায়ী দখল</td><td class="y">ইউজার পেমেন্টের সময় পায়</td><td class="n">মেয়াদ ও ছাড়া নিয়ে বাড়তি জটিলতা</td></tr>
+  </table>
+
+  <p>বাস্তবে <strong>হোল্ড + TTL</strong>-ই ব্যবহার হয়, কারণ পেমেন্ট শেষ হতে কয়েক মিনিট লাগে — এতক্ষণ ডেটাবেজ লক ধরে রাখা অসম্ভব। সিট নির্বাচনের সাথে সাথে Redis-এ <code>SET seat:A1 user:99 NX EX 600</code> দিয়ে দখল নেওয়া হয় (<code>NX</code> মানে আগে থেকে থাকলে ব্যর্থ — এটাই অ্যাটমিক গ্যারান্টি)। পেমেন্ট সফল হলে ডেটাবেজে স্থায়ী, ব্যর্থ বা সময় শেষ হলে সিট আপনাআপনি মুক্ত।</p>
+
+  <h4 class="mini">হাই-ডিমান্ড ইভেন্টের জন্য বাড়তি</h4>
+  <ul class="plain">
+    <li><strong>ভার্চুয়াল ওয়েটিং রুম</strong> — সবাইকে একসাথে ঢুকতে না দিয়ে কিউতে রেখে ধীরে ধীরে ছাড়া। এটাই একমাত্র উপায় যাতে ব্যাকএন্ড ভেঙে না পড়ে।</li>
+    <li><strong>পেমেন্টে idempotency key</strong> — ভলিউম ২-এর সেই শিক্ষা। ইউজার দুবার ক্লিক করলে বা রিট্রাই হলে দুবার চার্জ হবে না।</li>
+    <li><strong>read আর write আলাদা করুন</strong> — ইভেন্ট ব্রাউজিং ভারীভাবে ক্যাশড ও রেপ্লিকা থেকে সার্ভ, বুকিং পথ শুধু প্রাইমারিতে। ৯৫% ট্রাফিক তখন ক্রিটিক্যাল পথে ঢোকেই না।</li>
+    <li><strong>সিটের ম্যাপ eventual হলেও চলে</strong> — কেউ ২ সেকেন্ড পুরোনো "উপলব্ধ" দেখে ক্লিক করে ব্যর্থ হলে সেটা গ্রহণযোগ্য। কিন্তু <strong>চূড়ান্ত বুকিং অবশ্যই strong</strong>। এই বিভাজনটা স্পষ্ট করে বলাই এখানে সবচেয়ে বড় পয়েন্ট।</li>
+  </ul>
+</section>
+
+<!-- 8 MORE -->
+<section class="ch" id="c8">
+  <div class="ch-n">অধ্যায় ০৮</div>
+  <h2>আরও ১০টা ডিজাইন</h2>
+  <p class="sub">কার্ডে ক্লিক করুন — প্রতিটার মূল অন্তর্দৃষ্টি ও ফাঁদ</p>
+
+  <div class="w">
+    <div class="cards" id="dCards"></div>
+    <div class="dpanel" id="dPanel"></div>
+  </div>
+</section>
+
+<!-- 9 QUIZ -->
+<section class="ch" id="c9">
+  <div class="ch-n">অধ্যায় ০৯</div>
+  <h2>নিজেকে যাচাই করুন</h2>
+  <p class="sub">প্রতিটা উত্তর জোরে বলুন, তারপর মিলিয়ে নিন</p>
+  <div id="quiz"></div>
+  <div class="note" style="border-color:var(--acc)">
+    <span class="k" style="color:var(--acc)">ভলিউম ৩ শেষ</span>
+    <p>এই ১৭টা ডিজাইন হজম হয়ে গেলে অচেনা প্রবলেমও আর অচেনা লাগবে না — কারণ উপাদানগুলো বারবার ফিরে আসে। পরের ভলিউম — <strong>Low Level Design</strong>: SOLID, ডিজাইন প্যাটার্ন, আর ক্লাস-লেভেল ডিজাইন প্রবলেম।</p>
+  </div>
+</section>
+
+<footer>
+  <span>ভলিউম ৩ / ৫ · কেস স্টাডি</span>
+  <span>পরবর্তী → Low Level Design</span>
+</footer>
+</main>
+</div>
+
+<script>
+const bn=n=>String(n).replace(/[0-9]/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+const links=[...document.querySelectorAll(".toc a")];
+document.querySelectorAll(".ch").forEach(s=>new IntersectionObserver(es=>{es.forEach(e=>{
+  if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))})},
+  {rootMargin:"-20% 0px -70% 0px"}).observe(s));
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- 0 FRAMEWORK ---------- */
+const FW=[
+ {n:"রিকোয়ারমেন্ট",t:"০–৫ মিনিট",
+  d:"কিছুই আঁকবেন না। শুধু প্রশ্ন করুন এবং স্ক্রিনে লিখে রাখুন। ফাংশনাল (সিস্টেম কী করবে) আর নন-ফাংশনাল (কত দ্রুত, কতজনের জন্য, কতটা নির্ভুল) আলাদা করুন। স্কোপ ছোট করুন — ৪৫ মিনিটে সব ফিচার সম্ভব নয়, তাই ইন্টারভিউয়ারের সাথে মিলে ৩–৪টা মূল ফিচার বেছে নিন।",
+  s:"“কয়েকটা জিনিস স্পষ্ট করে নিই। শুধু টেক্সট মেসেজ, না ছবি-ভিডিওও? গ্রুপ চ্যাট আছে? read receipt দরকার? আমি ধরে নিচ্ছি প্রথম সংস্করণে ওয়ান-টু-ওয়ান টেক্সট আর ডেলিভারি স্ট্যাটাস — ঠিক আছে?”"},
+ {n:"এস্টিমেশন ও API",t:"৫–১০ মিনিট",
+  d:"DAU থেকে QPS, তারপর স্টোরেজ ও ব্যান্ডউইথ। গোল সংখ্যা ব্যবহার করুন (৮৬,৪০০ ≈ ১ লাখ)। প্রতিটা সংখ্যার পর <b>“অতএব”</b> বলুন — নাহলে হিসাবটা অর্থহীন। তারপর ৩–৪টা API endpoint লিখে ফেলুন; এটাই পরের পুরো ডিজাইনের চুক্তি।",
+  s:"“৫ কোটি DAU, প্রতিজন দিনে ৪০টা মেসেজ — ২০০ কোটি মেসেজ/দিন, মানে গড়ে ২৩,০০০ QPS, পিকে ৭০,০০০। <b>অতএব</b> একটা সার্ভারে হবে না, আর মেসেজ স্টোরকে শার্ড করতেই হবে।”"},
+ {n:"হাই-লেভেল ডিজাইন",t:"১০–২০ মিনিট",
+  d:"সরল ছবি আগে: ক্লায়েন্ট → LB → সার্ভিস → ডেটাবেজ। তারপর <b>এক এক করে</b> ক্যাশ, কিউ, CDN যোগ করুন — প্রতিটার কারণ বলতে বলতে। শুরুতেই মাইক্রোসার্ভিসের জাল আঁকবেন না; সহজ থেকে জটিলে যাওয়াটাই শক্তিশালী দেখায়।",
+  s:"“সবচেয়ে সরল সংস্করণ দিয়ে শুরু করি, তারপর যেখানে ভাঙবে সেখানে ঠিক করব। … এখন এই পথে ১ লাখ QPS আসছে, ডেটাবেজ পারবে না — <b>তাই</b> এখানে একটা ক্যাশ লেয়ার বসাচ্ছি।”"},
+ {n:"ডিপ ডাইভ",t:"২০–৪০ মিনিট",
+  d:"সবচেয়ে বড় ও সবচেয়ে গুরুত্বপূর্ণ অংশ — পাস-ফেল এখানেই ঠিক হয়। ইন্টারভিউয়ার যেখানে আগ্রহ দেখাবেন সেখানে ঢুকুন: ডেটা মডেল, পার্টিশন কী, ইনডেক্স, হট কী, রেপ্লিকেশন, কনসিস্টেন্সি। ভলিউম ২-এর জ্ঞান ঠিক এখানেই লাগে।",
+  s:"“পার্টিশন কী হিসেবে conversation_id নিচ্ছি, যাতে একটা কথোপকথনের সব মেসেজ একই জায়গায় থাকে আর ক্রম রক্ষা হয়। ঝুঁকি হলো খুব সক্রিয় গ্রুপ একটা হট পার্টিশন তৈরি করতে পারে — সেক্ষেত্রে …”"},
+ {n:"বটলনেক ও tradeoff",t:"৪০–৪৫ মিনিট",
+  d:"নিজেই নিজের ডিজাইনের দুর্বলতা ধরিয়ে দিন। single point of failure কোথায়? ট্রাফিক ১০ গুণ হলে প্রথমে কী ভাঙবে? কোন সিদ্ধান্তে কী ছেড়ে দিয়েছেন? মনিটরিং-এ কী দেখবেন? <b>নিজের ডিজাইনের সমালোচনা করতে পারা সিনিয়রিটির সবচেয়ে বড় সংকেত।</b>",
+  s:"“এই ডিজাইনের সবচেয়ে দুর্বল জায়গা কানেকশন রেজিস্ট্রি — ওটা গেলে রাউটিং বন্ধ। রেপ্লিকা রাখব, আর ফলব্যাক হিসেবে ব্রডকাস্ট। আর আমি eventual consistency বেছেছি, তাই খুব বিরল ক্ষেত্রে মেসেজ ক্রমভঙ্গ হয়ে দেখা যেতে পারে — সেটা sequence number দিয়ে ক্লায়েন্টে সাজিয়ে নেওয়া হবে।”"}
+];
+let fwI=0;
+document.getElementById("fwTabs").innerHTML=FW.map((f,i)=>
+ `<button data-fw="${i}" ${i===0?'aria-selected="true"':''}><i>${f.t}</i>${f.n}</button>`).join("");
+function fwR(){
+  const f=FW[fwI];
+  document.getElementById("fwBox").innerHTML=
+   `<p style="margin:0;font-size:15px">${f.d}</p>
+    <div class="say"><em>যেভাবে বলবেন</em>${f.s}</div>`;
+  document.querySelectorAll("[data-fw]").forEach((b,i)=>b.setAttribute("aria-selected",i===fwI));
+}
+document.querySelectorAll("[data-fw]").forEach(b=>b.onclick=()=>{fwI=+b.dataset.fw;fwR();});
+fwR();
+
+/* ---------- 1 URL SHORTENER ---------- */
+const KS={
+ hash:{t:"হ্যাশ + ছাঁটাই",
+  d:"<code>base62(md5(url))</code> নিয়ে প্রথম ৭ অক্ষর।<br><br><b>সুবিধা:</b> স্টেটলেস, একই URL দিলে একই কোড।<br><b>সমস্যা:</b> ছাঁটাই করলেই <b>সংঘর্ষ</b> হয় — তখন প্রতিবার ডেটাবেজে দেখতে হয় কোডটা নেওয়া আছে কি না, আর থাকলে salt দিয়ে আবার। এই অতিরিক্ত রিড লেখার পথকে ধীর করে দেয়, আর ট্রাফিক বাড়লে সংঘর্ষও বাড়ে।"},
+ counter:{t:"কাউন্টার + base62",
+  d:"একটা বৈশ্বিক ক্রমবর্ধমান সংখ্যাকে base62-তে রূপান্তর।<br><br><b>সুবিধা:</b> সংঘর্ষ <b>অসম্ভব</b>, কোড ছোট, ডেটাবেজে চেক লাগে না।<br><b>সমস্যা:</b> কাউন্টারটা কে রাখবে? এক জায়গায় রাখলে সেটা bottleneck ও single point of failure। সমাধান — প্রতিটা সার্ভার ZooKeeper বা DB থেকে <b>এক লাখের একটা রেঞ্জ</b> বরাদ্দ নেয়, তারপর মেমোরিতেই গোনে। আরেকটা সমস্যা: কোড অনুমানযোগ্য (…7, …8, …9), তাই গোপনীয়তার দরকার হলে base62-র বর্ণক্রম এলোমেলো করে নিন।"},
+ kgs:{t:"প্রি-জেনারেটেড (Key Generation Service)",
+  d:"আলাদা একটা সার্ভিস আগেই কোটি কোটি ইউনিক কোড বানিয়ে টেবিলে রাখে, দুটো ভাগে — ব্যবহৃত ও অব্যবহৃত।<br><br><b>সুবিধা:</b> লেখার সময় শুধু একটা কোড তুলে নেওয়া — <b>সবচেয়ে দ্রুত</b>, কোনো গণনা বা সংঘর্ষ চেক নেই।<br><b>সমস্যা:</b> আরেকটা সার্ভিস মেইনটেইন করতে হয়, আর KGS নিজেই SPOF — রেপ্লিকা লাগে। কোড তুলে নেওয়ার সময় দুই সার্ভার যাতে একই কোড না পায়, সেজন্য অ্যাটমিক অপারেশন দরকার।"}
+};
+function ksR(k){document.getElementById("ksBox").innerHTML=
+ `<h4 style="margin:0 0 8px;font-family:var(--disp);font-size:18px;font-weight:700">${KS[k].t}</h4>
+  <p style="margin:0;font-size:14.5px">${KS[k].d}</p>`;}
+document.querySelectorAll("[data-ks]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-ks]").forEach(x=>x.setAttribute("aria-selected",x===b));ksR(b.dataset.ks);});
+ksR("hash");
+const B62="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function b62(n){if(n===0)return "0";let s="";while(n>0){s=B62[n%62]+s;n=Math.floor(n/62);}return s;}
+const b62in=document.getElementById("b62in");
+function b62u(){document.getElementById("b62out").textContent=b62(Math.max(0,+b62in.value||0));}
+b62in.oninput=b62u;b62u();
+
+/* ---------- 2 RATE LIMITER ---------- */
+let rlAlgo="token",rlReqs=[];
+const RLD={
+ token:"বালতিতে ১০টা টোকেন, প্রতি সেকেন্ডে ১টা করে ভরে। রিকোয়েস্ট এলে ১টা টোকেন খরচ হয়, খালি থাকলে প্রত্যাখ্যান। <b>বার্স্ট সহ্য করে</b> — জমানো টোকেন একসাথে খরচ করা যায়, যেটা বাস্তব ট্রাফিকের জন্য ভালো।",
+ leaky:"রিকোয়েস্ট কিউতে ঢোকে, আর <b>স্থির হারে</b> বেরোয় (১টা/সেকেন্ড)। কিউ ভরে গেলে নতুনগুলো ফেলে দেওয়া হয়। আউটপুট রেট সবসময় সমান — ডাউনস্ট্রিমকে বাঁচানোর জন্য আদর্শ, কিন্তু বার্স্টে দেরি হয়।",
+ fixed:"সময়কে স্থির ১০ সেকেন্ডের ব্লকে ভাগ করে প্রতি ব্লকে গোনা। সরলতম, মেমোরি মাত্র একটা কাউন্টার। কিন্তু <b>সীমানায় বড় ফাঁক</b> — “সীমানায় বার্স্ট” বোতামটা চাপুন।",
+ sliding:"সবসময় “এই মুহূর্ত থেকে গত ১০ সেকেন্ড” দেখে। সীমানার ফাঁক নেই, নির্ভুল। লগ রাখলে মেমোরি বেশি লাগে; বাস্তবে বর্তমান ও আগের উইন্ডোর কাউন্টার ওজন করে আনুমানিক হিসাব করা হয় — প্রায় নিখুঁত, মেমোরি সামান্য।"};
+function rlDraw(){
+  const T=20000;
+  document.getElementById("rlTrack").innerHTML=
+    (rlAlgo==="fixed"?[0,.5].map(f=>`<div class="rl-win" style="left:${f*100}%;width:50%"></div>`).join(""):"")+
+    rlReqs.map(r=>`<div class="rl-req ${r.ok?"ok":"no"}" style="left:${r.t/T*100}%;top:${18+r.row*15}px"></div>`).join("")+
+    [0,5,10,15,20].map(s=>`<span class="rl-mark" style="left:${s/20*100}%">${bn(s)}s</span>`).join("");
+  document.getElementById("rlOk").textContent=bn(rlReqs.filter(r=>r.ok).length);
+  document.getElementById("rlNo").textContent=bn(rlReqs.filter(r=>!r.ok).length);
+}
+function rlRun(times){
+  rlReqs=[];const LIM=10,WIN=10000;
+  let tokens=LIM,lastT=0,queue=0,rows={};
+  times.forEach(t=>{
+    let ok;
+    if(rlAlgo==="token"){tokens=Math.min(LIM,tokens+(t-lastT)/1000);lastT=t;
+      if(tokens>=1){tokens--;ok=true}else ok=false;}
+    else if(rlAlgo==="leaky"){queue=Math.max(0,queue-(t-lastT)/1000);lastT=t;
+      if(queue<LIM){queue++;ok=true}else ok=false;}
+    else if(rlAlgo==="fixed"){const w=Math.floor(t/WIN);
+      rows[w]=(rows[w]||0);if(rows[w]<LIM){rows[w]++;ok=true}else ok=false;}
+    else{const recent=rlReqs.filter(r=>r.ok&&t-r.t<WIN).length;ok=recent<LIM;}
+    const bucket=Math.floor(t/500);rows["p"+bucket]=(rows["p"+bucket]||0);
+    rlReqs.push({t,ok,row:rows["p"+bucket]++});
+  });
+  rlDraw();
+  document.getElementById("rlOut").innerHTML=
+   `<h4>${bn(rlReqs.filter(r=>r.ok).length)} অনুমোদিত, ${bn(rlReqs.filter(r=>!r.ok).length)} প্রত্যাখ্যাত</h4>
+    <p>${RLD[rlAlgo]}</p>`;
+}
+document.querySelectorAll("[data-rl]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-rl]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  rlAlgo=b.dataset.rl;
+  document.getElementById("rlOut").innerHTML=`<h4>${b.textContent}</h4><p>${RLD[rlAlgo]}</p>`;
+  rlReqs=[];rlDraw();});
+document.getElementById("rlBurst").onclick=()=>rlRun(Array.from({length:15},(_,i)=>1000+i*60));
+document.getElementById("rlSteady").onclick=()=>rlRun(Array.from({length:20},(_,i)=>500+i*900));
+document.getElementById("rlEdge").onclick=()=>rlRun([...Array.from({length:8},(_,i)=>8600+i*40),
+  ...Array.from({length:8},(_,i)=>10100+i*40)]);
+document.getElementById("rlClear").onclick=()=>{rlReqs=[];rlDraw();};
+document.getElementById("rlOut").innerHTML=`<h4>Token bucket</h4><p>${RLD.token}</p>`;
+rlDraw();
+
+/* ---------- 3 FANOUT ---------- */
+const foR=document.getElementById("foR");
+function foU(){
+  const f=Math.round(Math.pow(10,+foR.value));
+  document.getElementById("foV").textContent=f>=1e7?bn((f/1e7).toFixed(1))+" কোটি"
+    :f>=1e5?bn((f/1e5).toFixed(1))+" লাখ":f>=1000?bn((f/1000).toFixed(1))+"K":bn(f);
+  document.getElementById("foPushV").textContent=(f>=1e6?bn((f/1e6).toFixed(1))+"M":f>=1000?bn((f/1000).toFixed(1))+"K":bn(f))+" লেখা";
+  document.getElementById("foPullV").textContent="১ লেখা";
+  const push=f<10000;
+  document.getElementById("foPush").classList.toggle("on",push);
+  document.getElementById("foPull").classList.toggle("on",!push);
+  document.getElementById("foOut").innerHTML= push
+   ? `<h4>পুশ জেতে</h4><p>ফলোয়ার কম, তাই পোস্ট করার সময় ${bn(f)}টা লেখা সহজেই ব্যাকগ্রাউন্ডে হয়ে যায়। বিনিময়ে ফিড পড়া হয় একটা মাত্র Redis লিস্ট থেকে — <b>ও(১)</b>, ২০ ms-এর কম। ৯৯% ইউজার এই দলে পড়ে।</p>`
+   : `<h4>পুশ ভেঙে পড়ে — পুল লাগবে</h4><p>${bn(f)} ফলোয়ার মানে একটা টুইটে ${bn(f)}টা লেখা। সেলিব্রিটি দিনে ২০ বার পোস্ট করলে কোটি কোটি লেখা — অসম্ভব, আর শেষ ফলোয়ার পোস্টটা পাবে কয়েক মিনিট পর। <b>তাই সেলিব্রিটির পোস্ট ফ্যান-আউট করা হয় না</b>; পড়ার সময় মার্জ করে নেওয়া হয়।</p>`;
+}
+foR.oninput=foU;foU();
+
+/* ---------- 5 ABR ---------- */
+const LADDER=[["২১৬০p",25,"4K"],["১০৮০p",8,"Full HD"],["৭২০p",5,"HD"],["৪৮০p",2.5,"SD"],["৩৬০p",1,"কম"],["১৪৪p",0.3,"সর্বনিম্ন"]];
+const bwR=document.getElementById("bwR");
+function abrU(){
+  const bw=+bwR.value;
+  document.getElementById("bwV").textContent=bn(bw.toFixed(1))+" Mbps";
+  const pick=LADDER.find(l=>l[1]<=bw*0.85)||LADDER[LADDER.length-1];
+  document.getElementById("abrBox").innerHTML=LADDER.map(l=>
+   `<div class="abrow"><span>${l[0]}</span>
+     <div class="abbar ${l===pick?"on":""}" style="width:${l[1]/25*100}%"></div>
+     <em>${bn(l[1])} Mbps</em></div>`).join("");
+  document.getElementById("abrOut").innerHTML=
+   `<h4>প্লেয়ার বেছে নিল: ${pick[0]}</h4>
+    <p>${bw<1?"ব্যান্ডউইথ খুব কম — প্লেয়ার সর্বনিম্ন মানে নেমে গেছে, কিন্তু <b>ভিডিও থামেনি</b>। বাফারিং-এর চেয়ে ঝাপসা ভিডিও ভালো, এটাই ABR-এর মূল দর্শন।"
+      :bw>20?"যথেষ্ট ব্যান্ডউইথ, সর্বোচ্চ মান চলছে। তবু প্লেয়ার ৮৫% এর বেশি ব্যবহার করে না — হঠাৎ গতি কমলে সামলানোর জন্য মার্জিন রাখে।"
+      :"প্লেয়ার প্রতিটা সেগমেন্টের আগে থ্রুপুট মেপে সিদ্ধান্ত নিচ্ছে। ব্যান্ডউইথ বদলালে পরের সেগমেন্টেই মান বদলে যাবে — ভিডিও থামবে না।"}</p>`;
+}
+bwR.oninput=abrU;abrU();
+
+/* ---------- 6 GEO ---------- */
+let gp=2,gsel=null,gnb=false;
+const DRIVERS=Array.from({length:60},(_,i)=>({x:(i*37.7)%100,y:(i*61.3)%100}));
+function geoDraw(){
+  const N=Math.pow(2,gp+1);
+  const m=document.getElementById("geoMap");
+  let h="";
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const on=gsel&&gsel.r===r&&gsel.c===c;
+    const nb=gnb&&gsel&&Math.abs(gsel.r-r)<=1&&Math.abs(gsel.c-c)<=1&&!on;
+    h+=`<div class="gcell ${on?"on":nb?"nb":""}" style="left:${c/N*100}%;top:${r/N*100}%;width:${100/N}%;height:${100/N}%"></div>`;
+  }
+  DRIVERS.forEach(d=>h+=`<div class="gdrv" style="left:${d.x}%;top:${d.y}%"></div>`);
+  if(gsel)h+=`<div class="gme" style="left:${gsel.x}%;top:${gsel.y}%"></div>`;
+  m.innerHTML=h;
+  document.getElementById("geoCell").textContent=gsel?`geohash: ${gsel.hash}`:"—";
+}
+document.getElementById("geoMap").onclick=e=>{
+  const r0=e.currentTarget.getBoundingClientRect();
+  const x=(e.clientX-r0.left)/r0.width*100,y=(e.clientY-r0.top)/r0.height*100;
+  const N=Math.pow(2,gp+1);
+  const c=Math.floor(x/100*N),r=Math.floor(y/100*N);
+  const B32="0123456789bcdefghjkmnpqrstuvwxyz";
+  const hash=Array.from({length:gp+3},(_,i)=>B32[(r*N+c+i*7)%32]).join("");
+  gsel={r,c,x,y,hash};geoDraw();
+  const inCell=DRIVERS.filter(d=>Math.floor(d.x/100*N)===c&&Math.floor(d.y/100*N)===r).length;
+  const inNb=DRIVERS.filter(d=>{const dc=Math.floor(d.x/100*N),dr=Math.floor(d.y/100*N);
+    return Math.abs(dc-c)<=1&&Math.abs(dr-r)<=1}).length;
+  document.getElementById("geoOut").innerHTML=
+   `<h4>সেল <code>${hash}</code> — ${bn(inCell)} জন ড্রাইভার</h4>
+    <p>${gnb?`প্রতিবেশী সহ ৯টা সেলে মোট <b>${bn(inNb)}</b> জন। পার্থক্যটা লক্ষ করুন — শুধু নিজের সেল দেখলে ${bn(inNb-inCell)} জন কাছের ড্রাইভার মিস হয়ে যেত, যাদের কেউ কেউ হয়তো সেলের ঠিক ওপাশেই দাঁড়িয়ে।`
+      :`নির্ভুলতা যত বেশি, সেল তত ছোট — সার্চ দ্রুত কিন্তু কম ড্রাইভার পাওয়া যায়। শহরে ছোট সেল ভালো, গ্রামে বড় সেল দরকার (এখানেই quadtree geohash-কে হারায়)। এখন <b>“প্রতিবেশী সেল দেখান”</b> চাপুন।`}</p>`;
+};
+document.querySelectorAll("[data-gp]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-gp]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  gp=+b.dataset.gp;gsel=null;geoDraw();});
+document.getElementById("geoNb").onclick=e=>{gnb=!gnb;e.target.setAttribute("aria-selected",gnb);
+  geoDraw();if(gsel)document.getElementById("geoMap").click;};
+geoDraw();
+
+/* ---------- 7 TICKET ---------- */
+let lk="none";
+const seatLog=document.getElementById("seatLog");
+function slog(t,c){seatLog.innerHTML+=`<div>${c?`<${c}>${t}</${c}>`:t}</div>`;seatLog.scrollTop=seatLog.scrollHeight;}
+function seatDraw(st){document.getElementById("seatBox").innerHTML=
+  `<div class="seat taken">A১</div><div class="seat taken">A২</div>
+   <div class="seat ${st||''}" id="lastSeat">A৩</div>
+   <div class="seat taken">A৪</div>`;}
+seatDraw();
+document.querySelectorAll("[data-lk]").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("[data-lk]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  lk=b.dataset.lk;seatDraw();seatLog.innerHTML="<div><b>▸ চালান চাপুন</b></div>";});
+document.getElementById("seatReset").onclick=()=>{seatDraw();seatLog.innerHTML="<div><b>▸ রিসেট</b></div>";};
+document.getElementById("seatRun").onclick=async()=>{
+  seatDraw();seatLog.innerHTML="";
+  if(lk==="none"){
+    slog("▸ কোনো লক নেই — ক্লাসিক রেস কন্ডিশন","b");
+    slog("ইউজার ১: SELECT seat A৩ → available ✓");
+    await wait(400);slog("ইউজার ২: SELECT seat A৩ → available ✓ (একই সময়ে)");
+    await wait(400);slog("ইউজার ১: UPDATE seat SET owner=১ ✓");
+    await wait(300);slog("ইউজার ২: UPDATE seat SET owner=২ ✓");
+    seatDraw("sold");
+    await wait(300);slog("▸ দুজনই টিকিট পেল, দুজনই টাকা দিল — একটাই সিট","u");
+    slog("দুজন কনসার্টে গিয়ে দেখবে একই আসন। এটাই double booking।","em");
+  } else if(lk==="pess"){
+    slog("▸ পেসিমিস্টিক লক — SELECT … FOR UPDATE","b");
+    slog("ইউজার ১: SELECT A৩ FOR UPDATE → সারি লক করল 🔒");
+    await wait(400);slog("ইউজার ২: SELECT A৩ FOR UPDATE → <em>অপেক্ষা করছে…</em>");
+    await wait(700);slog("ইউজার ১: UPDATE owner=১; COMMIT ✓ লক ছাড়ল");seatDraw("sold");
+    await wait(400);slog("ইউজার ২: লক পেল, দেখল সিট আর নেই → ব্যর্থ");
+    await wait(200);slog("▸ সঠিক ফল। কিন্তু ইউজার ২ পুরোটা সময় ব্লকড ছিল","b");
+    slog("হাজার জন একসাথে চাইলে সবাই লাইনে দাঁড়াবে — থ্রুপুট ধসে যাবে।","em");
+  } else if(lk==="opt"){
+    slog("▸ অপ্টিমিস্টিক লক — ভার্সন কলাম","b");
+    slog("ইউজার ১: পড়ল A৩, version=৭");
+    await wait(300);slog("ইউজার ২: পড়ল A৩, version=৭ (কোনো লক নেই)");
+    await wait(400);slog("ইউজার ১: UPDATE … WHERE version=৭ → ১ সারি বদলাল ✓ (version=৮)");
+    seatDraw("sold");
+    await wait(400);slog("ইউজার ২: UPDATE … WHERE version=৭ → <em>০ সারি বদলাল</em> ✕");
+    await wait(200);slog("▸ ইউজার ২ জানল সংঘর্ষ হয়েছে, রিট্রাই বা অন্য সিট বাছবে","b");
+    slog("কোনো লক নেই বলে দ্রুত। কিন্তু সংঘর্ষ বেশি হলে রিট্রাইয়ের ঝড় ওঠে।","em");
+  } else {
+    slog("▸ হোল্ড + TTL — বাস্তবে যা করা হয়","b");
+    slog("ইউজার ১: SET seat:A৩ user:১ NX EX ৬০০ → OK ✓ (১০ মিনিটের দখল)");
+    seatDraw("held");
+    await wait(400);slog("ইউজার ২: SET seat:A৩ user:২ NX EX ৬০০ → nil ✕ (NX ব্যর্থ)");
+    slog("ইউজার ২ সাথে সাথে জানল — “এই সিট কেউ ধরে রেখেছে”");
+    await wait(600);slog("ইউজার ১ পেমেন্ট করছে… (এতক্ষণ কোনো DB লক ধরা নেই)","em");
+    await wait(700);slog("পেমেন্ট সফল → DB-তে স্থায়ী বুকিং ✓");seatDraw("sold");
+    await wait(300);slog("▸ সঠিক ফল, কেউ ব্লকড হয়নি, ইউজার সময় পেল","b");
+    slog("পেমেন্ট ব্যর্থ হলে বা ১০ মিনিট পার হলে কী মুছে যেত — সিট আপনাআপনি মুক্ত।","em");
+  }
+};
+
+/* ---------- 8 MORE DESIGNS ---------- */
+const MORE=[
+ {n:"Pastebin",lvl:"সহজ",
+  key:"URL shortener-এর যমজ, শুধু বাড়তি একটা বড় টেক্সট বডি।",
+  ins:"টেক্সট ডেটাবেজে নয়, <b>অবজেক্ট স্টোরে</b> (S3) রাখুন; ডেটাবেজে শুধু মেটাডেটা ও পয়েন্টার। ডেটাবেজে মেগাবাইট সাইজের ব্লব রাখলে ব্যাকআপ, রেপ্লিকেশন সব ভারী হয়ে যায়।",
+  trap:"মেয়াদ শেষ হওয়া পেস্ট মুছবেন কীভাবে? প্রতিটার জন্য টাইমার নয় — লেজি ডিলিশন (পড়ার সময় চেক) + রাতে ব্যাচ ক্লিনআপ।"},
+ {n:"Notification System",lvl:"মাঝারি",
+  key:"এক ইভেন্ট, একাধিক চ্যানেল (পুশ, SMS, ইমেইল, ইন-অ্যাপ)।",
+  ins:"চ্যানেলপ্রতি আলাদা ওয়ার্কার ও আলাদা কিউ — SMS প্রোভাইডার ডাউন হলে ইমেইল যেন থেমে না যায় (bulkhead)। টেমপ্লেট সার্ভিস আলাদা রাখুন।",
+  trap:"ইউজার প্রেফারেন্স ও রেট লিমিট। একই ইভেন্টে ১০টা নোটিফিকেশন পাঠালে ইউজার অ্যাপ আনইনস্টল করবে — তাই ডিডুপ ও ব্যাচিং (“৫টা নতুন লাইক”) বাধ্যতামূলক।"},
+ {n:"Google Drive",lvl:"মাঝারি",
+  key:"ফাইল সিঙ্ক, ভার্সনিং, শেয়ারিং।",
+  ins:"ফাইলকে <b>ব্লকে ভাগ করুন</b> (৪ MB), প্রতিটার হ্যাশ রাখুন। ১ GB ফাইলের একটা লাইন বদলালে শুধু সেই ব্লকটা আপলোড হবে — delta sync। একই ব্লক একাধিক ইউজারের থাকলে একবারই রাখুন (dedup)।",
+  trap:"একই ফাইল দুই ডিভাইসে অফলাইনে এডিট হলে কনফ্লিক্ট। সমাধান: ভার্সন ভেক্টর ও দুটো কপি রেখে ইউজারকে জানানো — নীরবে একটা ফেলে দেওয়া নয়।"},
+ {n:"Web Crawler",lvl:"মাঝারি",
+  key:"বিলিয়ন পেজ ক্রল, নতুন লিঙ্ক আবিষ্কার, ভদ্র আচরণ।",
+  ins:"URL ফ্রন্টিয়ার = অগ্রাধিকার কিউ + প্রতি-হোস্ট কিউ। একই ডোমেইনে বারবার হিট করা যাবে না (politeness), robots.txt মানতে হবে। দেখা URL মনে রাখতে <b>Bloom filter</b> — বিলিয়ন URL-এর সেট মেমোরিতে রাখার একমাত্র উপায়।",
+  trap:"স্পাইডার ট্র্যাপ (অসীম ক্যালেন্ডার লিঙ্ক), ডুপ্লিকেট কনটেন্ট (checksum দিয়ে ধরুন), আর অসীম গভীরতা — depth সীমা দিন।"},
+ {n:"Search Autocomplete",lvl:"মাঝারি",
+  key:"প্রতিটা কীস্ট্রোকে ৫টা সাজেশন, &lt;১০০ ms।",
+  ins:"<b>Trie</b> — কিন্তু প্রতিবার গাছ ঘুরে দেখা ধীর। তাই প্রতিটা নোডে তার সাবট্রির শীর্ষ ৫টা <b>আগেই সংরক্ষণ</b> করে রাখুন। তখন লুকআপ = প্রিফিক্স পর্যন্ত নেমে সরাসরি উত্তর।",
+  trap:"Trie রিয়েল-টাইমে আপডেট করবেন না — অফলাইনে ঘণ্টায় একবার বানিয়ে রেপ্লিকায় পাঠান। ট্রেন্ডিং শব্দ কয়েক ঘণ্টা দেরিতে আসাটা গ্রহণযোগ্য।"},
+ {n:"Ad Click Aggregation",lvl:"কঠিন",
+  key:"সেকেন্ডে লাখো ক্লিক ইভেন্ট → মিনিটে অ্যাগ্রিগেটেড রিপোর্ট।",
+  ins:"স্ট্রিম প্রসেসিং (Kafka → Flink/Spark), টাম্বলিং উইন্ডোতে অ্যাগ্রিগেট, ফল OLAP স্টোরে। কাঁচা ইভেন্টও রাখুন — পরে হিসাব ভুল ধরা পড়লে <b>রি-প্রসেস</b> করতে হবে (এখানেই Kafka-র লগ মডেল সোনার দাম রাখে)।",
+  trap:"দেরিতে আসা ইভেন্ট (মোবাইল অফলাইন ছিল) — watermark দিয়ে সামলান। আর টাকার হিসাব বলে এখানে ডিডুপ ও exactly-once প্রসেসিং বাধ্যতামূলক।"},
+ {n:"Distributed Cache",lvl:"কঠিন",
+  key:"নিজেই একটা Redis বানান।",
+  ins:"কনসিস্টেন্ট হ্যাশিং দিয়ে শার্ডিং (ভলিউম ২), LRU ইভিকশন, প্রতি শার্ডে রেপ্লিকা। ক্লায়েন্ট-সাইড রাউটিং করলে একটা হপ বাঁচে।",
+  trap:"হট কী — একটা কী-তে সব ট্রাফিক গেলে শার্ডিং কাজে আসে না। সমাধান: হট কী চিহ্নিত করে একাধিক নোডে প্রতিলিপি, বা ক্লায়েন্টে লোকাল ক্যাশ।"},
+ {n:"S3 / Object Store",lvl:"কঠিন",
+  key:"অসীম স্টোরেজ, ১১ নাইন ডিউরেবিলিটি।",
+  ins:"মেটাডেটা সার্ভিস আর ডেটা নোড আলাদা। ডিউরেবিলিটির জন্য <b>erasure coding</b> — ৩ কপি রাখলে ৩০০% খরচ, কিন্তু ৬+৩ erasure coding-এ ১৫০% খরচেই একই নিরাপত্তা।",
+  trap:"লিস্টিং অপারেশন — বিলিয়ন অবজেক্টের বাকেটে <code>ls</code> চালালে কী হবে? তাই প্রিফিক্স-ভিত্তিক পেজিনেশন, আর কোনো সত্যিকারের ডিরেক্টরি নেই (শুধু কী-র প্রিফিক্স)।"},
+ {n:"Payment System",lvl:"কঠিন",
+  key:"টাকা — যেখানে ভুল করার সুযোগ নেই।",
+  ins:"<b>Idempotency key</b> সবখানে। <b>Double-entry ledger</b> — প্রতিটা লেনদেন দুটো এন্ট্রি (ডেবিট ও ক্রেডিট), যোগফল সবসময় শূন্য। এতে যেকোনো সময় হিসাব মিলিয়ে দেখা যায়।",
+  trap:"বাইরের পেমেন্ট গেটওয়ে অ্যাসিঙ্ক্রোনাস ও অবিশ্বস্ত। তাই reconciliation জব প্রতিদিন চালিয়ে নিজের ও গেটওয়ের রেকর্ড মেলাতে হয় — অমিল ধরা পড়বেই, প্রশ্ন শুধু কত দ্রুত।"},
+ {n:"Metrics / Monitoring",lvl:"কঠিন",
+  key:"সব সার্ভার থেকে মেট্রিক জমা, ড্যাশবোর্ড, অ্যালার্ট।",
+  ins:"টাইম-সিরিজ ডেটাবেজ — লেখা প্রচুর, আপডেট নেই, কোয়েরি সবসময় সময়ের রেঞ্জে। পুরোনো ডেটা <b>ডাউনস্যাম্পল</b> করুন (১ সেকেন্ড → ১ মিনিট → ১ ঘণ্টা), নাহলে স্টোরেজ অসীম বাড়বে।",
+  trap:"কার্ডিনালিটি বিস্ফোরণ। ট্যাগে user_id দিলে লাখো আলাদা টাইম-সিরিজ তৈরি হবে — সিস্টেম ভেঙে পড়বে। ট্যাগে সবসময় সীমিত মানের ফিল্ড রাখুন।"}
+];
+document.getElementById("dCards").innerHTML=MORE.map((m,i)=>
+ `<div class="dcard" data-dc="${i}" ${i===0?'aria-selected="true"':''}><b>${m.n}</b><em>${m.lvl}</em></div>`).join("");
+function dR(i){
+  const m=MORE[i];
+  document.getElementById("dPanel").innerHTML=
+   `<h4>${m.n}</h4>
+    <div class="row"><b>মূল কথা</b><span>${m.key}</span></div>
+    <div class="row"><b>অন্তর্দৃষ্টি</b><span>${m.ins}</span></div>
+    <div class="row"><b>ফাঁদ</b><span>${m.trap}</span></div>`;
+  document.querySelectorAll("[data-dc]").forEach((c,j)=>c.setAttribute("aria-selected",i===j));
+}
+document.querySelectorAll("[data-dc]").forEach(c=>c.onclick=()=>dR(+c.dataset.dc));
+dR(0);
+
+/* ---------- 9 QUIZ ---------- */
+const QZ=[
+ ["URL shortener-এ ৩০১ না ৩০২ রিডাইরেক্ট, কেন?",
+  "৩০২ (temporary), যদি অ্যানালিটিক্স দরকার হয়। ৩০১ ব্রাউজার স্থায়ীভাবে ক্যাশ করে ফেলে, তাই দ্বিতীয়বার থেকে সার্ভারে রিকোয়েস্টই আসে না — লোড কমে কিন্তু ক্লিক গোনা যায় না। bit.ly-র মতো ব্যবসায় অ্যানালিটিক্সই পণ্য, তাই ৩০২।"],
+ ["সাত অক্ষরের base62 কোডে কতগুলো URL ধরে, হিসাবটা দেখান?",
+  "62⁷ ≈ ৩.৫ লক্ষ কোটি (৩.৫ trillion)। দিনে ১০ কোটি নতুন URL হলে ৩.৫×10¹²/10⁸ ≈ ৩৫,০০০ দিন ≈ ৯৫ বছর। ছয় অক্ষরে ৫,৬০০ কোটি, যা মাত্র ~১.৫ বছর — তাই ৭ অক্ষর।"],
+ ["Fixed window rate limiter-এর সীমানা সমস্যাটা ব্যাখ্যা করুন।",
+  "উইন্ডোর সীমানা স্থির বলে ৯ম সেকেন্ডে ৮টা আর ১১তম সেকেন্ডে আরও ৮টা রিকোয়েস্ট পাঠানো যায় — ২ সেকেন্ডে ১৬টা, অথচ কোনো উইন্ডোতেই ১০-এর সীমা ভাঙেনি। কার্যত সীমা দ্বিগুণ হয়ে যায়। Sliding window সবসময় “গত ১০ সেকেন্ড” দেখে বলে এই ফাঁক থাকে না।"],
+ ["Redis দিয়ে ডিস্ট্রিবিউটেড rate limiter বানালে রেস কন্ডিশন কোথায়, সমাধান কী?",
+  "GET করে কাউন্ট পড়া আর SET করে বাড়ানোর মাঝখানে অন্য রিকোয়েস্ট ঢুকে যেতে পারে, ফলে সীমা ছাড়িয়ে যায়। সমাধান: পুরো লজিক একটা Lua স্ক্রিপ্টে রাখা (Redis সেটা অ্যাটমিকভাবে চালায়), অথবা INCR + EXPIRE ব্যবহার করা যা নিজেই অ্যাটমিক।"],
+ ["Fan-out on write কোথায় ভেঙে পড়ে, আর সমাধান কী?",
+  "সেলিব্রিটিদের ক্ষেত্রে — ২ কোটি ফলোয়ার মানে একটা পোস্টে ২ কোটি লেখা, যা অসম্ভব এবং শেষ ফলোয়ার পোস্ট পাবে অনেক দেরিতে। সমাধান হাইব্রিড: সাধারণ ইউজারে পুশ, সেলিব্রিটিতে পুল — পড়ার সময় প্রি-কম্পিউটেড ফিডের সাথে সেলিব্রিটির সাম্প্রতিক পোস্ট মার্জ করা।"],
+ ["ফিডে পোস্টের পুরো কনটেন্ট না রেখে শুধু ID রাখা হয় কেন?",
+  "মেমোরি বহুগুণ কমে (কোটি কোটি ফিড লিস্ট গুণ করলে পার্থক্যটা বিশাল), আর পোস্ট এডিট বা ডিলিট হলে সব কপি খুঁজে আপডেট করতে হয় না — একটা জায়গায় বদলালেই হয়। রেন্ডারের সময় ID দিয়ে হাইড্রেট করা হয়।"],
+ ["পেজিনেশনে offset-এর বদলে cursor কেন?",
+  "দুটো কারণ। এক, OFFSET 10000 ডেটাবেজকে ১০ হাজার সারি গুনে ফেলে দিতে বাধ্য করে — গভীরে গেলে ধীর। দুই, ফিডে নতুন আইটেম যোগ হলে অফসেট সরে যায়, ফলে একই পোস্ট দুবার দেখা যায় বা কিছু বাদ পড়ে। কার্সর শেষ দেখা আইটেমের ID/টাইমস্ট্যাম্প থেকে শুরু করে, দুটো সমস্যাই মেটে।"],
+ ["চ্যাটে মেসেজের ক্রম নিশ্চিত করবেন কীভাবে, টাইমস্ট্যাম্প দিয়ে কেন নয়?",
+  "সার্ভারগুলোর ঘড়ি ঠিক মেলে না (clock skew), তাই টাইমস্ট্যাম্পে ভরসা করলে ক্রম উল্টে যেতে পারে। বদলে কথোপকথন-ভিত্তিক ক্রমবর্ধমান সিকোয়েন্স নম্বর, বা Snowflake ID (টাইমস্ট্যাম্প + মেশিন ID + কাউন্টার) — এতে ক্রম ও ইউনিকনেস দুটোই আসে।"],
+ ["চ্যাট সার্ভারে সাধারণ round-robin লোড ব্যালান্সিং চলে না কেন?",
+  "WebSocket কানেকশন স্টেটফুল — একবার সংযুক্ত হলে ঐ কানেকশনের জীবনকাল একই সার্ভারে থাকতে হবে। তাই sticky routing লাগে, আর কোন ইউজার কোন সার্ভারে আছে তার একটা রেজিস্ট্রি (Redis) রাখতে হয় যাতে অন্য সার্ভার তাকে মেসেজ পাঠাতে পারে।"],
+ ["ভিডিও আপলোডে ক্লায়েন্ট সরাসরি S3-তে পাঠায় কেন?",
+  "নাহলে টেরাবাইট ট্রাফিক অ্যাপ সার্ভারের মধ্য দিয়ে যাবে — ব্যান্ডউইথ, মেমোরি ও কানেকশন সব শেষ। সার্ভার শুধু একটা pre-signed URL দেয় (সীমিত সময়ের অনুমতি), ক্লায়েন্ট সরাসরি অবজেক্ট স্টোরে আপলোড করে, শেষে একটা ইভেন্ট ট্রিগার হয়।"],
+ ["ভিডিওর মান বেছে নেয় কে — সার্ভার না প্লেয়ার?",
+  "প্লেয়ার। ভিডিও ছোট সেগমেন্টে একাধিক মানে প্রি-এনকোড করা থাকে; প্লেয়ার manifest পড়ে, নিজের মাপা থ্রুপুট ও বাফার লেভেল দেখে প্রতিটা সেগমেন্টের জন্য আলাদাভাবে মান বাছে। তাই নেটওয়ার্ক খারাপ হলে ভিডিও ঝাপসা হয় কিন্তু থামে না।"],
+ ["Geohash-এ সীমানা সমস্যা কী, কীভাবে সামলাবেন?",
+  "দুটো জায়গা কয়েক মিটার দূরে হলেও আলাদা সেলে পড়লে তাদের হ্যাশ সম্পূর্ণ ভিন্ন হতে পারে — শুধু নিজের সেল খুঁজলে ঠিক পাশের ড্রাইভার মিস হয়ে যাবে। সমাধান: নিজের সেল + চারপাশের ৮টা, মোট ৯টা সেলে সার্চ করা।"],
+ ["১০ লাখ ড্রাইভারের লাইভ লোকেশন কোথায় রাখবেন, কেন?",
+  "ইন-মেমোরিতে (Redis geo বা কাস্টম শার্ডেড সার্ভিস), স্থায়ী ডেটাবেজে নয়। প্রতি ৪ সেকেন্ডে আপডেট মানে ~২,৫০,০০০ লেখা/সেকেন্ড, যা কোনো সাধারণ DB নেবে না — আর নেওয়ার দরকারও নেই, কারণ ৪ সেকেন্ড পুরোনো অবস্থান এমনিতেই মূল্যহীন। শুধু ট্রিপের ইতিহাস স্থায়ী স্টোরে যায়।"],
+ ["টিকিট বুকিংয়ে ডেটাবেজ লক ধরে রেখে পেমেন্ট করা যায় না কেন, বিকল্প কী?",
+  "পেমেন্টে কয়েক মিনিট লাগে; এতক্ষণ সারি লক করে রাখলে থ্রুপুট শূন্যে নামবে ও কানেকশন পুল শেষ হবে। বিকল্প: Redis-এ TTL সহ অস্থায়ী হোল্ড (SET … NX EX 600) — অ্যাটমিক দখল, কেউ ব্লক হয় না, আর পেমেন্ট ব্যর্থ হলে বা সময় শেষ হলে সিট আপনাআপনি মুক্ত।"],
+ ["একই সিস্টেমে strong আর eventual consistency দুটোই — টিকিট বুকিংয়ে উদাহরণ দিন।",
+  "সিট ম্যাপ ব্রাউজ করা eventual — কেউ ২ সেকেন্ড পুরোনো “উপলব্ধ” দেখে ক্লিক করে ব্যর্থ হলে ক্ষতি নেই, বদলে ভারী ক্যাশিং ও রেপ্লিকা থেকে সার্ভ করা যায়। কিন্তু চূড়ান্ত বুকিং অবশ্যই strong — একটা সিট ঠিক একজনের। এই বিভাজন করতে পারাই ৯৫% ট্রাফিককে ক্রিটিক্যাল পথ থেকে সরিয়ে রাখে।"],
+ ["Web crawler-এ কোন URL আগে দেখা হয়েছে সেটা মনে রাখবেন কীভাবে?",
+  "বিলিয়ন URL-এর সেট মেমোরিতে রাখা যায় না, প্রতিবার ডেটাবেজে খোঁজা খুব ধীর। তাই Bloom filter — সামান্য মেমোরিতে “নিশ্চিতভাবে দেখিনি” বা “হয়তো দেখেছি” বলতে পারে। false positive-এ কিছু পেজ বাদ পড়ে, যা বিলিয়ন পেজের ক্ষেত্রে গ্রহণযোগ্য।"],
+ ["Autocomplete-এ প্রতিটা Trie নোডে শীর্ষ ৫টা সাজেশন আগেই রেখে দেওয়া হয় কেন?",
+  "নাহলে প্রতিটা কীস্ট্রোকে প্রিফিক্সের নিচের পুরো সাবট্রি ঘুরে শীর্ষ ৫ বের করতে হবে — ১০০ ms-এর বাজেটে অসম্ভব। প্রি-কম্পিউট করলে লুকআপ হয়ে যায় শুধু প্রিফিক্স পর্যন্ত নেমে সরাসরি উত্তর পড়া। এটা read গতির জন্য বাড়তি মেমোরি ও অফলাইন বিল্ডের বিনিময়।"]
+];
+document.getElementById("quiz").innerHTML=QZ.map(([q,a],i)=>
+ `<div class="q"><button onclick="this.parentNode.classList.toggle('open')">
+  <i>${bn(String(i+1).padStart(2,"0"))}</i><span>${q}</span></button>
+  <div class="a">${a}</div></div>`).join("");
+</script>
+</body>
+</html>
